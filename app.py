@@ -1,13 +1,24 @@
 #!/usr/bin/python3
 import discord
 import asyncio
+import logging
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 client = discord.Client()
 
 #Strings
 bot_ver = '1.0.0'
 
-source_repo = 'https://github.com/LunaNyan/Luna_Libertin_Discord_Bot'
+help_source = 'https://github.com/LunaNyan/Luna_Libertin_Discord_Bot\n'
+help_source+= '```This code can be used under MIT License.\n'
+help_source+= 'type `~license` to view license announcement.\n'
+help_source+= 'and also feel free to fork or creating issue.```'
+
 bot_invite_url = 'https://discordapp.com/oauth2/authorize?client_id=502305122404007956&scope=bot'
 
 #일체형으로 작성해야 하기에 라이센스 전문을 하드코딩합니다
@@ -29,22 +40,24 @@ license+= 'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI
 license+= 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n'
 license+= 'SOFTWARE.```'
 
-help = '테스트 중'
+help = '```~repo : show repository to this project\n'
+help+= '~license : show MIT license announcement\n'
+help+= '~help : show this help```'
 
 @client.event
 async def on_ready():
     print('name : ' + client.user.name)
     print('id   : ' + client.user.id)
+    await client.change_presence(game=discord.Game(name='testing'))
 
 @client.event
 async def on_message(message):
-    print(message.content)
     if message.content.startswith('~help'):
         await client.send_message(message.channel, help)
     elif message.content.startswith('~license'):
         await client.send_message(message.channel, license)
     elif message.content.startswith('~repo'):
-        await client.send_message(message.channel, source_repo)
+        await client.send_message(message.channel, help_source)
 
 # 토큰은 여기다 싸질러주세요
 client.run('')
