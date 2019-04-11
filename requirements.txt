@@ -1,3 +1,8 @@
 asyncio
 discord
 logging
+os
+random
+datetime
+psutil
+

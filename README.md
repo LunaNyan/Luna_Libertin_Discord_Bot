@@ -1,12 +1,4 @@
-# [Invite](https://discordapp.com/oauth2/authorize?client_id=502305122404007956&scope=bot)
+# 기계식 루냥이 : 제 서버 전용 개인봇
 
-## TODO
-- [ ] 새 서버 장만하기
-
-## 사용 방법
-- ~help : 도움말 표시
-- ~license : MIT 라이센스 전문 표시
-- ~repo : 소스 레포 URL 표시
-
-## 기타
-Luna Libertin : 제 오너캐 풀네임
+## 어떻게 쓸 수 있나요
+[제 서버](https://discord.gg/jW7yfZ2)에 오세요
