@@ -1,0 +1,6 @@
+[config]
+owner_id = (owner id here)
+bot_token = (bot token here)
+
+[user_point]
+
