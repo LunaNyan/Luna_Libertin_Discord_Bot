@@ -9,6 +9,7 @@ import datetime
 from datetime import date
 import time
 import psutil
+import configparser
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
@@ -17,7 +18,12 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 #Strings
-bot_ver = '1.5.6'
+bot_ver = '1.6.0'
+
+db_path = "luna_config.txt"
+
+db = configparser.ConfigParser()
+db.read(db_path)
 
 #해당 기능은 봇 재부팅 시 재설정이 필요함
 doing = ""
@@ -44,6 +50,15 @@ async def on_ready():
 async def on_message(message):
     global doing_enabled
     global doing
+    if message.author.id == '(bot ID here)':
+        temp_point = 0
+    else:
+        try:
+            temp_point = int(db.get("user_point", str(message.author.id)))
+            temp_point = temp_point + 10
+            db.set("user_point", str(message.author.id), str(temp_point))
+        except:
+            db.set("user_point", str(message.author.id), "10")
     if message.content.startswith('루냥아 도와줘'):
         await client.send_message(message.channel, "#기계식루냥이_사용법 ㄱ")
     elif message.content.startswith('루냥이 따먹을래'):
@@ -51,14 +66,14 @@ async def on_message(message):
     elif message.content.startswith('루냥이 섹스하자'):
         await client.send_message(message.channel, "꼬추 존나작네 안함 ㅅㄱㄹ")
     elif message.content.startswith('luna admin execute '):
-        if message.author.id =='(Owner ID here)':
+        if message.author.id =='(owner ID here)':
             shl_str = message.content
             shl_str = shl_str.replace('luna admin execute ','')
             await client.send_message(message.channel, "```" + str(os.popen(shl_str).read()) + "```")
         else:
             await client.send_message(message.channel, ":thinking:")
     elif message.content.startswith('luna admin presence change '):
-        if message.author.id =='(Owner ID here)':
+        if message.author.id =='(owner ID here)':
             doing_enabled = 1
             doing_sanitize = message.content
             doing_sanitize = doing_sanitize.replace('luna admin presence change ', '')
@@ -67,7 +82,7 @@ async def on_message(message):
         else:
             await client.send_message(message.channel, ":thinking:")
     elif message.content.startswith('luna admin presence disable'):
-        if message.author.id =='(Owner ID here)':
+        if message.author.id =='(owner ID here)':
             doing_enabled = 0
             await client.send_message(message.channel, ":ok_hand:")
         else:
@@ -155,7 +170,7 @@ async def on_message(message):
                      "배고프면 뭘 먹어도 맛있음 ㅇㅇ"]
         await client.send_message(message.channel, random.choice(lf_string))
     elif message.content.startswith('루냥이 귀여워'):
-        if message.author.id =='(Owner ID here)':
+        if message.author.id =='(owner ID here)':
             await client.send_message(message.channel, '**process check**\n444d : ' + str(checkIfProcessRunning('444d.sh')) + '\nhauzen : ' + str(checkIfProcessRunning('444d2.sh')))
         else:
             lc_string = ["그쵸 루냥이 진짜 너무 귀여워요 ㅠㅜ",
@@ -165,5 +180,10 @@ async def on_message(message):
                          "아웅 어뜩행 ㅠㅜ 너무 귀여워 ㅠㅜ",
                          "루냥이 너무 귀여워! :heart_eyes:"]
             await client.send_message(message.channel, random.choice(lc_string))
+    elif message.content.startswith('루냥아 내포인트'):
+        temp_point = db.get("user_point", str(message.author.id))
+        await client.send_message(message.channel, str(temp_point) + " 점입니다")
+    with open(db_path, 'w') as configfile:
+        db.write(configfile)
 
-client.run('?_?')
+client.run('(bot token here)')
