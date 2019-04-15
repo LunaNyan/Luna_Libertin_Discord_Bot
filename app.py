@@ -18,7 +18,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 #Strings
-bot_ver = '1.6.1'
+bot_ver = '1.6.2'
 
 db_path = "luna_config.txt"
 
@@ -52,7 +52,7 @@ async def on_message(message):
     global doing
     try:
         temp_point = int(db.get("user_point", str(message.author.id)))
-        temp_point = temp_point + 10
+        temp_point = temp_point + int(db.get("config", "point_increment"))
         db.set("user_point", str(message.author.id), str(temp_point))
     except:
         db.set("user_point", str(message.author.id), "10")
@@ -180,6 +180,17 @@ async def on_message(message):
     elif message.content.startswith('루냥아 내포인트'):
         temp_point = db.get("user_point", str(message.author.id))
         await client.send_message(message.channel, str(temp_point) + " 점입니다")
+    elif message.content.startswith('와! 샌즈!'):
+        sans = ["언더테일 아시는구나! 혹시 모르시는분들에 대해 설명해드립니다 샌즈랑 언더테일의 세가지 엔딩루트중 몰살엔딩의 최종보스로서 진.짜.겁.나.어.렵.습.니.다 공격은 전부다 회피하고 만피가 92인데 샌즈의 공격은 1초당 60이 다는데다가 독뎀까지 추가로 붙어있습니다.. 하지만 이러면 절대로 게임을 깰 수 가 없으니 제작진이 치명적인 약점을 만들었죠. 샌즈의 치명적인 약점이 바로 지친다는것입니다. 패턴들을 다 견디고나면 지쳐서 자신의 턴을 유지한채로 잠에듭니다. 하지만 잠이들었을때 창을옮겨서 공격을 시도하고 샌즈는 1차공격은 피하지만 그 후에 바로날아오는 2차 공격을 맞고 죽습니다.",
+                "와!",
+                "와 샌즈!",
+                "와 파피루스!",
+                "와 언더테일!",
+                "WA!",
+                "WA SANS!",
+                "WA PAPYRUS!",
+                "WA UNDERTALE!"]
+        await client.send_message(message.channel, random.choice(sans))
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 

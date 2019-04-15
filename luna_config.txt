@@ -1,6 +1,7 @@
 [config]
 owner_id = (owner id here)
 bot_token = (bot token here)
+point_increment = 10
 
 [user_point]
 
