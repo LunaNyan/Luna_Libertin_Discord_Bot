@@ -18,7 +18,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 #Strings
-bot_ver = '1.6.2'
+bot_ver = '1.6.3'
 
 db_path = "luna_config.txt"
 
@@ -85,9 +85,9 @@ async def on_message(message):
         else:
             await client.send_message(message.channel, ":thinking:")
     elif message.content.startswith('루냥아 무슨담배 피니'):
-        await client.send_message(message.channel, "에쎄 체인지 업\n인데요 갈수록 맛대가리가 병신되어가고있네여 비추천")
+        await client.send_message(message.channel, str(db.get("personal", "cigarette")))
     elif message.content.startswith('루냥아 무슨맥주 좋아하니'):
-        await client.send_message(message.channel, "버지 미스터")
+        await client.send_message(message.channel, str(db.get("personal", "beer")))
     elif message.content.startswith('루냥아 뭐하니'):
         global doing_enabled
         global doing
@@ -169,14 +169,13 @@ async def on_message(message):
     elif message.content.startswith('루냥이 귀여워'):
         if message.author.id == str(db.get("config", "owner_id")):
             await client.send_message(message.channel, '**process check**\n444d : ' + str(checkIfProcessRunning('444d.sh')) + '\nhauzen : ' + str(checkIfProcessRunning('444d2.sh')))
-        else:
-            lc_string = ["그쵸 루냥이 진짜 너무 귀여워요 ㅠㅜ",
-                         "아웅 루냥이 너무 큐트뽀쟉해 지구뿌셔ㅠㅠㅜ",
-                         "저 루냥이 꼬리 잡아당겨본 적 있는데 그때 진짜 심장멎을뻔했어요ㅠㅠ:heart_eyes:",
-                         "루냥이 쓰다듬다가 좋아하는 표정 보고 심쿵:heart_eyes: 골골송 하는것도 너무 큐트해ㅠㅜ",
-                         "아웅 어뜩행 ㅠㅜ 너무 귀여워 ㅠㅜ",
-                         "루냥이 너무 귀여워! :heart_eyes:"]
-            await client.send_message(message.channel, random.choice(lc_string))
+        lc_string = ["그쵸 루냥이 진짜 너무 귀여워요 ㅠㅜ",
+                     "아웅 루냥이 너무 큐트뽀쟉해 지구뿌셔ㅠㅠㅜ",
+                     "저 루냥이 꼬리 잡아당겨본 적 있는데 그때 진짜 심장멎을뻔했어요ㅠㅠ:heart_eyes:",
+                     "루냥이 쓰다듬다가 좋아하는 표정 보고 심쿵:heart_eyes: 골골송 하는것도 너무 큐트해ㅠㅜ",
+                     "아웅 어뜩행 ㅠㅜ 너무 귀여워 ㅠㅜ",
+                     "루냥이 너무 귀여워! :heart_eyes:"]
+        await client.send_message(message.channel, random.choice(lc_string))
     elif message.content.startswith('루냥아 내포인트'):
         temp_point = db.get("user_point", str(message.author.id))
         await client.send_message(message.channel, str(temp_point) + " 점입니다")
@@ -191,6 +190,12 @@ async def on_message(message):
                 "WA PAPYRUS!",
                 "WA UNDERTALE!"]
         await client.send_message(message.channel, random.choice(sans))
+    elif message.content.startswith('루냥이 쓰담쓰담'):
+        pat =  [">_<~ :two_hearts:",
+                "냐앙~ :heart_eyes: :two_hearts:",
+                "하우우..:blush:",
+                "하앙~(꼬리펑"]
+        await client.send_message(message.channel, random.choice(pat))
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 

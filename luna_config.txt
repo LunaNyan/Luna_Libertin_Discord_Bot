@@ -3,5 +3,9 @@ owner_id = (owner id here)
 bot_token = (bot token here)
 point_increment = 10
 
+[personal]
+cigarette = 디스 아프리카 이이스 잭
+beer = 테라 or 버지 미스터
+
 [user_point]
 
