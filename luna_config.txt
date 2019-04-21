@@ -1,11 +1,9 @@
 [config]
-owner_id = (owner id here)
-bot_token = (bot token here)
+owner_id = 
+server_id = 
+bot_token = 
 point_increment = 10
-
-[personal]
-cigarette = 디스 아프리카 이이스 잭
-beer = 테라 or 버지 미스터
+isthisbottesting = 0
 
 [user_point]
 

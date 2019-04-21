@@ -1,1 +1,5 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
 luna_config.txt
