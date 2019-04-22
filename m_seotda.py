@@ -15,8 +15,14 @@ result_str_cpu = ""
 xa = 0
 xb = 0
 
+xaa = 0
+xbb = 0
+
 ya = 0
 yb = 0
+
+yaa = 0
+ybb = 0
 
 def seotda_calc(a, b):
     global result_str
@@ -89,17 +95,25 @@ def seotda_calc(a, b):
 def seotda_player(aa, bb):
     global xa
     global xb
+    global xaa
+    global xbb
     global deck
-    xa = deck[aa]
-    xb = deck[bb]
-    return seotda_calc(xa, xb)
+    xa = aa
+    xb = bb
+    xaa = deck[aa]
+    xbb = deck[bb]
+    return seotda_calc(xaa, xbb)
 
 def seotda_cpu():
     global deck
+    global ya
+    global yb
+    global yaa
+    global ybb
     while 1 == 1:
         ya = randint(0, 9)
         yb = randint(0, 9)
-        if ya == yb or ya == xa or ya == xb or yb == xa or yb == xb:
+        if ya == yb or ya == xaa or ya == xbb or yb == xaa or yb == xbb:
             continue
         else:
             yaa = deck[ya]
@@ -125,26 +139,59 @@ def seotda_init(message_content):
         x = int(x)
         y = int(y)
         if x == y:
-            return "같은 카드를 두장 고를 수 없습니다"
+            return "e_duplicated"
         elif x < 0 or y < 0 or x > 9 or y > 9:
-            return "0에서 9까지의 숫자를 골라주세요"
+            return "e_outofrange"
         else:
-            seotda_ready()
-            power_player = seotda_player(x, y)
-            result_str_player = result_str
-            power_cpu = seotda_cpu()
-            result_str_cpu = result_str
-            if power_player == power_cpu:
-                return "비겼습니다!"
-            elif power_player > power_cpu:
-                return "승리!"
-            elif power_player < power_cpu:
-                return "패배!"
+            while 1 == 1:
+                seotda_ready()
+                power_player = seotda_player(x, y)
+                result_str_player = result_str
+                power_cpu = seotda_cpu()
+                result_str_cpu = result_str
+                if power_cpu - power_player >= 10:
+                    continue
+                elif power_player == power_cpu:
+                    return "비겼습니다!"
+                    break
+                elif power_player > power_cpu:
+                    if power_player - power_cpu == 1:
+                        return "한 끗 차이로 승리!"
+                    else:
+                        return "승리!"
+                    break
+                elif power_player < power_cpu:
+                    if power_cpu - power_player == 1:
+                        return "한 끗 차이로 패배!"
+                    else:
+                        return "패배!"
+                    break
     except ValueError:
-        return "숫자를 입력해주세요"
+        return "e_value"
 
 def ret_player():
     return result_str_player
 
 def ret_cpu():
     return result_str_cpu
+
+def ret_deck():
+    d0 = "```패 목록\n"
+    d2 = 0
+    for d1 in deck:
+        d0 = d0 + str(d2) + "번 패 : " + str(d1) + "월\n"
+        d2 = d2 + 1
+    d0 = d0 + "```"
+    return d0
+
+def ret_cpu_selection():
+    return str(ya) + ", " + str(yb)
+
+def ret_cpu_card():
+    return str(yaa) + "월, " + str(ybb) + "월"
+
+def ret_player_selection():
+    return str(xa) + ", " + str(xb)
+
+def ret_player_card():
+    return str(xaa) + "월, " + str(xbb) + "월"

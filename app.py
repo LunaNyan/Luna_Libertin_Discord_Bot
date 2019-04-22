@@ -8,7 +8,7 @@ import configparser
 
 import m_etc, m_lifetime, m_food
 from m_rps import rps_run
-from m_seotda import seotda_init, ret_player, ret_cpu
+from m_seotda import *
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
@@ -16,7 +16,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.0-t01"
+bot_ver = "1.7.2"
 
 db_path = "luna_config.txt"
 
@@ -98,9 +98,22 @@ async def on_message(message):
             await client.send_message(message.channel, rps_run(message.content))
         elif message.content.startswith(test_glyph + '루냥아 섯다 '):
             result = seotda_init(message.content)
-            result_player = ret_player()
-            result_cpu = ret_cpu()
-            await client.send_message(message.channel, result_player + " VS " + result_cpu + " : " + result)
+            if result == "e_duplicated":
+                await client.send_message(message.channel, ":thinking: 같은 카드를 중복해서 고를 수 없습니다")
+            elif result == "e_outofrange":
+                await client.send_message(message.channel, ":thinking: 0에서 9까지의 숫자를 입력해주세요")
+            elif result == "e_value":
+                await client.send_message(message.channel, ":thinking: 잘못된 입력입니다")
+            else:
+                result_player = ret_player()
+                result_cpu = ret_cpu()
+                await client.send_message(message.channel, ret_player_selection() + " (" + ret_player_card() + ")을 골랐습니다")
+                await client.send_message(message.channel, "상대방 패 : " + ret_cpu_selection() + " (" + ret_cpu_card() + ")")
+                await client.send_message(message.channel, result_player + " VS " + result_cpu + " : **" + result + "**\n" + ret_deck())
+        elif message.content.startswith(test_glyph + '루냥아 UUID'):
+            await client.send_message(message.channel, str(os.popen("uuidgen -r").read()))
+        elif message.content.startswith(test_glyph + '루냥아 현재시각'):
+            await client.send_message(message.channel, str(os.popen("date -Iseconds").read()))
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
