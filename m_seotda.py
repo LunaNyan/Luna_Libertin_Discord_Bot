@@ -113,7 +113,7 @@ def seotda_cpu():
     while 1 == 1:
         ya = randint(0, 9)
         yb = randint(0, 9)
-        if ya == yb or ya == xaa or ya == xbb or yb == xaa or yb == xbb:
+        if ya == yb or ya == xa or ya == xb or yb == xa or yb == xb:
             continue
         else:
             yaa = deck[ya]
@@ -149,7 +149,7 @@ def seotda_init(message_content):
                 result_str_player = result_str
                 power_cpu = seotda_cpu()
                 result_str_cpu = result_str
-                if power_cpu - power_player >= 10:
+                if power_cpu - power_player >= 7:
                     continue
                 elif power_player == power_cpu:
                     return "비겼습니다!"

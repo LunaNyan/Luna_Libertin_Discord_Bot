@@ -1,6 +1,8 @@
 [config]
 owner_id = 
 server_id = 
+alert_channel_id = 
+log_channel_id = 
 bot_token = 
 point_increment = 10
 isthisbottesting = 0

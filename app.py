@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import re
+import traceback
 import discord
 import asyncio
 import logging
@@ -6,9 +8,10 @@ import os
 import random
 import configparser
 
-import m_etc, m_lifetime, m_food
+import m_lifetime, m_food
 from m_rps import rps_run
 from m_seotda import *
+from m_etc import *
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
@@ -16,7 +19,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.2"
+bot_ver = "1.7.3"
 
 db_path = "luna_config.txt"
 
@@ -43,6 +46,8 @@ async def on_message(message):
     global precense_enabled
     global precense
     global test_glyph
+    if message.author == client.user:
+        return
     if message.server.id == db.get("config", "server_id"):
         try:
             temp_point = int(db.get("user_point", str(message.author.id)))
@@ -50,24 +55,28 @@ async def on_message(message):
             db.set("user_point", str(message.author.id), str(temp_point))
         except:
             db.set("user_point", str(message.author.id), "0")
+        hatespeech = re.compile('(메[0-9]*[갤갈]|[김씹]치[남녀]|한남충?|[남여]혐|워마드|빻[남녀]|피싸개|[빻애]니프사|피싸개|[트꼴]페미|재기|추하[네다죠]|[부통자]들[부통자]들|네덕|비틱|네다[찐씹]|[조좆]팔).*')
+        hs_match = hatespeech.match(message.content)
+        if hs_match:
+            await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), "possible hate speech found at " + message.channel.name + "\n" + message.author.display_name + " : " + message.content)
         if message.content.startswith(test_glyph + '루냥아 도와줘'):
             await client.send_message(message.channel, "#기계식루냥이_사용법 ㄱ")
-        elif message.content.startswith(test_glyph + 'luna admin execute '):
+        elif message.content.startswith(test_glyph + '루냥아 실행해줘 '):
             if message.author.id == str(db.get("config", "owner_id")):
                 shl_str = message.content
-                shl_str = shl_str.replace(test_glyph + 'luna admin execute ','')
+                shl_str = shl_str.replace(test_glyph + '루냥아 실행해줘 ','')
                 await client.send_message(message.channel, "```" + str(os.popen(shl_str).read()) + "```")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + 'luna admin presence change '):
+        elif message.content.startswith(test_glyph + '루냥아 precense '):
             if message.author.id == str(db.get("config", "onwer_id")):
                 precense_sanitize = message.content
-                precense_sanitize = precense_sanitize.replace(test_glyph + 'luna admin presence change ', '')
+                precense_sanitize = precense_sanitize.replace(test_glyph + '루냥아 precense ', '')
                 precense = precense_sanitize
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + 'luna admin presence disable'):
+        elif message.content.startswith(test_glyph + '루냥아 presence --disable'):
             if message.author.id == str(db.get("config", "owner_id")):
                 precense = ""
                 await client.send_message(message.channel, ":ok_hand:")
@@ -114,9 +123,25 @@ async def on_message(message):
             await client.send_message(message.channel, str(os.popen("uuidgen -r").read()))
         elif message.content.startswith(test_glyph + '루냥아 현재시각'):
             await client.send_message(message.channel, str(os.popen("date -Iseconds").read()))
+        elif message.content.startswith(test_glyph + '루냥아 확성기 '):
+            say_str = message.content
+            say_str = say_str.replace(test_glyph + '루냥아 확성기 ','')
+            say_mention = message.author.display_name
+            say_channel = message.channel.name
+            await client.delete_message(message)
+            await client.send_message(message.channel, say_str)
+            await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "used sayd : " + say_mention + " : " + say_str + "\nat : " + say_channel)
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
         await client.send_message(message.channel, "**STOP!**\n\nRunning this bot out of owner's server is prohibited.\n**PLEASE KICK ME.**\n\nIf you can understand what are you doing, you can pork my source repository!\nhttps://github.com/LunaNyan/Luna_Libertin_Discord_Bot")
+
+@client.event
+async def on_message_delete(message):
+    await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "message removed from " + message.author.display_name + " at " + message.channel.name + "\n" + message.content)
+
+@client.event
+async def on_message_edit(before, after):
+    await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "message edited from " + before.author.display_name + " at " + before.channel.name + "\nbefore : " + before.content + "\nafter : " + after.content)
 
 client.run(db.get("config", "bot_token"))
