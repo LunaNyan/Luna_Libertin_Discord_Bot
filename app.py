@@ -55,7 +55,7 @@ async def on_message(message):
             db.set("user_point", str(message.author.id), str(temp_point))
         except:
             db.set("user_point", str(message.author.id), "0")
-        hatespeech = re.compile('(메[0-9]*[갤갈]|[김씹]치[남녀]|한남충?|[남여]혐|워마드|빻[남녀]|피싸개|[빻애]니프사|피싸개|[트꼴]페미|재기|추하[네다죠]|[부통자]들[부통자]들|네덕|비틱|네다[찐씹]|[조좆]팔).*')
+        hatespeech = re.compile(db.get("string", "hatespeech"))
         hs_match = hatespeech.match(message.content)
         if hs_match:
             await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), "possible hate speech found at " + message.channel.name + "\n" + message.author.display_name + " : " + message.content)
