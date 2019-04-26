@@ -19,7 +19,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.3a"
+bot_ver = "1.7.4"
 
 db_path = "luna_config.txt"
 
@@ -131,6 +131,10 @@ async def on_message(message):
             await client.delete_message(message)
             await client.send_message(message.channel, say_str)
             await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "used sayd : " + say_mention + " : " + say_str + "\nat : " + say_channel)
+        elif message.content.startswith(test_glyph + "루냥아 계산해줘 "):
+            bc_str = message.content
+            bc_str = bc_str.replace("루냥아 계산해줘 ","")
+            await client.send_message(message.channel, str(os.popen("echo " + bc_str + " | bc -q").read()))
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
