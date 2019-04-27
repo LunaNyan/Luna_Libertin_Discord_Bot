@@ -136,6 +136,8 @@ async def on_message(message):
             bc_str = message.content
             bc_str = bc_str.replace("루냥아 계산해줘 ","")
             await client.send_message(message.channel, str(os.popen("echo " + bc_str + " | bc -q").read()))
+        elif message.content.startswith(test_glyph + '루냥아 초대코드'):
+            await client.send_message(message.channel, str(db.get("string", "invite_code")))
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
