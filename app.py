@@ -2,6 +2,7 @@
 import re
 import traceback
 import discord
+import datetime
 import asyncio
 import logging
 import os
@@ -19,7 +20,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.4"
+bot_ver = "1.7.4a"
 
 db_path = "luna_config.txt"
 
@@ -58,7 +59,7 @@ async def on_message(message):
         hatespeech = re.compile(db.get("string", "hatespeech"))
         hs_match = hatespeech.match(message.content)
         if hs_match:
-            await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), "possible hate speech found at " + message.channel.name + "\n" + message.author.display_name + " : " + message.content)
+            await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), "possible hate speech found at " + message.channel.name + "\n" + message.author.display_name + " : " + message.content + "\nat : " + str(datetime.datetime.now()))
         if message.content.startswith(test_glyph + '루냥아 도와줘'):
             await client.send_message(message.channel, "#기계식루냥이_사용법 ㄱ")
         elif message.content.startswith(test_glyph + '루냥아 실행해줘 '):
@@ -142,10 +143,10 @@ async def on_message(message):
 
 @client.event
 async def on_message_delete(message):
-    await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "message removed from " + message.author.display_name + " at " + message.channel.name + "\n" + message.content)
+    await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "message removed from " + message.author.display_name + " at " + message.channel.name + "\n" + message.content + "\nat : " + str(datetime.datetime.now()))
 
 @client.event
 async def on_message_edit(before, after):
-    await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "message edited from " + before.author.display_name + " at " + before.channel.name + "\nbefore : " + before.content + "\nafter : " + after.content)
+    await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "message edited from " + before.author.display_name + " at " + before.channel.name + "\nbefore : " + before.content + "\nafter : " + after.content + "\nat : " + str(datetime.datetime.now()))
 
 client.run(db.get("config", "bot_token"))
