@@ -12,6 +12,7 @@ import configparser
 import m_lifetime, m_food
 from m_rps import rps_run
 from m_seotda import *
+from m_wolframalpha import wa_calc
 from m_etc import *
 
 logger = logging.getLogger('discord')
@@ -20,7 +21,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.4a"
+bot_ver = "1.7.5"
 
 db_path = "luna_config.txt"
 
@@ -86,13 +87,7 @@ async def on_message(message):
         elif message.content.startswith(test_glyph + '루냥아 뭐하니'):
             await client.send_message(message.channel, return_lifetime(precense))
         elif message.content.startswith(test_glyph + '루냥이 실력 어느정도니'):
-            lg_string = ["옵치 딜힐위주 골드정도",
-                         "이지투 5키온리 14 조무사",
-                         "이지투 5키스탠 쌍오토걸고 15 조무사",
-                         "펌프 DR걸고 11렙 깸",
-                         "테트리스 쌉고수임",
-                         "사볼안해요 꺼지셈"]
-            await client.send_message(message.channel, random.choice(lg_string) + "\n떡치기 실력을 기대하셨습니까? 그런거 없습니다 ㅅㄱ")
+            await client.send_message(message.channel, lg_ret())
         elif message.content.startswith(test_glyph + '루냥아 배고파'):
             await client.send_message(message.channel, return_food())
         elif message.content.startswith(test_glyph + '루냥이 귀여워'):
@@ -133,11 +128,21 @@ async def on_message(message):
             await client.send_message(message.channel, say_str)
             await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "used sayd : " + say_mention + " : " + say_str + "\nat : " + say_channel)
         elif message.content.startswith(test_glyph + "루냥아 계산해줘 "):
-            bc_str = message.content
-            bc_str = bc_str.replace("루냥아 계산해줘 ","")
-            await client.send_message(message.channel, str(os.popen("echo " + bc_str + " | bc -q").read()))
+            try:
+                bc_str = message.content
+                bc_str = bc_str.replace("루냥아 계산해줘 ","")
+                if bc_str == "":
+                    await client.send_message(message.channel, "연산식을 입력해주세요")
+                elif bc_str == "1+1":
+                    await client.send_message(message.channel, "귀요미! 난 귀요미! :two_hearts:")
+                else:
+                    await client.send_message(message.channel, wa_calc(bc_str))
+            except:
+                await client.send_message(message.channel, "연산식을 다시 확인해주세요")
         elif message.content.startswith(test_glyph + '루냥아 초대코드'):
+            bc_tmp = await client.send_message(message.channel, "잠시만 기다려주세요!")
             await client.send_message(message.channel, str(db.get("string", "invite_code")))
+            await client.delete_message(bc_tmp)
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
