@@ -4,8 +4,7 @@ import configparser
 conf = configparser.ConfigParser()
 conf.read("luna_config.txt")
 
-appid = conf.get("wolframalpha", "appid")
-client = wolframalpha.Client(appid)
+client = wolframalpha.Client(conf.get("wolframalpha", "appid"))
 
 def wa_calc(query):
     res = client.query(query)

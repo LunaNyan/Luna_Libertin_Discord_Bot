@@ -136,13 +136,13 @@ async def on_message(message):
                 elif bc_str == "1+1":
                     await client.send_message(message.channel, "귀요미! 난 귀요미! :two_hearts:")
                 else:
+                    bc_tmp = await client.send_message(message.channel, "잠시만 기다려주세요!"
                     await client.send_message(message.channel, wa_calc(bc_str))
+                    await client.delete_message(bc_tmp)
             except:
                 await client.send_message(message.channel, "연산식을 다시 확인해주세요")
         elif message.content.startswith(test_glyph + '루냥아 초대코드'):
-            bc_tmp = await client.send_message(message.channel, "잠시만 기다려주세요!")
             await client.send_message(message.channel, str(db.get("string", "invite_code")))
-            await client.delete_message(bc_tmp)
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
