@@ -1,15 +1,5 @@
 #!/usr/bin/python3
-import re
-import traceback
-import discord
-import datetime
-import asyncio
-import logging
-import os
-import random
-import configparser
-
-import m_lifetime, m_food
+import re, traceback, discord, datetime, asyncio, logging, os, random, configparser, m_lifetime, m_food, m_ez2ac
 from m_rps import rps_run
 from m_seotda import *
 from m_wolframalpha import wa_calc
@@ -21,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.5"
+bot_ver = "1.7.6"
 
 db_path = "luna_config.txt"
 
@@ -49,6 +39,8 @@ async def on_message(message):
     global precense
     global test_glyph
     if message.author == client.user:
+        return
+    elif message.author.bot:
         return
     if message.server.id == db.get("config", "server_id"):
         try:
@@ -136,13 +128,15 @@ async def on_message(message):
                 elif bc_str == "1+1":
                     await client.send_message(message.channel, "귀요미! 난 귀요미! :two_hearts:")
                 else:
-                    bc_tmp = await client.send_message(message.channel, "잠시만 기다려주세요!"
+                    bc_tmp = await client.send_message(message.channel, "잠시만 기다려주세요!")
                     await client.send_message(message.channel, wa_calc(bc_str))
                     await client.delete_message(bc_tmp)
             except:
                 await client.send_message(message.channel, "연산식을 다시 확인해주세요")
         elif message.content.startswith(test_glyph + '루냥아 초대코드'):
             await client.send_message(message.channel, str(db.get("string", "invite_code")))
+        elif message.content.startswith(test_glyph + '루냥아 갓곡알려줘'):
+            await client.send_message(message.channel, m_ez2ac.ez2ac_song_select())
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
@@ -150,10 +144,18 @@ async def on_message(message):
 
 @client.event
 async def on_message_delete(message):
+    if message.author == client.user:
+        return
+    elif message.author.bot:
+        return
     await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "message removed from " + message.author.display_name + " at " + message.channel.name + "\n" + message.content + "\nat : " + str(datetime.datetime.now()))
 
 @client.event
 async def on_message_edit(before, after):
+    if before.author == client.user:
+        return
+    elif before.author.bot:
+        return
     await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "message edited from " + before.author.display_name + " at " + before.channel.name + "\nbefore : " + before.content + "\nafter : " + after.content + "\nat : " + str(datetime.datetime.now()))
 
 client.run(db.get("config", "bot_token"))
