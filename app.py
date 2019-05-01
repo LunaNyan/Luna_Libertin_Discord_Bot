@@ -77,7 +77,7 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, ":thinking:")
         elif message.content.startswith(test_glyph + '루냥아 뭐하니'):
-            await client.send_message(message.channel, return_lifetime(precense))
+            await client.send_message(message.channel, m_lifetime.return_lifetime(precense))
         elif message.content.startswith(test_glyph + '루냥이 실력 어느정도니'):
             await client.send_message(message.channel, lg_ret())
         elif message.content.startswith(test_glyph + '루냥아 배고파'):
