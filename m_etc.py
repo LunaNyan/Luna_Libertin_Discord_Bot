@@ -33,3 +33,12 @@ def pat():
                 "하우우..:blush:",
                 "하앙~(꼬리펑"]
     return random.choice(pat_str)
+
+def lg_ret():
+    lg_str = ["옵치 딜힐위주 골드정도",
+              "이지투 5키온리 14 조무사",
+              "이지투 5키스탠 쌍오토걸고 15 깸",
+              "펌프 DR걸고 11렙 깸",
+              "테트리스 쌉고수임",
+              "사볼안해요 꺼지셈"]
+    return random.choice(lg_str)

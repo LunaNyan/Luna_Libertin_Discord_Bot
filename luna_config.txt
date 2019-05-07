@@ -16,3 +16,5 @@ invite_code =
 
 [user_point]
 
+[user_mute]
+

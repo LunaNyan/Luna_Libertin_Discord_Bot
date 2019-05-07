@@ -70,7 +70,7 @@ def seotda_calc(a, b):
         xcuta = str(a + b)[-1]
         xcut = int(xcuta)
         if xcut == 9:
-            result_str = "갑오"
+            result_str = "갑오(아홉끗)"
         elif xcut == 8:
             result_str = "여덟끗"
         elif xcut == 7:
@@ -88,7 +88,7 @@ def seotda_calc(a, b):
         elif xcut == 1:
             result_str = "한끗"
         elif xcut == 0:
-            result_str = "망통"
+            result_str = "망통(영끗)"
         sd_power = xcut
     return sd_power
 

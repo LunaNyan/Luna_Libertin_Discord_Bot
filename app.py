@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import re, traceback, discord, datetime, asyncio, logging, os, random, configparser, m_lifetime, m_food, m_ez2ac
+import re, traceback, discord, datetime, asyncio, logging, os, random, configparser, m_lifetime, m_food, m_ez2ac, m_muteuser
 from m_rps import rps_run
 from m_seotda import *
 from m_wolframalpha import wa_calc
@@ -11,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.6"
+bot_ver = "1.7.7"
 
 db_path = "luna_config.txt"
 
@@ -43,6 +43,9 @@ async def on_message(message):
     elif message.author.bot:
         return
     if message.server.id == db.get("config", "server_id"):
+        if m_muteuser.check_muted(str(message.author.id)):
+            await client.delete_message(message)
+            return
         try:
             temp_point = int(db.get("user_point", str(message.author.id)))
             temp_point = temp_point + int(db.get("config", "point_increment"))
@@ -137,6 +140,18 @@ async def on_message(message):
             await client.send_message(message.channel, str(db.get("string", "invite_code")))
         elif message.content.startswith(test_glyph + '루냥아 갓곡알려줘'):
             await client.send_message(message.channel, m_ez2ac.ez2ac_song_select())
+        elif message.content.startswith(test_glyph + '루냥아 채금해줘 '):
+            if message.author.server_permissions.administrator:
+                await client.send_message(message.channel, m_muteuser.mute_user(str(message.mentions[0].id)))
+                await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), str(message.mentions[0].name) + " muted by " + message.author.display_name + " at " + str(datetime.datetime.now()))
+            else:
+                await client.send_message(message.channel, ":thinking:")
+        elif message.content.startswith(test_glyph + '루냥아 채금 풀어줘 '):
+            if message.author.server_permissions.administrator:
+                await client.send_message(message.channel, m_muteuser.unmute_user(str(message.mentions[0].id)))
+                await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), str(message.mentions[0].name) + " unmuted by " + message.author.display_name + " at " + str(datetime.datetime.now()))
+            else:
+                await client.send_message(message.channel, ":thinking:")
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
