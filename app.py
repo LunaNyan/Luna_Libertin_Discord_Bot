@@ -80,7 +80,7 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, ":thinking:")
         elif message.content.startswith(test_glyph + '루냥아 gprecense '):
-            if message.author.id == str(db.get("config", "onwer_id")):
+            if message.author.id == str(db.get("config", "owner_id")):
                 gprec_sanitize = message.content
                 gprec_sanitize = gprec_sanitize.replace('루냥아 gprecense ', '')
                 await client.change_presence(game=discord.Game(name=gprec_sanitize))
