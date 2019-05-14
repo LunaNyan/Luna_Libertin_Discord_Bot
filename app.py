@@ -11,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.8"
+bot_ver = "1.7.8a"
 
 db_path = "luna_config.txt"
 
@@ -65,10 +65,10 @@ async def on_message(message):
                 await client.send_message(message.channel, "```" + str(os.popen(shl_str).read()) + "```")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 precense '):
+        elif message.content.startswith(test_glyph + '루냥아 precense --set '):
             if message.author.id == str(db.get("config", "onwer_id")):
                 precense_sanitize = message.content
-                precense_sanitize = precense_sanitize.replace(test_glyph + '루냥아 precense ', '')
+                precense_sanitize = precense_sanitize.replace(test_glyph + '루냥아 precense --set ', '')
                 precense = precense_sanitize
                 await client.send_message(message.channel, ":ok_hand:")
             else:
@@ -79,10 +79,10 @@ async def on_message(message):
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 gprecense '):
+        elif message.content.startswith(test_glyph + '루냥아 gprecense --set '):
             if message.author.id == str(db.get("config", "owner_id")):
                 gprec_sanitize = message.content
-                gprec_sanitize = gprec_sanitize.replace('루냥아 gprecense ', '')
+                gprec_sanitize = gprec_sanitize.replace('루냥아 gprecense --set ', '')
                 await client.change_presence(game=discord.Game(name=gprec_sanitize))
                 await client.send_message(message.channel, ":ok_hand:")
             else:
