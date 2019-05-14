@@ -11,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.7"
+bot_ver = "1.7.8"
 
 db_path = "luna_config.txt"
 
@@ -29,8 +29,8 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    print('name : ' + client.user.name)
-    print('id   : ' + client.user.id)
+    print('name : ' + str(client.user.name))
+    print('id   : ' + str(client.user.id))
     await client.change_presence(game=discord.Game(name='#기계식루냥이_사용법 ㄱ | ' + bot_ver))
 
 @client.event
@@ -76,6 +76,20 @@ async def on_message(message):
         elif message.content.startswith(test_glyph + '루냥아 presence --disable'):
             if message.author.id == str(db.get("config", "owner_id")):
                 precense = ""
+                await client.send_message(message.channel, ":ok_hand:")
+            else:
+                await client.send_message(message.channel, ":thinking:")
+        elif message.content.startswith(test_glyph + '루냥아 gprecense '):
+            if message.author.id == str(db.get("config", "onwer_id")):
+                gprec_sanitize = message.content
+                gprec_sanitize = gprec_sanitize.replace('루냥아 gprecense ', '')
+                await client.change_presence(game=discord.Game(name=gprec_sanitize))
+                await client.send_message(message.channel, ":ok_hand:")
+            else:
+                await client.send_message(message.channel, ":thinking:")
+        elif message.content.startswith(test_glyph + '루냥아 gpresence --disable'):
+            if message.author.id == str(db.get("config", "owner_id")):
+                await client.change_presence(game=discord.Game(name='#기계식루냥이_사용법 ㄱ | ' + bot_ver))
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
