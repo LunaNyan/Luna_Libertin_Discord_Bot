@@ -11,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.8a"
+bot_ver = "1.7.9"
 
 db_path = "luna_config.txt"
 
@@ -87,7 +87,7 @@ async def on_message(message):
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 gpresence --disable'):
+        elif message.content.startswith(test_glyph + '루냥아 gprecense --disable'):
             if message.author.id == str(db.get("config", "owner_id")):
                 await client.change_presence(game=discord.Game(name='#기계식루냥이_사용법 ㄱ | ' + bot_ver))
                 await client.send_message(message.channel, ":ok_hand:")
@@ -166,10 +166,14 @@ async def on_message(message):
                 await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), str(message.mentions[0].name) + " unmuted by " + message.author.display_name + " at " + str(datetime.datetime.now()))
             else:
                 await client.send_message(message.channel, ":thinking:")
+        elif message.content.startswith(test_glyph + '루냥아'):
+            await client.send_message(message.channel, l_ping())
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     else:
-        await client.send_message(message.channel, "**STOP!**\n\nRunning this bot out of owner's server is prohibited.\n**PLEASE KICK ME.**\n\nIf you can understand what are you doing, you can pork my source repository!\nhttps://github.com/LunaNyan/Luna_Libertin_Discord_Bot")
+        await client.send_message(message.channel, "**STOP!**\n\nRunning this bot out of owner's server is prohibited.\n**I'M OUT THIS SERVER.**\n\nIf you can understand what are you doing, you can pork my source repository!\nhttps://github.com/LunaNyan/Luna_Libertin_Discord_Bot")
+        await client.leave_server(message.server)
+        return
 
 @client.event
 async def on_message_delete(message):

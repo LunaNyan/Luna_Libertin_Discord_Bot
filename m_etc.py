@@ -42,3 +42,11 @@ def lg_ret():
               "테트리스 쌉고수임",
               "사볼안해요 꺼지셈"]
     return random.choice(lg_str)
+
+def l_ping():
+    lp_str = ["우웅? (쫑긋",
+              "(꼬리살랑",
+              "후아암~(발라당",
+              "네에~?(쫑긋",
+              "부르셨어요? 헤헤..(꼬리살랑"]
+    return random.choice(lp_str)
