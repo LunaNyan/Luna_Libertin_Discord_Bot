@@ -11,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.9"
+bot_ver = "1.7.10"
 
 db_path = "luna_config.txt"
 
@@ -166,6 +166,8 @@ async def on_message(message):
                 await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), str(message.mentions[0].name) + " unmuted by " + message.author.display_name + " at " + str(datetime.datetime.now()))
             else:
                 await client.send_message(message.channel, ":thinking:")
+        elif message.content.startswith(test_glyph + '루냥아 골라줘 '):
+            await client.send_message(message.channel, "**" + selectr(message.content) + "** (이)가 선택되었습니다")
         elif message.content.startswith(test_glyph + '루냥아'):
             await client.send_message(message.channel, l_ping())
         with open(db_path, 'w') as configfile:

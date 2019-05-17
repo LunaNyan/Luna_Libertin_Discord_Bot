@@ -50,3 +50,10 @@ def l_ping():
               "네에~?(쫑긋",
               "부르셨어요? 헤헤..(꼬리살랑"]
     return random.choice(lp_str)
+
+def selectr(message):
+    m = message
+    m = message.replace("_", "")
+    m = message.replace("루냥아 골라줘 ", "")
+    i = m.split(" ")
+    return random.choice(i)
