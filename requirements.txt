@@ -6,3 +6,5 @@ random
 datetime
 psutil
 configparser
+requests
+xmltodict

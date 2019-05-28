@@ -2,7 +2,7 @@
 import re, traceback, discord, datetime, asyncio, logging, os, random, configparser, m_lifetime, m_food, m_ez2ac, m_muteuser
 from m_rps import rps_run
 from m_seotda import *
-from m_wolframalpha import wa_calc
+from m_wolframalpha import wa_calc, wa_img
 from m_etc import *
 
 logger = logging.getLogger('discord')
@@ -11,14 +11,14 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.10"
+bot_ver = "1.7.11"
 
 db_path = "luna_config.txt"
 
 db = configparser.ConfigParser()
 db.read(db_path)
 
-#해당 기능은 봇 재부팅 시 재설정이 필요함
+#global variables (this requires reassignment after restart)
 precense = ""
 
 test_glyph = ""
@@ -136,10 +136,16 @@ async def on_message(message):
             await client.delete_message(message)
             await client.send_message(message.channel, say_str)
             await client.send_message(discord.Object(id=db.get('config', 'log_channel_id')), "used sayd : " + say_mention + " : " + say_str + "\nat : " + say_channel)
+        elif message.content.startswith(test_glyph + "루냥아 계산해줘 이미지 "):
+            message_temp = await client.send_message(message.channel, "잠시만 기다려주세요!")
+            bci_str = message.content
+            bci_str = bci_str.replace(test_glyph + "루냥아 계산해줘 이미지 ", "")
+            await client.send_file(message.channel, wa_img(bci_str))
+            await client.delete_message(message_temp)
         elif message.content.startswith(test_glyph + "루냥아 계산해줘 "):
             try:
                 bc_str = message.content
-                bc_str = bc_str.replace("루냥아 계산해줘 ","")
+                bc_str = bc_str.replace(test_glyph + "루냥아 계산해줘 ","")
                 if bc_str == "":
                     await client.send_message(message.channel, "연산식을 입력해주세요")
                 elif bc_str == "1+1":
