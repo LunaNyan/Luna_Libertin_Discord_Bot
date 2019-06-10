@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
-from random import randint
-from random import shuffle
+from random import randint, shuffle
 
 result_str = ""
 deck = []

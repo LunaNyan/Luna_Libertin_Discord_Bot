@@ -11,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.11"
+bot_ver = "1.7.12"
 
 db_path = "luna_config.txt"
 
@@ -98,7 +98,7 @@ async def on_message(message):
         elif message.content.startswith(test_glyph + '루냥이 실력 어느정도니'):
             await client.send_message(message.channel, lg_ret())
         elif message.content.startswith(test_glyph + '루냥아 배고파'):
-            await client.send_message(message.channel, return_food())
+            await client.send_message(message.channel, m_food.return_food())
         elif message.content.startswith(test_glyph + '루냥이 귀여워'):
             await client.send_message(message.channel, imcute())
         elif message.content.startswith(test_glyph + '루냥아 내포인트'):
