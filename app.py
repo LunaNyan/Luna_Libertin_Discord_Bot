@@ -11,15 +11,16 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.12"
+bot_ver = "1.7.13"
 
 db_path = "luna_config.txt"
 
 db = configparser.ConfigParser()
 db.read(db_path)
+print('successfully loaded configurarion file. starting bot.')
 
 #global variables (this requires reassignment after restart)
-precense = ""
+presence = ""
 
 test_glyph = ""
 if db.get("config", "IsThisBotTesting") == "1":
@@ -29,14 +30,15 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    print('name : ' + str(client.user.name))
-    print('id   : ' + str(client.user.id))
+    print('name    : ' + str(client.user.name))
+    print('id      : ' + str(client.user.id))
+    print('version : ' + bot_ver)
     await client.change_presence(game=discord.Game(name='#기계식루냥이_사용법 ㄱ | ' + bot_ver))
 
 @client.event
 async def on_message(message):
-    global precense_enabled
-    global precense
+    global presence_enabled
+    global presence
     global test_glyph
     if message.author == client.user:
         return
@@ -65,41 +67,41 @@ async def on_message(message):
                 await client.send_message(message.channel, "```" + str(os.popen(shl_str).read()) + "```")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 precense --set '):
+        elif message.content.startswith(test_glyph + '루냥아 presence --set '):
             if message.author.id == str(db.get("config", "onwer_id")):
-                precense_sanitize = message.content
-                precense_sanitize = precense_sanitize.replace(test_glyph + '루냥아 precense --set ', '')
-                precense = precense_sanitize
+                presence_sanitize = message.content
+                presence_sanitize = presence_sanitize.replace(test_glyph + '루냥아 presence --set ', '')
+                presence = presence_sanitize
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
         elif message.content.startswith(test_glyph + '루냥아 presence --disable'):
             if message.author.id == str(db.get("config", "owner_id")):
-                precense = ""
+                presence = ""
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 gprecense --set '):
+        elif message.content.startswith(test_glyph + '루냥아 gpresence --set '):
             if message.author.id == str(db.get("config", "owner_id")):
                 gprec_sanitize = message.content
-                gprec_sanitize = gprec_sanitize.replace('루냥아 gprecense --set ', '')
+                gprec_sanitize = gprec_sanitize.replace('루냥아 gpresence --set ', '')
                 await client.change_presence(game=discord.Game(name=gprec_sanitize))
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 gprecense --disable'):
+        elif message.content.startswith(test_glyph + '루냥아 gpresence --disable'):
             if message.author.id == str(db.get("config", "owner_id")):
                 await client.change_presence(game=discord.Game(name='#기계식루냥이_사용법 ㄱ | ' + bot_ver))
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
         elif message.content.startswith(test_glyph + '루냥아 뭐하니'):
-            await client.send_message(message.channel, m_lifetime.return_lifetime(precense))
+            await client.send_message(message.channel, m_lifetime.return_lifetime(presence))
         elif message.content.startswith(test_glyph + '루냥이 실력 어느정도니'):
             await client.send_message(message.channel, lg_ret())
         elif message.content.startswith(test_glyph + '루냥아 배고파'):
             await client.send_message(message.channel, m_food.return_food())
-        elif message.content.startswith(test_glyph + '루냥이 귀여워'):
+        elif message.content.startswith(test_glyph + '루냥이 귀여워') or message.content.startswith(test_glyph + '루냥이 커여워'):
             await client.send_message(message.channel, imcute())
         elif message.content.startswith(test_glyph + '루냥아 내포인트'):
             temp_point = db.get("user_point", str(message.author.id))
@@ -174,7 +176,9 @@ async def on_message(message):
                 await client.send_message(message.channel, ":thinking:")
         elif message.content.startswith(test_glyph + '루냥아 골라줘 '):
             await client.send_message(message.channel, "**" + selectr(message.content) + "** (이)가 선택되었습니다")
-        elif message.content.startswith(test_glyph + '루냥아'):
+        elif message.content.startswith(test_glyph + '루냥아 짖어봐'):
+            await client.send_message(message.channel, '왈왈멍망컹컹컹RRRRRRRRRRR간나새끼RRRRRRRRRR')
+        elif message.content == test_glyph + '루냥아':
             await client.send_message(message.channel, l_ping())
         with open(db_path, 'w') as configfile:
             db.write(configfile)
