@@ -39,7 +39,8 @@ ez2ac = [
 	"무배빠리 무배빠리 https://www.youtube.com/watch?v=AYbMX2yit5E",
 	"하고싶다 https://www.youtube.com/watch?v=au55VEavKlU"
         "마! 니 게헨나! https://www.youtube.com/watch?v=tNxeM6jT9QY"
-        "똥피하기 각? https://www.youtube.com/watch?v=rcLjNNkAB9A"
+        "똥피하기 각? https://www.youtube.com/watch?v=rcLjNNkAB9A",
+        "커엽 https://youtu.be/QWABKe60qqs"
 	]
 
 def ez2ac_song_select():

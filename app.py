@@ -11,13 +11,13 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.13"
+bot_ver = "1.7.14"
 
 db_path = "luna_config.txt"
 
 db = configparser.ConfigParser()
 db.read(db_path)
-print('successfully loaded configurarion file. starting bot.')
+print('successfully loaded configurarion file. connecting to Discord server. please wait...')
 
 #global variables (this requires reassignment after restart)
 presence = ""
@@ -101,7 +101,7 @@ async def on_message(message):
             await client.send_message(message.channel, lg_ret())
         elif message.content.startswith(test_glyph + '루냥아 배고파'):
             await client.send_message(message.channel, m_food.return_food())
-        elif message.content.startswith(test_glyph + '루냥이 귀여워') or message.content.startswith(test_glyph + '루냥이 커여워'):
+        elif message.content.startswith(test_glyph + '루냥이 귀여워') or message.content.startswith(test_glyph + '루냥이 커여워') or message.content.startswith('귀냥이 루여워') or message.content.startswith('커냥이 루여워'):
             await client.send_message(message.channel, imcute())
         elif message.content.startswith(test_glyph + '루냥아 내포인트'):
             temp_point = db.get("user_point", str(message.author.id))

@@ -148,7 +148,7 @@ def seotda_init(message_content):
                 result_str_player = result_str
                 power_cpu = seotda_cpu()
                 result_str_cpu = result_str
-                if power_cpu - power_player >= 7:
+                if power_cpu - power_player >= 10: #승률 조절 (값이 낮을 수록 높아짐)
                     continue
                 elif power_player == power_cpu:
                     return "비겼습니다!"

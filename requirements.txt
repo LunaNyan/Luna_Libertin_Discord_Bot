@@ -1,9 +1,5 @@
 asyncio
 discord==0.16.12
-logging
-os
-random
-datetime
 psutil
 configparser
 requests
