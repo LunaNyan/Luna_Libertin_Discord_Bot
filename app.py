@@ -11,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.14"
+bot_ver = "1.7.15"
 
 db_path = "luna_config.txt"
 
@@ -58,7 +58,7 @@ async def on_message(message):
         hs_match = hatespeech.match(message.content)
         if hs_match:
             await client.send_message(discord.Object(id=db.get('config', 'alert_channel_id')), "possible hate speech found at " + message.channel.name + "\n" + message.author.display_name + " : " + message.content + "\nat : " + str(datetime.datetime.now()))
-        if message.content.startswith(test_glyph + '루냥아 도와줘'):
+        if message.content == test_glyph + '루냥아 도와줘':
             await client.send_message(message.channel, "#기계식루냥이_사용법 ㄱ")
         elif message.content.startswith(test_glyph + '루냥아 실행해줘 '):
             if message.author.id == str(db.get("config", "owner_id")):
@@ -75,7 +75,7 @@ async def on_message(message):
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 presence --disable'):
+        elif message.content == test_glyph + '루냥아 presence --disable':
             if message.author.id == str(db.get("config", "owner_id")):
                 presence = ""
                 await client.send_message(message.channel, ":ok_hand:")
@@ -89,26 +89,26 @@ async def on_message(message):
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 gpresence --disable'):
+        elif message.content == test_glyph + '루냥아 gpresence --disable':
             if message.author.id == str(db.get("config", "owner_id")):
                 await client.change_presence(game=discord.Game(name='#기계식루냥이_사용법 ㄱ | ' + bot_ver))
                 await client.send_message(message.channel, ":ok_hand:")
             else:
                 await client.send_message(message.channel, ":thinking:")
-        elif message.content.startswith(test_glyph + '루냥아 뭐하니'):
+        elif message.content == test_glyph + '루냥아 뭐하니':
             await client.send_message(message.channel, m_lifetime.return_lifetime(presence))
-        elif message.content.startswith(test_glyph + '루냥이 실력 어느정도니'):
+        elif message.content == test_glyph + '루냥이 실력 어느정도니':
             await client.send_message(message.channel, lg_ret())
-        elif message.content.startswith(test_glyph + '루냥아 배고파'):
+        elif message.content == test_glyph + '루냥아 배고파':
             await client.send_message(message.channel, m_food.return_food())
-        elif message.content.startswith(test_glyph + '루냥이 귀여워') or message.content.startswith(test_glyph + '루냥이 커여워') or message.content.startswith('귀냥이 루여워') or message.content.startswith('커냥이 루여워'):
+        elif message.content == test_glyph + '루냥이 귀여워' or message.content == test_glyph + '루냥이 커여워' or message.content == '귀냥이 루여워' or message.content == '커냥이 루여워':
             await client.send_message(message.channel, imcute())
-        elif message.content.startswith(test_glyph + '루냥아 내포인트'):
+        elif message.content == test_glyph + '루냥아 내포인트':
             temp_point = db.get("user_point", str(message.author.id))
             await client.send_message(message.channel, str(temp_point) + " 점입니다")
-        elif message.content.startswith(test_glyph + '와! 샌즈!'):
+        elif message.content == test_glyph + '와! 샌즈!':
             await client.send_message(message.channel, sans())
-        elif message.content.startswith(test_glyph + '루냥이 쓰담쓰담'):
+        elif message.content == test_glyph + '루냥이 쓰담쓰담':
             await client.send_message(message.channel, pat())
         elif message.content.startswith(test_glyph + '루냥아 가위바위보 '):
             await client.send_message(message.channel, rps_run(message.content))
@@ -126,9 +126,9 @@ async def on_message(message):
                 await client.send_message(message.channel, ret_player_selection() + " (" + ret_player_card() + ")을 골랐습니다")
                 await client.send_message(message.channel, "상대방 패 : " + ret_cpu_selection() + " (" + ret_cpu_card() + ")")
                 await client.send_message(message.channel, result_player + " VS " + result_cpu + " : **" + result + "**\n" + ret_deck())
-        elif message.content.startswith(test_glyph + '루냥아 UUID'):
+        elif message.content == test_glyph + '루냥아 UUID':
             await client.send_message(message.channel, str(os.popen("uuidgen -r").read()))
-        elif message.content.startswith(test_glyph + '루냥아 현재시각'):
+        elif message.content == test_glyph + '루냥아 현재시각':
             await client.send_message(message.channel, str(os.popen("date -Iseconds").read()))
         elif message.content.startswith(test_glyph + '루냥아 확성기 '):
             say_str = message.content
@@ -158,9 +158,9 @@ async def on_message(message):
                     await client.delete_message(bc_tmp)
             except:
                 await client.send_message(message.channel, "연산식을 다시 확인해주세요")
-        elif message.content.startswith(test_glyph + '루냥아 초대코드'):
+        elif message.content == test_glyph + '루냥아 초대코드':
             await client.send_message(message.channel, str(db.get("string", "invite_code")))
-        elif message.content.startswith(test_glyph + '루냥아 갓곡알려줘'):
+        elif message.content == test_glyph + '루냥아 갓곡알려줘':
             await client.send_message(message.channel, m_ez2ac.ez2ac_song_select())
         elif message.content.startswith(test_glyph + '루냥아 채금해줘 '):
             if message.author.server_permissions.administrator:
@@ -176,7 +176,7 @@ async def on_message(message):
                 await client.send_message(message.channel, ":thinking:")
         elif message.content.startswith(test_glyph + '루냥아 골라줘 '):
             await client.send_message(message.channel, "**" + selectr(message.content) + "** (이)가 선택되었습니다")
-        elif message.content.startswith(test_glyph + '루냥아 짖어봐'):
+        elif message.content == test_glyph + '루냥아 짖어봐':
             await client.send_message(message.channel, '왈왈멍망컹컹컹RRRRRRRRRRR간나새끼RRRRRRRRRR')
         elif message.content == test_glyph + '루냥아':
             await client.send_message(message.channel, l_ping())
