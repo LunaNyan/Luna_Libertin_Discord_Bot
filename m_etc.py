@@ -34,16 +34,6 @@ def pat():
                 "하앙~(꼬리펑"]
     return random.choice(pat_str)
 
-def lg_ret():
-    lg_str = ["옵치 딜힐위주 골드정도",
-              "이지투 5키온리 15 다깸",
-              "이지투 5키스탠 쌍오토걸고 16 깸",
-              "펌프 DR걸고 S11 깸",
-              "손펌프 DR걸고 S25까지 깸",
-              "테트리스 99 쌉고수임",
-              "사볼 그냥 재미로 13까지는 깸"]
-    return random.choice(lg_str)
-
 def l_ping():
     lp_str = ["우웅? (쫑긋",
               "(꼬리살랑",
@@ -52,9 +42,22 @@ def l_ping():
               "부르셨어요? 헤헤..(꼬리살랑"]
     return random.choice(lp_str)
 
+def ret_help():
+    help = "```명령어 목록\n"
+    help+= "루냥아 도와줘 : 이 메시지를 표시합니다\n"
+    help+= "루냥아 배고파 : 랜덤으로 음식을 추천해줍니다\n"
+    help+= "루냥아 섯다 : CPU와 두장섯다를 진행합니다\n"
+    help+= "              진행 방법은 1에서 10까지의 숫자 두개를 선택합니다 (예 : 루냥아 섯다 3 5)\n"
+    help+= "루냥아 확성기 (할 말) : 기계식 루냥이가 대신 말해줍니다\n"
+    help+= "루냥아 계산해줘 (계산식) : Wolfram|Alpha 계산을 수행합니다\n"
+    help+= "루냥아 골라줘 (선택1) (선택2) .. : 무작위로 선택지를 골라줍니다"
+    help+= "\n\n이외에도 숨겨진 명령어가 몇개 있으니 찾아보세요!\n"
+    help+= "\n오류 발생이나 기타 건의사항은 chkong1998@gmail.com으로 문의 바랍니다```"
+    return help
+
 def selectr(message):
     m = message
-    m = message.replace("_", "")
-    m = message.replace("루냥아 골라줘 ", "")
+    m = m.replace("_", "")
+    m = m.replace("루냥아 골라줘 ", "")
     i = m.split(" ")
     return random.choice(i)
