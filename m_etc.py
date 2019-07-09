@@ -52,7 +52,9 @@ def ret_help():
     help+= "루냥아 계산해줘 (계산식) : Wolfram|Alpha 계산을 수행합니다\n"
     help+= "루냥아 골라줘 (선택1) (선택2) .. : 무작위로 선택지를 골라줍니다"
     help+= "\n\n이외에도 숨겨진 명령어가 몇개 있으니 찾아보세요!\n"
-    help+= "\n오류 발생이나 기타 건의사항은 chkong1998@gmail.com으로 문의 바랍니다```"
+    help+= "\n오류 발생이나 기타 건의사항은 민원창수 서버로 문의 바랍니다\n"
+    help+= "민원창구 서버 : https://discordapp.com/invite/yyS9x5V\n"
+    help+= "봇 초대하기 : https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=76864```"
     return help
 
 def selectr(message):
