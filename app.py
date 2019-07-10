@@ -11,7 +11,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.7.15"
+bot_ver = "1.8.0"
 
 db_path = "luna_config.txt"
 
@@ -29,11 +29,21 @@ if db.get("config", "IsThisBotTesting") == "1":
 client = discord.Client()
 
 @client.event
+async def bgjob_change_playing():
+    while True:
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name='루냥아 도와줘 → 도움말'))
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name=m_lifetime.return_lifetime(presence)))
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name='v' + bot_ver))
+
+@client.event
 async def on_ready():
     print('name    : ' + str(client.user.name))
     print('id      : ' + str(client.user.id))
     print('version : ' + bot_ver)
-    await client.change_presence(game=discord.Game(name='#기계식루냥이_사용법 ㄱ | ' + bot_ver))
+    client.loop.create_task(bgjob_change_playing())
 
 @client.event
 async def on_message(message):
