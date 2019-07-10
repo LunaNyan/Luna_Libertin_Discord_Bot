@@ -52,10 +52,22 @@ def ret_help():
     help+= "루냥아 계산해줘 (계산식) : Wolfram|Alpha 계산을 수행합니다\n"
     help+= "루냥아 골라줘 (선택1) (선택2) .. : 무작위로 선택지를 골라줍니다"
     help+= "\n\n이외에도 숨겨진 명령어가 몇개 있으니 찾아보세요!\n"
-    help+= "\n오류 발생이나 기타 건의사항은 민원창수 서버로 문의 바랍니다\n"
+    help+= "\n오류 발생이나 기타 건의사항은 민원창구 서버로 문의 바랍니다\n"
+    help+= "Copyright (C) 2017 - 2019 libertin```\n"
     help+= "민원창구 서버 : https://discordapp.com/invite/yyS9x5V\n"
-    help+= "봇 초대하기 : https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=76864```"
+    help+= "봇 초대하기 : https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=76864\n"
     return help
+
+def ret_changelog():
+    changelog = "```1.8.2m(2019-07-11)\n"
+    changelog+= "- 일부 오타 수정\n"
+    changelog = "v1.8.1m (2019-07-11)\n"
+    changelog+= "- 업데이트 내역 보기 기능 추가\n"
+    changelog+= "- 봇 동작 안정화\n"
+    changelog+= "v1.8.0m (2019-07-10)\n"
+    changelog+= "- '게임 플레이 중'이 10초마다 바뀌게 수정\n"
+    changelog+= "- 일부 명령어를 오인식하는 현상 수정```"
+    return changelog
 
 def selectr(message):
     m = message

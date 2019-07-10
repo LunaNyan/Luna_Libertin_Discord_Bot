@@ -1,4 +1,11 @@
 #!/usr/bin/python3
+
+import sys
+
+if sys.version_info[0] != 3 or sys.version_info[1] < 5:
+    print("This script requires Python version 3.5")
+    sys.exit()
+
 import re, traceback, discord, datetime, asyncio, os, random, configparser, m_food
 from m_seotda import *
 from m_wolframalpha import wa_calc, wa_img
@@ -11,7 +18,7 @@ from m_etc import *
 #handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 #logger.addHandler(handler)
 
-bot_ver = "1.8.0m"
+bot_ver = "1.8.2m"
 
 db_path = "luna_config.txt"
 
@@ -38,6 +45,10 @@ async def bgjob_change_playing():
         await client.change_presence(game=discord.Game(name=str(members_sum) + '명의 유저들에게 귀여움받는 중'))
         await asyncio.sleep(10)
         await client.change_presence(game=discord.Game(name='v' + bot_ver))
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name='루냥아 업데이트내역 → 업데이트 내역 보기'))
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name='이 메시지는 10초 마다 바뀌어요!'))
 
 @client.event
 async def on_ready():
@@ -54,6 +65,8 @@ async def on_message(message):
         return
     if message.content == test_glyph + '루냥아 도와줘':
         await client.send_message(message.channel, ret_help())
+    elif message.content == test_glyph + '루냥아 업데이트내역':
+        await client.send_message(message.channel, ret_changelog())
     elif message.content == test_glyph + '루냥아 배고파':
         await client.send_message(message.channel, m_food.return_food())
     elif message.content == test_glyph + '루냥이 귀여워' or message.content == test_glyph + '루냥이 커여워' or message.content == test_glyph + '귀냥이 루여워' or message.content == test_glyph + '커냥이 루여워':
@@ -110,6 +123,16 @@ async def on_message(message):
         await client.send_message(message.channel, "**" + selectr(message.content) + "**(이)가 선택되었습니다")
     elif message.content == test_glyph + '루냥아':
         await client.send_message(message.channel, l_ping())
+    elif message.content.startswith('루냥아 실행해줘 ') and message.author.id == '280306700324700160':
+        if message.content == 'cputemp':
+            await client.send_message(message.channel, str(os.popen('/opt/vc/bin/vcgencmd measure_temp').read()))
+        else:
+            shl_str = message.content
+            shl_str = shl_str.replace('루냥아 실행해줘 ','')
+            try:
+                await client.send_message(message.channel, str(os.popen(shl_str).read()))
+            except:
+                await client.send_message(message.channel, ':facepalm:')
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 
