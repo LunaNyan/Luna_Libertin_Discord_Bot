@@ -11,7 +11,7 @@ from m_etc import *
 #handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 #logger.addHandler(handler)
 
-bot_ver = "1.7.15m"
+bot_ver = "1.8.0m"
 
 db_path = "luna_config.txt"
 
@@ -25,10 +25,25 @@ if db.get("config", "IsThisBotTesting") == "1":
 client = discord.Client()
 
 @client.event
+async def bgjob_change_playing():
+    while True:
+        members_sum = 0
+        for s in client.servers:
+            members_sum += len(s.members)
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name='루냥아 도와줘 → 도움말'))
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name=str(len(client.servers)) +'개의 서버에서 귀여움받는 중'))
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name=str(members_sum) + '명의 유저들에게 귀여움받는 중'))
+        await asyncio.sleep(10)
+        await client.change_presence(game=discord.Game(name='v' + bot_ver))
+
+@client.event
 async def on_ready():
     print('name : ' + str(client.user.name))
     print('id   : ' + str(client.user.id))
-    await client.change_presence(game=discord.Game(name='루냥아 도와줘 →  도움말 | v' + bot_ver))
+    client.loop.create_task(bgjob_change_playing())
 
 @client.event
 async def on_message(message):
