@@ -42,26 +42,13 @@ def l_ping():
               "부르셨어요? 헤헤..(꼬리살랑"]
     return random.choice(lp_str)
 
-def ret_help():
-    help = "```명령어 목록\n"
-    help+= "루냥아 도와줘 : 이 메시지를 표시합니다\n"
-    help+= "루냥아 배고파 : 랜덤으로 음식을 추천해줍니다\n"
-    help+= "루냥아 섯다 : CPU와 두장섯다를 진행합니다\n"
-    help+= "              진행 방법은 1에서 10까지의 숫자 두개를 선택합니다 (예 : 루냥아 섯다 3 5)\n"
-    help+= "루냥아 확성기 (할 말) : 기계식 루냥이가 대신 말해줍니다\n"
-    help+= "루냥아 계산해줘 (계산식) : Wolfram|Alpha 계산을 수행합니다\n"
-    help+= "루냥아 골라줘 (선택1) (선택2) .. : 무작위로 선택지를 골라줍니다"
-    help+= "\n\n이외에도 숨겨진 명령어가 몇개 있으니 찾아보세요!\n"
-    help+= "\n오류 발생이나 기타 건의사항은 민원창구 서버로 문의 바랍니다\n"
-    help+= "Copyright (C) 2017 - 2019 libertin```\n"
-    help+= "민원창구 서버 : https://discordapp.com/invite/yyS9x5V\n"
-    help+= "봇 초대하기 : https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=76864\n"
-    return help
-
 def ret_changelog():
-    changelog = "```1.8.2m(2019-07-11)\n"
+    changelog = "```v1.9.0 (2019-07-11)\n"
+    changelog+= "- 도움말 기능 개선\n"
+    changelog+= "- 확성기 사용 시 혐오 단어가 감지되지 않는 문제 수정\n"
+    changelog+= "v1.8.2m (2019-07-11)\n"
     changelog+= "- 일부 오타 수정\n"
-    changelog = "v1.8.1m (2019-07-11)\n"
+    changelog+= "v1.8.1m (2019-07-11)\n"
     changelog+= "- 업데이트 내역 보기 기능 추가\n"
     changelog+= "- 봇 동작 안정화\n"
     changelog+= "v1.8.0m (2019-07-10)\n"

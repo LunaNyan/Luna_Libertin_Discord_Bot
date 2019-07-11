@@ -1,20 +1,13 @@
 [config]
-owner_id = 
 server_id = 
-alert_channel_id = 
-log_channel_id = 
 bot_token = 
-point_increment = 10
 isthisbottesting = 0
-
-[wolframalpha]
-appid = 
 
 [string]
 hatespeech = (메[0-9]*[갤갈]|[김씹]치[남녀]|한남충?|[남여]혐|워마드|빻[남녀]|피싸개|[빻애]니프사|피싸개|[트꼴]페미|재기|추하[네다죠]|[부통자]들[부통자]들|네덕|비틱|네다[찐씹]|[조좆]팔).*
-invite_code = 
 
-[user_point]
+[wolframalpha]
+appid = 
 
 [user_mute]
 
