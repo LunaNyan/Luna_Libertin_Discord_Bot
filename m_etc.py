@@ -43,15 +43,20 @@ def l_ping():
     return random.choice(lp_str)
 
 def ret_changelog():
-    changelog = "```v1.9.0 (2019-07-11)\n"
+    changelog = "```v1.9.2 (2019-07-12)\n"
+    changelog+= "- 주사위 기능 추가\n"
+    changelog+= "v1.9.1 (2019-07-12)\n"
+    changelog+= "- 권한 관련 문제 수정\n"
+    changelog+= "- 짖는 커맨드 추가\n"
+    changelog+= "v1.9.0 (2019-07-11)\n"
     changelog+= "- 도움말 기능 개선\n"
     changelog+= "- 확성기 사용 시 혐오 단어가 감지되지 않는 문제 수정\n"
-    changelog+= "v1.8.2m (2019-07-11)\n"
+    changelog+= "v1.8.2 (2019-07-11)\n"
     changelog+= "- 일부 오타 수정\n"
-    changelog+= "v1.8.1m (2019-07-11)\n"
+    changelog+= "v1.8.1 (2019-07-11)\n"
     changelog+= "- 업데이트 내역 보기 기능 추가\n"
     changelog+= "- 봇 동작 안정화\n"
-    changelog+= "v1.8.0m (2019-07-10)\n"
+    changelog+= "v1.8.0 (2019-07-10)\n"
     changelog+= "- '게임 플레이 중'이 10초마다 바뀌게 수정\n"
     changelog+= "- 일부 명령어를 오인식하는 현상 수정```"
     return changelog
@@ -62,3 +67,11 @@ def selectr(message):
     m = m.replace("루냥아 골라줘 ", "")
     i = m.split(" ")
     return random.choice(i)
+
+def l_dog():
+    dog_str = ["월", "멍", "왈", "애옹"]
+    return random.choice(dog_str)
+
+def l_dice():
+    dice_str = ["1", "2", "3", "4", "5", "6"]
+    return random.choice(dice_str)
