@@ -34,16 +34,6 @@ def pat():
                 "하앙~(꼬리펑"]
     return random.choice(pat_str)
 
-def lg_ret():
-    lg_str = ["옵치 딜힐위주 골드정도",
-              "이지투 5키온리 15 다깸",
-              "이지투 5키스탠 쌍오토걸고 16 깸",
-              "펌프 DR걸고 S11 깸",
-              "손펌프 DR걸고 S25까지 깸",
-              "테트리스 99 쌉고수임",
-              "사볼 그냥 재미로 13까지는 깸"]
-    return random.choice(lg_str)
-
 def l_ping():
     lp_str = ["우웅? (쫑긋",
               "(꼬리살랑",
@@ -52,9 +42,36 @@ def l_ping():
               "부르셨어요? 헤헤..(꼬리살랑"]
     return random.choice(lp_str)
 
+def ret_changelog():
+    changelog = "```v1.9.2 (2019-07-12)\n"
+    changelog+= "- 주사위 기능 추가\n"
+    changelog+= "v1.9.1 (2019-07-12)\n"
+    changelog+= "- 권한 관련 문제 수정\n"
+    changelog+= "- 짖는 커맨드 추가\n"
+    changelog+= "v1.9.0 (2019-07-11)\n"
+    changelog+= "- 도움말 기능 개선\n"
+    changelog+= "- 확성기 사용 시 혐오 단어가 감지되지 않는 문제 수정\n"
+    changelog+= "v1.8.2 (2019-07-11)\n"
+    changelog+= "- 일부 오타 수정\n"
+    changelog+= "v1.8.1 (2019-07-11)\n"
+    changelog+= "- 업데이트 내역 보기 기능 추가\n"
+    changelog+= "- 봇 동작 안정화\n"
+    changelog+= "v1.8.0 (2019-07-10)\n"
+    changelog+= "- '게임 플레이 중'이 10초마다 바뀌게 수정\n"
+    changelog+= "- 일부 명령어를 오인식하는 현상 수정```"
+    return changelog
+
 def selectr(message):
     m = message
-    m = message.replace("_", "")
-    m = message.replace("루냥아 골라줘 ", "")
+    m = m.replace("_", "")
+    m = m.replace("루냥아 골라줘 ", "")
     i = m.split(" ")
     return random.choice(i)
+
+def l_dog():
+    dog_str = ["월", "멍", "왈", "애옹"]
+    return random.choice(dog_str)
+
+def l_dice():
+    dice_str = ["1", "2", "3", "4", "5", "6"]
+    return random.choice(dice_str)
