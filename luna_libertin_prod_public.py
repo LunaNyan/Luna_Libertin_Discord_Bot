@@ -18,16 +18,20 @@ from m_etc import *
 #handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 #logger.addHandler(handler)
 
-bot_ver = "1.9.2m"
+bot_ver = "1.9.3m"
 
 db_path = "luna_config.txt"
 
 db = configparser.ConfigParser()
 db.read(db_path)
+print("successfully loaded configuration file. connecting to Discord server. please wait.")
 
 test_glyph = ""
 if db.get("config", "IsThisBotTesting") == "1":
     test_glyph = "_"
+    print("This bot is in test range. you must insert '_' before command.")
+else:
+    print("This bot is not in test range.")
 
 client = discord.Client()
 
@@ -52,6 +56,7 @@ async def bgjob_change_playing():
 
 @client.event
 async def on_ready():
+    print('Bot is ready to use.')
     print('name    : ' + str(client.user.name))
     print('id      : ' + str(client.user.id))
     print('version : ' + bot_ver)
@@ -82,14 +87,24 @@ async def on_message(message):
             embed.add_field(name="루냥이 쓰담쓰담", value="자기 자신한테 사이버(?) 쓰다듬을 선물해줍니다", inline=False)
             embed.add_field(name="루냥아 짖어봐", value="멍", inline=False)
             embed.add_field(name="루냥아 손", value=":raised_hand:", inline=False)
-            embed.add_field(name="루냥아 주사위", value="1부터 6까지 무작위의 숫자를 출력합니다", inline=False)
             embed.add_field(name="와! 샌즈!", value="언더테일 아시는구나!", inline=False)
         elif a == ' 게임':
+            embed=discord.Embed(title="도움말", description="게임", color=0xffff00)
+            embed.set_author(name="게임 사용 방법 보기 : 루냥아 도와줘 게임 (게임이름)")
+            embed.add_field(name="섯다", value="CPU와 두장섯다를 진행합니다", inline=False)
+            embed.add_field(name="제비뽑기", value="CPU가 제비뽑기를 실행합니다", inline=False)
+            embed.add_field(name="루냥아 주사위", value="1부터 6까지 무작위의 숫자를 출력합니다", inline=False)
+        elif a == ' 게임 섯다':
             embed=discord.Embed(title="두장섯다 사용 방법", description="명령어 : 루냥아 섯다 (숫자1) (숫자2), 0~9까지의 숫자 두개를 입력해 진행합니다", color=0xffff00)
             embed.add_field(name="족보 순위", value="땡 > 삥 > 끗", inline=False)
             embed.add_field(name="땡", value="두 패가 같은 경우 (장땡 ~ 삥땡)", inline=False)
             embed.add_field(name="삥", value="알리(1+2), 독사(1+4), 구삥(1+9), 장삥(1+10), 장사(4+10), 세륙(4+6)", inline=False)
             embed.add_field(name="끗", value="두 패 합의 일의 자리 숫자 (갑오 ~ 망통)", inline=False)
+        elif a == ' 게임 제비뽑기':
+            embed=discord.Embed(title="제비뽑기 사용 방법", description="명령어 : 루냥아 제비뽑기 (선택지1) (선택지2) ... | (결과1) (결과2) ...", color=0xffff00)
+            embed.add_field(name="주의사항", value="선택지와 결과의 개수는 동일해야 합니다", inline=True)
+        elif a == ' 게임 주사위':
+            embed=discord.Embed(title="주사위 사용 방법", description="명령어 : 루냥아 주사위", color=0xffff00)
         elif a == ' 유용한 기능':
             embed=discord.Embed(title="도움말", description="유용한 기능", color=0x00ff00)
             embed.add_field(name="루냥아 계산해줘 (계산식)", value="Wolfram|Alpha 계산 쿼리를 제공합니다", inline=False)
@@ -160,6 +175,8 @@ async def on_message(message):
         await client.send_message(message.channel, ':raised_hand:')
     elif message.content == test_glyph + '루냥아 주사위':
         await client.send_message(message.channel, '(쫑긋) (데구르르) ' + l_dice() + '!')
+    elif message.content.startswith(test_glyph + '루냥아 제비뽑기 '):
+        await client.send_message(message.channel, l_ticket(message.content))
     elif message.content.startswith('루냥아 실행해줘 ') and message.author.id == '280306700324700160':
         if message.content == 'cputemp':
             await client.send_message(message.channel, str(os.popen('/opt/vc/bin/vcgencmd measure_temp').read()))

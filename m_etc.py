@@ -43,22 +43,16 @@ def l_ping():
     return random.choice(lp_str)
 
 def ret_changelog():
-    changelog = "```v1.9.2 (2019-07-12)\n"
+    changelog = "```v1.9.3 (2019-07-14)\n"
+    changelog+= "- 제비뽑기 기능 추가\n"
+    changelog+= "v1.9.2 (2019-07-12)\n"
     changelog+= "- 주사위 기능 추가\n"
     changelog+= "v1.9.1 (2019-07-12)\n"
     changelog+= "- 권한 관련 문제 수정\n"
     changelog+= "- 짖는 커맨드 추가\n"
     changelog+= "v1.9.0 (2019-07-11)\n"
     changelog+= "- 도움말 기능 개선\n"
-    changelog+= "- 확성기 사용 시 혐오 단어가 감지되지 않는 문제 수정\n"
-    changelog+= "v1.8.2 (2019-07-11)\n"
-    changelog+= "- 일부 오타 수정\n"
-    changelog+= "v1.8.1 (2019-07-11)\n"
-    changelog+= "- 업데이트 내역 보기 기능 추가\n"
-    changelog+= "- 봇 동작 안정화\n"
-    changelog+= "v1.8.0 (2019-07-10)\n"
-    changelog+= "- '게임 플레이 중'이 10초마다 바뀌게 수정\n"
-    changelog+= "- 일부 명령어를 오인식하는 현상 수정```"
+    changelog+= "- 확성기 사용 시 혐오 단어가 감지되지 않는 문제 수정```"
     return changelog
 
 def selectr(message):
@@ -75,3 +69,21 @@ def l_dog():
 def l_dice():
     dice_str = ["1", "2", "3", "4", "5", "6"]
     return random.choice(dice_str)
+
+def l_ticket(message):
+    a = message
+    a = a.replace("루냥아 제비뽑기 ", "")
+    b = a.split(' | ')
+    a0 = b[0].split()
+    b0 = b[1].split()
+    if len(a0) != len(b0):
+        return "선택지와 결과의 개수가 맞지 않습니다"
+    else:
+        random.shuffle(b0)
+        c = 0
+        ret = "```제비뽑기 결과!\n"
+        for i in a0:
+           ret+= str(i) + ' : ' + str(b0[c]) + "\n"
+           c = c + 1
+        ret+= "```"
+        return ret
