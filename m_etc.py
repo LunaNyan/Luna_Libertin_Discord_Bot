@@ -43,7 +43,11 @@ def l_ping():
     return random.choice(lp_str)
 
 def ret_changelog():
-    changelog = "```v1.9.3 (2019-07-14)\n"
+    changelog = "```v1.9.5 (2019-07-17)\n"
+    changelog+= "- 제비뽑기 기능 개선"
+    changelog+= "v1.9.4 (2019-07-15)\n"
+    changelog+= "- 제비뽑기 사용 방법 변경\n"
+    changelog+= "v1.9.3 (2019-07-14)\n"
     changelog+= "- 제비뽑기 기능 추가\n"
     changelog+= "v1.9.2 (2019-07-12)\n"
     changelog+= "- 주사위 기능 추가\n"
@@ -73,17 +77,20 @@ def l_dice():
 def l_ticket(message):
     a = message
     a = a.replace("루냥아 제비뽑기 ", "")
-    b = a.split(' | ')
-    a0 = b[0].split()
-    b0 = b[1].split()
-    if len(a0) != len(b0):
-        return "선택지와 결과의 개수가 맞지 않습니다"
-    else:
-        random.shuffle(b0)
-        c = 0
-        ret = "```제비뽑기 결과!\n"
-        for i in a0:
-           ret+= str(i) + ' : ' + str(b0[c]) + "\n"
-           c = c + 1
-        ret+= "```"
-        return ret
+    try:
+        b = a.split(',')
+        a0 = b[0].split()
+        b0 = b[1].split()
+        if len(a0) != len(b0):
+            return "선택지와 결과의 개수가 맞지 않습니다 (각 항목은 띄어쓰기로 구분합니다)"
+        else:
+            random.shuffle(b0)
+            c = 0
+            ret = "```제비뽑기 결과!\n"
+            for i in a0:
+               ret+= str(i) + ' : ' + str(b0[c]) + "\n"
+               c = c + 1
+            ret+= "```"
+            return ret
+    except:
+        return "선택지와 결과를 구분할 때는 쉼표(,)를 입력해주세요"

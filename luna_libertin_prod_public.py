@@ -18,7 +18,7 @@ from m_etc import *
 #handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 #logger.addHandler(handler)
 
-bot_ver = "1.9.3m"
+bot_ver = "1.9.5m"
 
 db_path = "luna_config.txt"
 
@@ -101,7 +101,8 @@ async def on_message(message):
             embed.add_field(name="삥", value="알리(1+2), 독사(1+4), 구삥(1+9), 장삥(1+10), 장사(4+10), 세륙(4+6)", inline=False)
             embed.add_field(name="끗", value="두 패 합의 일의 자리 숫자 (갑오 ~ 망통)", inline=False)
         elif a == ' 게임 제비뽑기':
-            embed=discord.Embed(title="제비뽑기 사용 방법", description="명령어 : 루냥아 제비뽑기 (선택지1) (선택지2) ... | (결과1) (결과2) ...", color=0xffff00)
+            embed=discord.Embed(title="제비뽑기 사용 방법", description="명령어 : 루냥아 제비뽑기 (선택지1) (선택지2) ... , (결과1) (결과2) ...", color=0xffff00)
+            embed.add_field(name="사용 방법", value="각 항목은 띄어쓰기로 구분, 선택지와 결과는 쉼표(,)로 구분!", inline=False)
             embed.add_field(name="주의사항", value="선택지와 결과의 개수는 동일해야 합니다", inline=True)
         elif a == ' 게임 주사위':
             embed=discord.Embed(title="주사위 사용 방법", description="명령어 : 루냥아 주사위", color=0xffff00)
@@ -177,6 +178,20 @@ async def on_message(message):
         await client.send_message(message.channel, '(쫑긋) (데구르르) ' + l_dice() + '!')
     elif message.content.startswith(test_glyph + '루냥아 제비뽑기 '):
         await client.send_message(message.channel, l_ticket(message.content))
+    elif message.content == test_glyph + '루냥아 자가진단':
+        permcheck_message_manage = ":green_heart: 정상"
+        permcheck_links = ":green_heart: 정상"
+        try:
+            embed=discord.Embed(title='test')
+            permcheck_link_test = await client.send_message(message.channel, embed=embed)
+        except:
+            permcheck_links = ":broken_heart: 오류"
+        await client.delete_message(permcheck_link_test)
+        try:
+            await client.delete_message(message)
+        except:
+            permcheck_message_manage = ":broken_heart: 오류"
+        await client.send_message(message.channel, "봇 권한 자가진단 결과\n봇 버전 : " + bot_ver + "\n메시지 읽기, 쓰기 : :green_heart: 정상\n링크 첨부 : " + permcheck_links + "\n메시지 관리 : " + permcheck_message_manage + "\n**봇 역할의 권한을 임의로 수정하지 마세요! 오류가 발생할 수 있습니다!**")
     elif message.content.startswith('루냥아 실행해줘 ') and message.author.id == '280306700324700160':
         if message.content == 'cputemp':
             await client.send_message(message.channel, str(os.popen('/opt/vc/bin/vcgencmd measure_temp').read()))
