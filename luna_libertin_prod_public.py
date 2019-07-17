@@ -10,6 +10,7 @@ import re, traceback, discord, datetime, asyncio, os, random, configparser, m_fo
 from m_seotda import *
 from m_wolframalpha import wa_calc, wa_img
 from m_etc import *
+from m_hash import getHash
 
 #imoort logging
 #logger = logging.getLogger('discord')
@@ -18,7 +19,7 @@ from m_etc import *
 #handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 #logger.addHandler(handler)
 
-bot_ver = "1.9.5m"
+bot_ver = "1.9.6m"
 
 db_path = "luna_config.txt"
 
@@ -32,6 +33,8 @@ if db.get("config", "IsThisBotTesting") == "1":
     print("This bot is in test range. you must insert '_' before command.")
 else:
     print("This bot is not in test range.")
+
+print("MD5 Hash: "  + getHash("luna_libertin_prod_public.py"))
 
 client = discord.Client()
 

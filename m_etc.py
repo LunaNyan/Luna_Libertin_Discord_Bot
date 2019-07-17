@@ -43,7 +43,9 @@ def l_ping():
     return random.choice(lp_str)
 
 def ret_changelog():
-    changelog = "```v1.9.5 (2019-07-17)\n"
+    changelog = "```v1.9.6 (2019-07-17)\n"
+    changelog+= "- 봇 동작 안정화\n"
+    changelog+= "v1.9.5 (2019-07-17)\n"
     changelog+= "- 제비뽑기 기능 개선"
     changelog+= "v1.9.4 (2019-07-15)\n"
     changelog+= "- 제비뽑기 사용 방법 변경\n"
