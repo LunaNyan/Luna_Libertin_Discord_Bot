@@ -42,25 +42,6 @@ def l_ping():
               "부르셨어요? 헤헤..(꼬리살랑"]
     return random.choice(lp_str)
 
-def ret_changelog():
-    changelog = "```v1.9.6 (2019-07-17)\n"
-    changelog+= "- 봇 동작 안정화\n"
-    changelog+= "v1.9.5 (2019-07-17)\n"
-    changelog+= "- 제비뽑기 기능 개선"
-    changelog+= "v1.9.4 (2019-07-15)\n"
-    changelog+= "- 제비뽑기 사용 방법 변경\n"
-    changelog+= "v1.9.3 (2019-07-14)\n"
-    changelog+= "- 제비뽑기 기능 추가\n"
-    changelog+= "v1.9.2 (2019-07-12)\n"
-    changelog+= "- 주사위 기능 추가\n"
-    changelog+= "v1.9.1 (2019-07-12)\n"
-    changelog+= "- 권한 관련 문제 수정\n"
-    changelog+= "- 짖는 커맨드 추가\n"
-    changelog+= "v1.9.0 (2019-07-11)\n"
-    changelog+= "- 도움말 기능 개선\n"
-    changelog+= "- 확성기 사용 시 혐오 단어가 감지되지 않는 문제 수정```"
-    return changelog
-
 def selectr(message):
     m = message
     m = m.replace("_", "")
