@@ -19,7 +19,7 @@ from m_hash import getHash
 #handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 #logger.addHandler(handler)
 
-bot_ver = "1.9.7m"
+bot_ver = "1.9.7p1m"
 
 db_path = "luna_config.txt"
 
@@ -44,18 +44,10 @@ async def bgjob_change_playing():
         members_sum = 0
         for s in client.servers:
             members_sum += len(s.members)
-        await asyncio.sleep(10)
-        await client.change_presence(game=discord.Game(name='루냥아 도와줘 → 도움말'))
-        await asyncio.sleep(10)
-        await client.change_presence(game=discord.Game(name=str(len(client.servers)) +'개의 서버에서 귀여움받는 중'))
-        await asyncio.sleep(10)
-        await client.change_presence(game=discord.Game(name=str(members_sum) + '명의 유저들에게 귀여움받는 중'))
-        await asyncio.sleep(10)
-        await client.change_presence(game=discord.Game(name='v' + bot_ver))
-        await asyncio.sleep(10)
-        await client.change_presence(game=discord.Game(name='루냥아 업데이트내역 → 업데이트 내역 보기'))
-        await asyncio.sleep(10)
-        await client.change_presence(game=discord.Game(name='이 메시지는 10초 마다 바뀌어요!'))
+        presences_list = ["루냥아 도와줘 : 도움말" , "루냥아 업데이트내역 : 업데이트 내역 보기", str(len(client.servers)) + "개의 서버에서 귀여움받는 중", str(members_sum) + "명의 유저들에게 귀여움받는 중", "v" + bot_ver, "이 메시지는 10초 마다 바뀌어요!"]
+        for v in presences_list:
+            await asyncio.sleep(10)
+            await client.change_presence(game=discord.Game(name=v))
 
 @client.event
 async def on_ready():
@@ -76,7 +68,7 @@ async def on_message(message):
         embed = m_help.help(client, message.content, bot_ver)
         await client.send_message(message.channel, embed=embed)
     elif message.content == test_glyph + '루냥아 업데이트내역':
-        await client.send_message(message.channel, ret_changelog())
+        await client.send_message(message.channel, m_help.ret_changelog())
     elif message.content == test_glyph + '루냥아 배고파':
         await client.send_message(message.channel, m_food.return_food())
     elif message.content == test_glyph + '루냥이 귀여워' or message.content == test_glyph + '루냥이 커여워' or message.content == test_glyph + '귀냥이 루여워' or message.content == test_glyph + '커냥이 루여워':
