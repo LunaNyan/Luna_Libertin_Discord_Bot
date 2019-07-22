@@ -2,6 +2,12 @@
 
 from random import randint, shuffle
 
+winning_percentage = 7
+# 승률 조정 (기본값 : 7)
+# 0부터 25까지 있으며, 낮을 수록 승률이 높습니다.
+# 예를 들어, 승률을 0으로 맞출 경우 CPU가 플레이어보다 낮은 패를 선택할 수 없게 되기에, 플레이어는 무조건 이기게 됩니다.
+# 승률을 25로 맞출 경우, CPU는 모든 종류의 패를 선택할 수 있게 됩니다.
+
 result_str = ""
 deck = []
 
@@ -131,6 +137,7 @@ def seotda_ready():
 def seotda_init(message_content):
     global result_str_player
     global result_str_cpu
+    global winning_percentage
     try:
         message_content = message_content.replace("_", "")
         message_content = message_content.replace("루냥아 섯다 ", "")
@@ -148,7 +155,7 @@ def seotda_init(message_content):
                 result_str_player = result_str
                 power_cpu = seotda_cpu()
                 result_str_cpu = result_str
-                if power_cpu - power_player >= 7:
+                if power_cpu - power_player >= winning_percentage:
                     continue
                 elif power_player == power_cpu:
                     return "비겼습니다!"

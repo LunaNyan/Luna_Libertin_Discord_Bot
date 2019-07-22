@@ -8,7 +8,7 @@ def help(client, text, bot_ver):
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V) [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160)", color=0xff0080)
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
         embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역", inline=False)
-        embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 주사위, 와! 샌즈!", inline=False)
+        embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 주사위, 루냥아 인기도, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
@@ -19,6 +19,7 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥이 쓰담쓰담", value="자기 자신한테 사이버(?) 쓰다듬을 선물해줍니다", inline=False)
         embed.add_field(name="루냥아 짖어봐", value="멍", inline=False)
         embed.add_field(name="루냥아 손", value=":raised_hand:", inline=False)
+        embed.add_field(name="루냥아 인기도", value="몇개의 서버에서 몇명의 유저들이 저를 보고 있는지 알려줘요!", inline=False)
         embed.add_field(name="와! 샌즈!", value="언더테일 아시는구나!", inline=False)
     elif a == ' 게임':
         embed=discord.Embed(title="도움말", description="게임", color=0xffff00)
@@ -49,12 +50,14 @@ def help(client, text, bot_ver):
     return embed
 
 def ret_changelog():
-    changelog = "```v1.9.7 (2019-07-21)\n"
+    changelog = "```v1.9.8 (2019-07-22)\n"
+    changelog+= "- 인기도 확인 기능 추가\n"
+    changelog+= "v1.9.7 (2019-07-21)\n"
     changelog+= "- 봇 동작 안정화\n"
     changelog+= "v1.9.6 (2019-07-17)\n"
     changelog+= "- 봇 동작 안정화\n"
     changelog+= "v1.9.5 (2019-07-17)\n"
-    changelog+= "- 제비뽑기 기능 개선"
+    changelog+= "- 제비뽑기 기능 개선\n"
     changelog+= "v1.9.4 (2019-07-15)\n"
     changelog+= "- 제비뽑기 사용 방법 변경\n"
     changelog+= "v1.9.3 (2019-07-14)\n"

@@ -19,7 +19,7 @@ from m_hash import getHash
 #handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 #logger.addHandler(handler)
 
-bot_ver = "1.9.7p1m"
+bot_ver = "1.9.8m"
 
 db_path = "luna_config.txt"
 
@@ -144,6 +144,11 @@ async def on_message(message):
         except:
             permcheck_message_manage = ":broken_heart: 오류"
         await client.send_message(message.channel, "봇 권한 자가진단 결과\n봇 버전 : " + bot_ver + "\n메시지 읽기, 쓰기 : :green_heart: 정상\n링크 첨부 : " + permcheck_links + "\n메시지 관리 : " + permcheck_message_manage + "\n**봇 역할의 권한을 임의로 수정하지 마세요! 오류가 발생할 수 있습니다!**")
+    elif message.content == test_glyph + "루냥아 인기도":
+        members_sum = 0
+        for s in client.servers:
+            members_sum += len(s.members)
+        await client.send_message(message.channel, str(len(client.servers)) + "개의 서버에서 " + str(members_sum) + "명에게 귀여움받는중 :two_hearts:")
     elif message.content.startswith('루냥아 실행해줘 ') and message.author.id == '280306700324700160':
         if message.content == 'cputemp':
             await client.send_message(message.channel, str(os.popen('/opt/vc/bin/vcgencmd measure_temp').read()))
