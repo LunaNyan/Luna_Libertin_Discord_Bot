@@ -3,3 +3,5 @@ __pycache__/
 *$py.class
 
 luna_config.txt
+log.txt
+for_hash.py
