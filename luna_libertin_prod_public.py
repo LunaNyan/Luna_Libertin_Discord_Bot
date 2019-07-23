@@ -19,7 +19,7 @@ from m_hash import getHash
 #handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 #logger.addHandler(handler)
 
-bot_ver = "1.9.8m"
+bot_ver = "1.9.8p2"
 
 db_path = "luna_config.txt"
 
@@ -34,7 +34,12 @@ if db.get("config", "IsThisBotTesting") == "1":
 else:
     print("This bot is not in test range.")
 
-print("MD5 Hash: "  + getHash("luna_libertin_prod_public.py"))
+try:
+    hash_str = getHash("for_hash.py")
+    print("self MD5 hash get.")
+except:
+    hash_str = disabled
+    print("couldn't get hard link to get self MD5 hash. type 'ln -f luna_libertin_prod_public.py for_hash.py' to resolve.")
 
 client = discord.Client()
 
@@ -55,11 +60,13 @@ async def on_ready():
     print('name    : ' + str(client.user.name))
     print('id      : ' + str(client.user.id))
     print('version : ' + bot_ver)
+    print('MD5 hash: ' + hash_str)
     client.loop.create_task(bgjob_change_playing())
 
 @client.event
 async def on_message(message):
     global test_glyph
+    global hash_str
     if message.author == client.user:
         return
     elif message.author.bot:
@@ -130,6 +137,8 @@ async def on_message(message):
         await client.send_message(message.channel, '(쫑긋) (데구르르) ' + l_dice() + '!')
     elif message.content.startswith(test_glyph + '루냥아 제비뽑기 '):
         await client.send_message(message.channel, l_ticket(message.content))
+    elif message.content == test_glyph + '루냥아 자가진단 getHash':
+        await client.send_message(message.channel, hash_str)
     elif message.content == test_glyph + '루냥아 자가진단':
         permcheck_message_manage = ":green_heart: 정상"
         permcheck_links = ":green_heart: 정상"
