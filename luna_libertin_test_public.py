@@ -12,14 +12,14 @@ from m_wolframalpha import wa_calc, wa_img
 from m_etc import *
 from m_hash import getHash
 
-#imoort logging
-#logger = logging.getLogger('discord')
-#logger.setLevel(logging.DEBUG)
-#handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
-#handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-#logger.addHandler(handler)
+import logging
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
-bot_ver = "1.9.8p2"
+bot_ver = "1.10.0-t0"
 
 db_path = "luna_config.txt"
 
@@ -158,7 +158,11 @@ async def on_message(message):
         for s in client.servers:
             members_sum += len(s.members)
         await client.send_message(message.channel, str(len(client.servers)) + "개의 서버에서 " + str(members_sum) + "명에게 귀여움받는중 :two_hearts:")
-    elif message.content.startswith('루냥아 실행해줘 ') and message.author.id == '280306700324700160':
+    elif message.content == test_glyph + "루냥아 서버목록":
+        await client.send_message(message.channel, embed=m_help.servers_list(client))
+    elif message.content == "_루냥아 테스트기능":
+        await client.send_message(message.channel, embed=m_help.test_features(bot_ver))
+    elif message.content.startswith(test_glyph + '루냥아 실행해줘 ') and message.author.id == '280306700324700160':
         if message.content == 'cputemp':
             await client.send_message(message.channel, str(os.popen('/opt/vc/bin/vcgencmd measure_temp').read()))
         else:

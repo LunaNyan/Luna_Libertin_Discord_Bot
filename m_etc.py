@@ -54,8 +54,8 @@ def l_dog():
     return random.choice(dog_str)
 
 def l_dice():
-    dice_str = ["1", "2", "3", "4", "5", "6"]
-    return random.choice(dice_str)
+    dice_int = random.randint(1, 6)
+    return str(dice_int)
 
 def l_ticket(message):
     a = message

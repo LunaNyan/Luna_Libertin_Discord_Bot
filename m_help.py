@@ -49,6 +49,21 @@ def help(client, text, bot_ver):
         embed=discord.Embed(title='전체 도움말을 원하신다면 그냥 "루냥아 도와줘"라고만 입력해주세요!')
     return embed
 
+def servers_list(client):
+    embed=discord.Embed(title="전체 서버 목록", color=0xff00ff)
+    members_sum = 0
+    for s in client.servers:
+        embed.add_field(name=str(s), value="유저 수 : " + str(len(s.members)), inline=True)
+        members_sum+= len(s.members)
+    embed.set_footer(text="전제 서버 수 : " + str(len(client.servers)) + ", 전체 유저 수 : " + str(members_sum))
+    return embed
+
+def test_features(bot_ver):
+    embed=discord.Embed(title="기계식 루냥이 테스트존에 오신 것을 환영합니다!", description="테스트 기능 목록", color=0xff00ff)
+    embed.add_field(name="루냥아 서버목록", value="전체 서버 목록과 유저 수를 볼 수 있습니다", inline=False)
+    embed.set_footer(text="ver " + bot_ver)
+    return embed
+
 def ret_changelog():
     changelog = "```v1.9.8 (2019-07-22)\n"
     changelog+= "- 인기도 확인 기능 추가\n"
