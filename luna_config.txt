@@ -1,5 +1,4 @@
 [config]
-server_id = 
 bot_token = 
 isthisbottesting = 0
 
