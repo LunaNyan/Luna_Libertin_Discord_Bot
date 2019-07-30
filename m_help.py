@@ -7,10 +7,10 @@ def help(client, text, bot_ver):
     if a == '':
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V) [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160)", color=0xff0080)
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
-        embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역", inline=False)
+        embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역, 루냥아 나 어때", inline=False)
         embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 주사위, 루냥아 인기도, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다", inline=False)
-        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
+        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 서버목록", inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
     elif a == ' 일상':
         embed=discord.Embed(title="도움말", description="일상 항목", color=0x8080ff)
@@ -45,30 +45,30 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥아 계산해줘 이미지 (계산식)", value="Wolfram|Alpha 플롯 계산 쿼리를 제공합니다(실험적인 기능입니다!)", inline=False)
         embed.add_field(name="루냥아 골라줘 (선택지1) (선택지2) ...", value="어느것을 고를까요 알아맞춰 봅시다", inline=False)
         embed.add_field(name="루냥아 확성기 (할 말)", value="루냥이가 대신 말해줍니다 (혐오 단어가 감지되는 경우 거부됩니다)", inline=False)
+        embed.add_field(name="루냥아 서버목록", value="이 봇이 활동중인 서버들의 목록을 불러옵니다", inline=False)
     else:
         embed=discord.Embed(title='전체 도움말을 원하신다면 그냥 "루냥아 도와줘"라고만 입력해주세요!')
     return embed
 
+def servers_list(client):
+    embed=discord.Embed(title="전체 서버 목록", color=0xff00ff)
+    members_sum = 0
+    for s in client.servers:
+        embed.add_field(name=str(s), value="유저 수 : " + str(len(s.members)), inline=True)
+        members_sum+= len(s.members)
+    embed.set_footer(text="전제 서버 수 : " + str(len(client.servers)) + ", 전체 유저 수 : " + str(members_sum))
+    return embed
+
+def test_features(bot_ver):
+    embed=discord.Embed(title="기계식 루냥이 테스트존에 오신 것을 환영합니다!", description="테스트 기능 목록", color=0xff00ff)
+    embed.add_field(name="루냥아 서버목록", value="전체 서버 목록과 유저 수를 볼 수 있습니다", inline=False)
+    embed.add_field(name="루냥아 나 어때", value="호감도와 프로필을 보여줍니다", inline=False)
+    embed.set_footer(text="ver " + bot_ver)
+    return embed
+
 def ret_changelog():
-    changelog = "```v1.9.8 (2019-07-22)\n"
-    changelog+= "- 인기도 확인 기능 추가\n"
-    changelog+= "v1.9.7 (2019-07-21)\n"
-    changelog+= "- 봇 동작 안정화\n"
-    changelog+= "v1.9.6 (2019-07-17)\n"
-    changelog+= "- 봇 동작 안정화\n"
-    changelog+= "v1.9.5 (2019-07-17)\n"
-    changelog+= "- 제비뽑기 기능 개선\n"
-    changelog+= "v1.9.4 (2019-07-15)\n"
-    changelog+= "- 제비뽑기 사용 방법 변경\n"
-    changelog+= "v1.9.3 (2019-07-14)\n"
-    changelog+= "- 제비뽑기 기능 추가\n"
-    changelog+= "v1.9.2 (2019-07-12)\n"
-    changelog+= "- 주사위 기능 추가\n"
-    changelog+= "v1.9.1 (2019-07-12)\n"
-    changelog+= "- 권한 관련 문제 수정\n"
-    changelog+= "- 짖는 커맨드 추가\n"
-    changelog+= "v1.9.0 (2019-07-11)\n"
-    changelog+= "- 도움말 기능 개선\n"
-    changelog+= "- 확성기 사용 시 혐오 단어가 감지되지 않는 문제 수정```"
+    changelog = "```v1.10.0 (2019-07-31)\n"
+    changelog+= "- 명령어 2개 추가\n"
+    changelog+= "- 봇 동작 안정화```"
     return changelog
 

@@ -6,20 +6,20 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import re, traceback, discord, datetime, asyncio, os, random, configparser, m_food, m_help
+import re, traceback, discord, datetime, asyncio, os, random, configparser, m_food, m_help, m_user
 from m_seotda import *
 from m_wolframalpha import wa_calc, wa_img
 from m_etc import *
 from m_hash import getHash
 
-#imoort logging
-#logger = logging.getLogger('discord')
-#logger.setLevel(logging.DEBUG)
-#handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
-#handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-#logger.addHandler(handler)
+import logging
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
-bot_ver = "1.9.8p2"
+bot_ver = "1.10.0"
 
 db_path = "luna_config.txt"
 
@@ -49,7 +49,10 @@ async def bgjob_change_playing():
         members_sum = 0
         for s in client.servers:
             members_sum += len(s.members)
-        presences_list = ["루냥아 도와줘 : 도움말" , "루냥아 업데이트내역 : 업데이트 내역 보기", str(len(client.servers)) + "개의 서버에서 귀여움받는 중", str(members_sum) + "명의 유저들에게 귀여움받는 중", "v" + bot_ver, "이 메시지는 10초 마다 바뀌어요!"]
+        if test_glyph == "_":
+            presences_list = ["명령어 앞에 _를 붙여주세요!", "_루냥아 테스트기능 : 실험 중인 기능 확인하기", "v" + bot_ver, "이 메시지는 10초 마다 바뀌어요!"]
+        else:
+            presences_list = ["루냥아 도와줘 : 도움말" , "루냥아 업데이트내역 : 업데이트 내역 보기", str(len(client.servers)) + "개의 서버에서 귀여움받는 중", str(members_sum) + "명의 유저들에게 귀여움받는 중", "v" + bot_ver, "이 메시지는 10초 마다 바뀌어요!"]
         for v in presences_list:
             await asyncio.sleep(10)
             await client.change_presence(game=discord.Game(name=v))
@@ -71,6 +74,7 @@ async def on_message(message):
         return
     elif message.author.bot:
         return
+    m_user.increase(db, message.author)
     if message.content.startswith(test_glyph + '루냥아 도와줘'):
         embed = m_help.help(client, message.content, bot_ver)
         await client.send_message(message.channel, embed=embed)
@@ -137,6 +141,8 @@ async def on_message(message):
         await client.send_message(message.channel, '(쫑긋) (데구르르) ' + l_dice() + '!')
     elif message.content.startswith(test_glyph + '루냥아 제비뽑기 '):
         await client.send_message(message.channel, l_ticket(message.content))
+    elif message.content == test_glyph + '루냥아 나 어때':
+        await client.send_message(message.channel, embed=m_user.check(db, message.author))
     elif message.content == test_glyph + '루냥아 자가진단 getHash':
         await client.send_message(message.channel, hash_str)
     elif message.content == test_glyph + '루냥아 자가진단':
@@ -158,7 +164,11 @@ async def on_message(message):
         for s in client.servers:
             members_sum += len(s.members)
         await client.send_message(message.channel, str(len(client.servers)) + "개의 서버에서 " + str(members_sum) + "명에게 귀여움받는중 :two_hearts:")
-    elif message.content.startswith('루냥아 실행해줘 ') and message.author.id == '280306700324700160':
+    elif message.content == test_glyph + "루냥아 서버목록":
+        await client.send_message(message.channel, embed=m_help.servers_list(client))
+    elif message.content == "_루냥아 테스트기능" and test_glyph == "_":
+        await client.send_message(message.channel, embed=m_help.test_features(bot_ver))
+    elif message.content.startswith(test_glyph + '루냥아 실행해줘 ') and message.author.id == '280306700324700160':
         if message.content == 'cputemp':
             await client.send_message(message.channel, str(os.popen('/opt/vc/bin/vcgencmd measure_temp').read()))
         else:
