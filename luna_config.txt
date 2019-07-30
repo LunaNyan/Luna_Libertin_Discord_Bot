@@ -9,5 +9,5 @@ hatespeech = (.*?)(메[0-9]*[갤갈]|[김씹]치[남녀]|한남충?|[남여]혐|
 [wolframalpha]
 appid = 
 
-[user_mute]
+[user_level]
 
