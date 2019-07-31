@@ -11,6 +11,7 @@ def help(client, text, bot_ver):
         embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 주사위, 루냥아 인기도, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 서버목록", inline=False)
+        embed.add_field(name="패시브", value="관심 가져주기", inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
     elif a == ' 일상':
         embed=discord.Embed(title="도움말", description="일상 항목", color=0x8080ff)
@@ -46,6 +47,9 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥아 골라줘 (선택지1) (선택지2) ...", value="어느것을 고를까요 알아맞춰 봅시다", inline=False)
         embed.add_field(name="루냥아 확성기 (할 말)", value="루냥이가 대신 말해줍니다 (혐오 단어가 감지되는 경우 거부됩니다)", inline=False)
         embed.add_field(name="루냥아 서버목록", value="이 봇이 활동중인 서버들의 목록을 불러옵니다", inline=False)
+    elif a == ' 패시브':
+        embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
+        embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
     else:
         embed=discord.Embed(title='전체 도움말을 원하신다면 그냥 "루냥아 도와줘"라고만 입력해주세요!')
     return embed

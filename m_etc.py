@@ -77,3 +77,7 @@ def l_ticket(message):
             return ret
     except:
         return "선택지와 결과를 구분할 때는 쉼표(,)를 입력해주세요"
+
+def say_lv():
+    say_lv_str = ["(꼬옥", "(껴안"]
+    return random.choice(say_lv_str)

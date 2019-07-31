@@ -9,6 +9,12 @@ def increase(conf, user):
     except:
         return False
 
+def ret_check(conf, user):
+    try:
+        return int(conf.get("user_level", str(user.id)))
+    except:
+        return 0
+
 def check(conf, user):
     firstrun = False
     try:
@@ -52,3 +58,47 @@ def check(conf, user):
         usrperm = "일반"
     embed.add_field(name="서버 권한", value=usrperm, inline=True)
     return embed
+
+def check_allow_sudden_hugging(conf, user):
+    try:
+        if int(conf.get("sudden_hugging", str(user.id))) == 1:
+            return True
+        elif int(conf.get("sudden_hugging", str(user.id))) == 0:
+            return False
+    except:
+        conf.set("sudden_hugging", str(user.id), "1")
+        return True
+
+def toggle_sudden_hugging(conf, user):
+    if user.display_name == user.name:
+        usrname = user.name
+    else:
+        usrname = user.display_name + "(" + user.name + ")"
+    try:
+        if int(conf.get("sudden_hugging", str(user.id))) == 1:
+            conf.set("sudden_hugging", str(user.id), "0")
+            embed = discord.Embed(title=usrname + " 님에게 관심 가져주기를 껐어요!")
+        elif int(conf.get("sudden_hugging", str(user.id))) == 0:
+            conf.set("sudden_hugging", str(user.id), "1")
+            embed = discord.Embed(title=usrname + " 님에게 관심 가져주기를 켰어요!")
+    except:
+        conf.set("sudden_hugging", str(user.id), "0")
+        embed = discord.Embed(title=usrname + " 님에게 관심 가져주기를 껐어요!")
+    return embed
+
+def count(conf, user):
+    try:
+        pt = int(conf.get("count", str(user.id))) + 1
+        conf.set("count", str(user.id), str(pt))
+    except:
+        conf.set("count", str(user.id), "1")
+
+def check_count(conf, user):
+    try:
+        return int(conf.get("count", str(user.id)))
+    except:
+        conf.set("count", str(user.id), "1")
+        return 1
+
+def reset_count(conf, user):
+    conf.set("count", str(user.id), "0")

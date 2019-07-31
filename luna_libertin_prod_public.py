@@ -7,6 +7,7 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     sys.exit()
 
 import re, traceback, discord, datetime, asyncio, os, random, configparser, m_food, m_help, m_user
+from random import randint
 from m_seotda import *
 from m_wolframalpha import wa_calc, wa_img
 from m_etc import *
@@ -19,7 +20,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.0"
+bot_ver = "1.10.1"
 
 db_path = "luna_config.txt"
 
@@ -74,7 +75,12 @@ async def on_message(message):
         return
     elif message.author.bot:
         return
-    m_user.increase(db, message.author)
+    if message.content.startswith(test_glyph + '루냥아') or message.content.startswith(test_glyph + '루냥이') or message.content.startswith(test_glyph + '커냥이') or message.content.startswith(test_glyph + '귀냥이'):
+        m_user.increase(db, message.author)
+    m_user.count(db, message.author)
+    if m_user.ret_check(db, message.author) >= 200 and m_user.check_count(db, message.author) >= 10 and randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True:
+        await client.send_message(message.channel, message.author.mention + " " + say_lv())
+        m_user.reset_count(db, message.author)
     if message.content.startswith(test_glyph + '루냥아 도와줘'):
         embed = m_help.help(client, message.content, bot_ver)
         await client.send_message(message.channel, embed=embed)
@@ -143,6 +149,8 @@ async def on_message(message):
         await client.send_message(message.channel, l_ticket(message.content))
     elif message.content == test_glyph + '루냥아 나 어때':
         await client.send_message(message.channel, embed=m_user.check(db, message.author))
+    elif message.content == test_glyph + '루냥아 관심 가져주기':
+        await client.send_message(message.channel, embed=m_user.toggle_sudden_hugging(db, message.author))
     elif message.content == test_glyph + '루냥아 자가진단 getHash':
         await client.send_message(message.channel, hash_str)
     elif message.content == test_glyph + '루냥아 자가진단':
