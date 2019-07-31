@@ -20,7 +20,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.1p1"
+bot_ver = "1.10.1p2"
 
 db_path = "luna_config.txt"
 
@@ -41,6 +41,8 @@ try:
 except:
     hash_str = disabled
     print("couldn't get hard link to get self MD5 hash. type 'ln -f luna_libertin_prod_public.py for_hash.py' to resolve.")
+
+news_str = ""
 
 client = discord.Client()
 
@@ -71,6 +73,7 @@ async def on_ready():
 async def on_message(message):
     global test_glyph
     global hash_str
+    global news_str
     if message.author == client.user:
         return
     elif message.author.bot:
@@ -181,15 +184,25 @@ async def on_message(message):
     elif message.content == "_루냥아 테스트기능" and test_glyph == "_":
         await client.send_message(message.channel, embed=m_help.test_features(bot_ver))
     elif message.content.startswith(test_glyph + '루냥아 실행해줘 ') and message.author.id == '280306700324700160':
-        if message.content == 'cputemp':
-            await client.send_message(message.channel, str(os.popen('/opt/vc/bin/vcgencmd measure_temp').read()))
-        else:
-            shl_str = message.content
-            shl_str = shl_str.replace('루냥아 실행해줘 ','')
-            try:
-                await client.send_message(message.channel, str(os.popen(shl_str).read()))
-            except:
-                await client.send_message(message.channel, ':facepalm:')
+        shl_str = message.content
+        shl_str = shl_str.replace('루냥아 실행해줘 ','')
+        try:
+            await client.send_message(message.channel, str(os.popen(shl_str).read()))
+        except:
+            await client.send_message(message.channel, ':facepalm:')
+    elif message.content.startswith(test_glyph + '루냥아 set_news ') and message.author.id == '280306700324700160':
+        news_str = message.content
+        news_str = news_str.replace('루냥아 set_news ', '')
+        news_str = news_str.replace("&nbsp", "\n")
+        await client.send_message(message.channel, news_str)
+    elif message.content.startswith(test_glyph + '루냥아 send_news ') and message.author.id == '280306700324700160':
+        channel_str = message.content
+        channel_str = channel_str.replace('루냥아 send_news ', '')
+        news_channel = discord.Object(id=channel_str)
+        embed = discord.Embed(title="기계식 루냥이 공지", description=news_str, color=0xffccff)
+        embed.set_thumbnail(url=client.user.avatar_url)
+        embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
+        await client.send_message(news_channel, embed=embed)
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 
