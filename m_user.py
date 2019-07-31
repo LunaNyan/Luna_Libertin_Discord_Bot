@@ -86,6 +86,20 @@ def toggle_sudden_hugging(conf, user):
         embed = discord.Embed(title=usrname + " 님에게 관심 가져주기를 껐어요!")
     return embed
 
+def hug_count(conf, user):
+    try:
+        pt = int(conf.get("hug_count", str(user.id))) + 1
+        conf.set("hug_count", str(user.id), str(pt))
+    except:
+        conf.set("hug_count", str(user.id), "1")
+
+def check_hug_count(conf, user):
+    try:
+        return int(conf.get("hug_count", str(user.id)))
+    except:
+        conf.set("hug_count", str(user.id), "0")
+        return 0
+
 def count(conf, user):
     try:
         pt = int(conf.get("count", str(user.id))) + 1

@@ -71,7 +71,9 @@ def test_features(bot_ver):
     return embed
 
 def ret_changelog():
-    changelog = "```v1.10.0 (2019-07-31)\n"
+    changelog = "```v1.10.1 (2019-07-31)\n"
+    changelog+= "- 관심 가져주기 기능 추가\n"
+    changelog+= "v1.10.0 (2019-07-31)\n"
     changelog+= "- 명령어 2개 추가\n"
     changelog+= "- 봇 동작 안정화```"
     return changelog
