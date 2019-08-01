@@ -6,12 +6,15 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import re, traceback, discord, datetime, asyncio, os, random, configparser, m_food, m_help, m_user
+import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user
+from datetime import datetime, timedelta
 from random import randint
 from m_seotda import *
 from m_wolframalpha import wa_calc, wa_img
 from m_etc import *
 from m_hash import getHash
+
+startTime = datetime.now()
 
 import logging
 logger = logging.getLogger('discord')
@@ -20,7 +23,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.1p2"
+bot_ver = "1.10.1p3"
 
 db_path = "luna_config.txt"
 
@@ -81,7 +84,7 @@ async def on_message(message):
     if message.content.startswith(test_glyph + '루냥아') or message.content.startswith(test_glyph + '루냥이') or message.content.startswith(test_glyph + '커냥이') or message.content.startswith(test_glyph + '귀냥이'):
         m_user.increase(db, message.author)
     m_user.count(db, message.author)
-    if m_user.ret_check(db, message.author) >= 200 and m_user.check_count(db, message.author) >= 10 and randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True:
+    if m_user.ret_check(db, message.author) >= 200 and m_user.check_count(db, message.author) >= 30 and randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True:
         await client.send_message(message.channel, message.author.mention + " " + say_lv())
         if m_user.check_hug_count(db, message.author) <= 3:
             embed = discord.Embed(title="놀라셨나요?", description='기계식 루냥이의 패시브 기능입니다\n"루냥아 도와줘 패시브"를 입력해보세요!')
@@ -203,6 +206,10 @@ async def on_message(message):
         embed.set_thumbnail(url=client.user.avatar_url)
         embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
         await client.send_message(news_channel, embed=embed)
+    elif message.content == test_glyph + '루냥아 getinfo' and message.author.id == '280306700324700160':
+        process = psutil.Process(os.getpid())
+        upt = datetime.now() - startTime
+        await client.send_message(message.channel, embed=m_help.get_info(client, str(upt), client.user.id, hash_str, process.memory_info().rss, bot_ver))
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 
