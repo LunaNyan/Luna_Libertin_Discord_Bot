@@ -1,4 +1,4 @@
-import discord
+import discord, cpuinfo, psutil
 
 def help(client, text, bot_ver):
     a = text
@@ -84,6 +84,8 @@ def get_info(client, uptime, uid, hash_str, memkb, bot_ver):
     embed.add_field(name="Bot ID", value=str(uid), inline=True)
     embed.add_field(name="Uptime", value=uptime, inline=True)
     embed.add_field(name="Self MD5 Hash", value=hash_str, inline=True)
-    embed.add_field(name="Memory usage", value=str(memkb / 1024) + " KB", inline=True)
+    embed.add_field(name="Python version", value=cpuinfo.get_cpu_info()["python_version"], inline=True)
+    embed.add_field(name="Processor", value=cpuinfo.get_cpu_info()["brand"], inline=True)
+    embed.add_field(name="Memory", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB of total RAM\n" + str(memkb / 1024) + " KB using by bot", inline=True)
     embed.set_footer(text="ver " + bot_ver)
     return embed

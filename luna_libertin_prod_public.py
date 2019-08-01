@@ -23,7 +23,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.1p3"
+bot_ver = "1.10.1p4"
 
 db_path = "luna_config.txt"
 
