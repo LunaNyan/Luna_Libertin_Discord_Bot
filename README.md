@@ -7,11 +7,11 @@
 # 서버 구축에 필요한 자원
 - 리눅스 탑재 시스템
 
-권장 : Debian, Ubuntu / i386, x86-64, ARMv6 ~ v8a
+ 권장 : Debian, Ubuntu / i386, x86-64, ARMv6 ~ v8a
 
 - Python 3.5+
 
-권장 : 3.6, 3.7
+ 권장 : 3.6, 3.7
 
 - 인터넷 연결
 
@@ -20,7 +20,7 @@
 - (가능한 경우) Wolfram|Alpha 앱 토큰
 
 # 서버 구축 방법
-1. `sudo pip3 install -r requirements.txt`를 실행합니다. 이 명령어는 기계식 루냥이를 동작시키는 데 필요힌 모든 모듈 패키지를 설치함니다.
+1. `sudo pip3 install -r requirements.txt`를 실행합니다. 이 명령어는 기계식 루냥이를 동작시키는 데 필요힌 모든 모듈 패키지를 설치합니다.
 
 2. luna_config.txt를 vim, nano 등의 에디터로 실행해 토큰을 입력합니다.
 
