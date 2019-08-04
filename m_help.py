@@ -1,4 +1,4 @@
-import discord, cpuinfo, psutil
+import discord, cpuinfo, psutil, os
 
 def help(client, text, bot_ver):
     a = text
@@ -8,8 +8,8 @@ def help(client, text, bot_ver):
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V) [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160)", color=0xff0080)
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
         embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역, 루냥아 나 어때", inline=False)
-        embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 주사위, 루냥아 인기도, 와! 샌즈!", inline=False)
-        embed.add_field(name="게임", value="루냥아 섯다", inline=False)
+        embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 인기도, 와! 샌즈!", inline=False)
+        embed.add_field(name="게임", value="루냥아 섯다, 루냥아 주사위, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 서버목록", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기", inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
@@ -27,7 +27,8 @@ def help(client, text, bot_ver):
         embed.set_author(name="게임 사용 방법 보기 : 루냥아 도와줘 게임 (게임이름)")
         embed.add_field(name="섯다", value="CPU와 두장섯다를 진행합니다", inline=False)
         embed.add_field(name="제비뽑기", value="CPU가 제비뽑기를 실행합니다", inline=False)
-        embed.add_field(name="루냥아 주사위", value="1부터 6까지 무작위의 숫자를 출력합니다", inline=False)
+        embed.add_field(name="주사위", value="1부터 6까지 무작위의 숫자를 출력합니다", inline=False)
+        embed.add_field(name="가위바위보", value="CPU와 가위바위보를 진행합니다", inline=False)
     elif a == ' 게임 섯다':
         embed=discord.Embed(title="두장섯다 사용 방법", description="명령어 : 루냥아 섯다 (숫자1) (숫자2), 0~9까지의 숫자 두개를 입력해 진행합니다", color=0xffff00)
         embed.add_field(name="족보 순위", value="땡 > 삥 > 끗", inline=False)
@@ -40,6 +41,9 @@ def help(client, text, bot_ver):
         embed.add_field(name="주의사항", value="선택지와 결과의 개수는 동일해야 합니다", inline=True)
     elif a == ' 게임 주사위':
         embed=discord.Embed(title="주사위 사용 방법", description="명령어 : 루냥아 주사위", color=0xffff00)
+    elif a == ' 게임 가위바위보':
+        embed=discord.Embed(title="가위바위보 사용 방법", description="명령어 : 루냥아 가위바위보 (선택지)", color=0xffff00)
+        embed.add_field(name="선택지", value="가위, 바위, 보", inline=False)
     elif a == ' 유용한 기능':
         embed=discord.Embed(title="도움말", description="유용한 기능", color=0x00ff00)
         embed.add_field(name="루냥아 계산해줘 (계산식)", value="Wolfram|Alpha 계산 쿼리를 제공합니다", inline=False)
@@ -71,21 +75,36 @@ def test_features(bot_ver):
     return embed
 
 def ret_changelog():
-    changelog = "```v1.10.1 (2019-07-31)\n"
+    changelog = "```v1.10.2 (2019-08-04)\n"
+    changelog+= "- 가위바위보 기능 추가\n"
+    changelog+= "v1.10.1 (2019-07-31)\n"
     changelog+= "- 관심 가져주기 기능 추가\n"
     changelog+= "v1.10.0 (2019-07-31)\n"
     changelog+= "- 명령어 2개 추가\n"
     changelog+= "- 봇 동작 안정화```"
     return changelog
 
-def get_info(client, uptime, uid, hash_str, memkb, bot_ver):
+def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, servers, users):
     embed=discord.Embed(title="System Information")
     embed.set_thumbnail(url=client.user.avatar_url)
     embed.add_field(name="Bot ID", value=str(uid), inline=True)
     embed.add_field(name="Uptime", value=uptime, inline=True)
+    embed.add_field(name="Command count", value=str(count_d) + " (Total " + str(count_s) + ")", inline=True)
+    embed.add_field(name="Instance count", value=str(servers) + " servers, " + str(users) + " users", inline=True)
     embed.add_field(name="Self MD5 Hash", value=hash_str, inline=True)
+    embed.add_field(name="Environment", value=str(os.popen("uname -s").read()), inline=True)
     embed.add_field(name="Python version", value=cpuinfo.get_cpu_info()["python_version"], inline=True)
     embed.add_field(name="Processor", value=cpuinfo.get_cpu_info()["brand"], inline=True)
     embed.add_field(name="Memory", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB of total RAM\n" + str(memkb / 1024) + " KB using by bot", inline=True)
+    embed.set_footer(text="ver " + bot_ver)
+    return embed
+
+def ret_admincmd(bot_ver):
+    embed=discord.Embed(title="Admistrator commands")
+    embed.add_field(name="getinfo", value="Returns system information and bot status.", inline=True)
+    embed.add_field(name="실행해줘", value="executes shell command.\narguments : command", inline=True)
+    embed.add_field(name="set_news", value="sets announcement text.\narguments : text\nuse '&nbsp' as line feed.", inline=True)
+    embed.add_field(name="send_news", value="sends announcement.\narguments : Channel ID", inline=True)
+    embed.add_field(name="자가진단", value="tests bot permission. can used by normal users.", inline=True)
     embed.set_footer(text="ver " + bot_ver)
     return embed

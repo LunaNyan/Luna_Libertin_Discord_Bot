@@ -81,3 +81,7 @@ def l_ticket(message):
 def say_lv():
     say_lv_str = ["(꼬옥", "(껴안"]
     return random.choice(say_lv_str)
+
+def l_lv():
+    l_lv_str = ["저두우~:two_hearts:", "헤헤~(방긋"]
+    return random.choice(l_lv_str)

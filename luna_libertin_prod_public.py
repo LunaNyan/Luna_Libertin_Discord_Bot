@@ -6,7 +6,7 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user
+import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps
 from datetime import datetime, timedelta
 from random import randint
 from m_seotda import *
@@ -23,7 +23,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.1p4"
+bot_ver = "1.10.2"
 
 db_path = "luna_config.txt"
 
@@ -46,6 +46,8 @@ except:
     print("couldn't get hard link to get self MD5 hash. type 'ln -f luna_libertin_prod_public.py for_hash.py' to resolve.")
 
 news_str = ""
+
+comm_count = 0
 
 client = discord.Client()
 
@@ -77,12 +79,15 @@ async def on_message(message):
     global test_glyph
     global hash_str
     global news_str
+    global comm_count
     if message.author == client.user:
         return
     elif message.author.bot:
         return
     if message.content.startswith(test_glyph + '루냥아') or message.content.startswith(test_glyph + '루냥이') or message.content.startswith(test_glyph + '커냥이') or message.content.startswith(test_glyph + '귀냥이'):
         m_user.increase(db, message.author)
+        comm_count+= 1
+        db.set("etc", "comm_count", str(int(db.get("etc", "comm_count")) + 1))
     m_user.count(db, message.author)
     if m_user.ret_check(db, message.author) >= 200 and m_user.check_count(db, message.author) >= 30 and randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True:
         await client.send_message(message.channel, message.author.mention + " " + say_lv())
@@ -151,6 +156,8 @@ async def on_message(message):
         await client.send_message(message.channel, l_ping())
     elif message.content == test_glyph + '루냥아 짖어봐':
         await client.send_message(message.channel, l_dog())
+    elif message.content == test_glyph + '루냥아 사랑해':
+        await client.send_message(message.channel, l_lv())
     elif message.content == test_glyph + '루냥아 손':
         await client.send_message(message.channel, ':raised_hand:')
     elif message.content == test_glyph + '루냥아 주사위':
@@ -161,8 +168,6 @@ async def on_message(message):
         await client.send_message(message.channel, embed=m_user.check(db, message.author))
     elif message.content == test_glyph + '루냥아 관심 가져주기':
         await client.send_message(message.channel, embed=m_user.toggle_sudden_hugging(db, message.author))
-    elif message.content == test_glyph + '루냥아 자가진단 getHash':
-        await client.send_message(message.channel, hash_str)
     elif message.content == test_glyph + '루냥아 자가진단':
         permcheck_message_manage = ":green_heart: 정상"
         permcheck_links = ":green_heart: 정상"
@@ -182,6 +187,8 @@ async def on_message(message):
         for s in client.servers:
             members_sum += len(s.members)
         await client.send_message(message.channel, str(len(client.servers)) + "개의 서버에서 " + str(members_sum) + "명에게 귀여움받는중 :two_hearts:")
+    elif message.content.startswith(test_glyph + '루냥아 가위바위보'):
+        await client.send_message(message.channel, embed=m_rps.rps(message.content))
     elif message.content == test_glyph + "루냥아 서버목록":
         await client.send_message(message.channel, embed=m_help.servers_list(client))
     elif message.content == "_루냥아 테스트기능" and test_glyph == "_":
@@ -197,7 +204,9 @@ async def on_message(message):
         news_str = message.content
         news_str = news_str.replace('루냥아 set_news ', '')
         news_str = news_str.replace("&nbsp", "\n")
-        await client.send_message(message.channel, news_str)
+        embed = discord.Embed(title="Youe news will see like this", description=news_str, color=0xffccff)
+        embed.set_thumbnail(url=client.user.avatar_url)
+        await client.send_message(message.channel, embed=embed)
     elif message.content.startswith(test_glyph + '루냥아 send_news ') and message.author.id == '280306700324700160':
         channel_str = message.content
         channel_str = channel_str.replace('루냥아 send_news ', '')
@@ -209,7 +218,12 @@ async def on_message(message):
     elif message.content == test_glyph + '루냥아 getinfo' and message.author.id == '280306700324700160':
         process = psutil.Process(os.getpid())
         upt = datetime.now() - startTime
-        await client.send_message(message.channel, embed=m_help.get_info(client, str(upt), client.user.id, hash_str, process.memory_info().rss, bot_ver))
+        users = 0
+        for s in client.servers:
+            users += len(s.members)
+        await client.send_message(message.channel, embed=m_help.get_info(client, str(upt), client.user.id, hash_str, process.memory_info().rss, comm_count, db.get("etc", "comm_count"), bot_ver, str(len(client.servers)), users))
+    elif message.content == test_glyph + '루냥아 admincmd' and message.author.id == '280306700324700160':
+        await client.send_message(message.channel, embed=m_help.ret_admincmd(bot_ver))
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 
