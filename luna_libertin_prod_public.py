@@ -23,7 +23,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.2"
+bot_ver = "1.10.3"
 
 db_path = "luna_config.txt"
 
@@ -110,17 +110,7 @@ async def on_message(message):
     elif message.content == test_glyph + '루냥이 쓰담쓰담':
         await client.send_message(message.channel, pat())
     elif message.content.startswith(test_glyph + '루냥아 섯다 '):
-        result = seotda_init(message.content)
-        if result == "e_duplicated":
-            await client.send_message(message.channel, ":thinking: 같은 카드를 중복해서 고를 수 없습니다")
-        elif result == "e_outofrange":
-            await client.send_message(message.channel, ":thinking: 0에서 9까지의 숫자를 입력해주세요")
-        elif result == "e_value":
-            await client.send_message(message.channel, ":thinking: 잘못된 입력입니다")
-        else:
-            result_player = ret_player()
-            result_cpu = ret_cpu()
-            await client.send_message(message.channel, ret_player_selection() + " (" + ret_player_card() + ")을 골랐습니다\n상대방 패 : " + ret_cpu_selection() + " (" + ret_cpu_card() + ")\n" + result_player + " VS " + result_cpu + " : **" + result + "**\n" + ret_deck())
+        await client.send_message(message.channel, embed=seotda(message.content))
     elif message.content.startswith(test_glyph + '루냥아 확성기 '):
         if re.search(db.get("string", "hatespeech"), message.content):
             await client.delete_message(message)
@@ -204,17 +194,21 @@ async def on_message(message):
         news_str = message.content
         news_str = news_str.replace('루냥아 set_news ', '')
         news_str = news_str.replace("&nbsp", "\n")
-        embed = discord.Embed(title="Youe news will see like this", description=news_str, color=0xffccff)
+        embed = discord.Embed(title="Successfully set news. here is a preview", description=news_str, color=0xffccff)
         embed.set_thumbnail(url=client.user.avatar_url)
         await client.send_message(message.channel, embed=embed)
     elif message.content.startswith(test_glyph + '루냥아 send_news ') and message.author.id == '280306700324700160':
         channel_str = message.content
         channel_str = channel_str.replace('루냥아 send_news ', '')
-        news_channel = discord.Object(id=channel_str)
-        embed = discord.Embed(title="기계식 루냥이 공지", description=news_str, color=0xffccff)
-        embed.set_thumbnail(url=client.user.avatar_url)
-        embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
-        await client.send_message(news_channel, embed=embed)
+        try:
+            news_channel = discord.Object(id=channel_str)
+            embed = discord.Embed(title="기계식 루냥이 공지", description=news_str, color=0xffccff)
+            embed.set_thumbnail(url=client.user.avatar_url)
+            embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
+            await client.send_message(news_channel, embed=embed)
+        except Exception as e:
+            embed = discord.Embed(title="Exception occured", description=str(e), color=0xff0000)
+            await client.send_message(message.channel, embed=embed)
     elif message.content == test_glyph + '루냥아 getinfo' and message.author.id == '280306700324700160':
         process = psutil.Process(os.getpid())
         upt = datetime.now() - startTime

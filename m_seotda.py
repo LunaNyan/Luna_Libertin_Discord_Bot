@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from random import randint, shuffle
+import discord
 
 winning_percentage = 7
 # 승률 조정 (기본값 : 7)
@@ -134,7 +135,7 @@ def seotda_ready():
     shuffle(deck)
     deck = deck[:10]
 
-def seotda_init(message_content):
+def seotda(message_content):
     global result_str_player
     global result_str_cpu
     global winning_percentage
@@ -145,9 +146,9 @@ def seotda_init(message_content):
         x = int(x)
         y = int(y)
         if x == y:
-            return "e_duplicated"
+            embed = discord.Embed(title="같은 카드를 두 번 고를 수 없습니다")
         elif x < 0 or y < 0 or x > 9 or y > 9:
-            return "e_outofrange"
+            embed = discord.Embed(title="0에서 9까지의 숫자 두개를 골라주세요")
         else:
             while 1 == 1:
                 seotda_ready()
@@ -158,46 +159,30 @@ def seotda_init(message_content):
                 if power_cpu - power_player >= winning_percentage:
                     continue
                 elif power_player == power_cpu:
-                    return "비겼습니다!"
+                    result = "비겼습니다!"
                     break
                 elif power_player > power_cpu:
                     if power_player - power_cpu == 1:
-                        return "한 끗 차이로 승리!"
+                        result = "한 끗 차이로 승리!"
                     else:
-                        return "승리!"
+                        result = "승리!"
                     break
                 elif power_player < power_cpu:
                     if power_cpu - power_player == 1:
-                        return "한 끗 차이로 패배!"
+                        result = "한 끗 차이로 패배!"
                     else:
-                        return "패배!"
+                        result = "패배!"
                     break
+            embed = discord.Embed(title="섯다 진행 결과", color=0xffff00)
+            embed.add_field(name="사용자 선택", value=str(xa) + ", " + str(xb) + "(" + str(xaa) + "월, " + str(xbb) + "월), " + result_str_player, inline=True)
+            embed.add_field(name="CPU 선택", value=str(ya) + ", " + str(yb) + "(" + str(yaa) + "월, " + str(ybb) + "월), " + result_str_cpu, inline=True)
+            embed.add_field(name="결과", value=result, inline=True)
+            d0 = ""
+            d2 = 0
+            for d1 in deck:
+                d0 = d0 + str(d2) + "번 패 : " + str(d1) + "월\n"
+                d2 = d2 + 1
+            embed.add_field(name="패 목록", value=d0, inline=False)
     except ValueError:
-        return "e_value"
-
-def ret_player():
-    return result_str_player
-
-def ret_cpu():
-    return result_str_cpu
-
-def ret_deck():
-    d0 = "```패 목록\n"
-    d2 = 0
-    for d1 in deck:
-        d0 = d0 + str(d2) + "번 패 : " + str(d1) + "월\n"
-        d2 = d2 + 1
-    d0 = d0 + "```"
-    return d0
-
-def ret_cpu_selection():
-    return str(ya) + ", " + str(yb)
-
-def ret_cpu_card():
-    return str(yaa) + "월, " + str(ybb) + "월"
-
-def ret_player_selection():
-    return str(xa) + ", " + str(xb)
-
-def ret_player_card():
-    return str(xaa) + "월, " + str(xbb) + "월"
+        embed = discord.Embed(title="잘못된 카드 번호입니다")
+    return embed

@@ -33,7 +33,7 @@ def check(conf, user):
         embed = discord.Embed(title=usrname + " 님의 프로필", color=0xff0080)
     embed.set_thumbnail(url=user.avatar_url)
     if pt == 2147483647:
-        ptstr = "노예"
+        ptstr = "개발자"
     elif pt >= 500:
         ptstr = "애인"
     elif pt >= 300:
@@ -49,14 +49,13 @@ def check(conf, user):
     else:
         ptstr = "안녕하세요!"
     embed.add_field(name="호감도", value=ptstr, inline=True)
-    embed.add_field(name="유저 ID", value=str(user.id), inline=True)
-    embed.add_field(name="가입 일시", value=user.created_at.isoformat(), inline=True)
+    embed.add_field(name="Discord 가입 일시", value=user.created_at.isoformat(), inline=True)
     embed.add_field(name="서버 가입 일시", value=user.joined_at.isoformat(), inline=True)
     if user.server_permissions.administrator:
         usrperm = "서버 관리자"
     else:
         usrperm = "일반"
-    embed.add_field(name="서버 권한", value=usrperm, inline=True)
+    embed.add_field(name="서버에서의 권한", value=usrperm, inline=True)
     return embed
 
 def check_allow_sudden_hugging(conf, user):

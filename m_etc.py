@@ -19,12 +19,9 @@ def sans():
     return random.choice(sans_str)
 
 def imcute():
-    imcute_str = ["그쵸 루냥이 진짜 너무 귀여워요 ㅠㅜ",
-                  "아웅 루냥이 너무 큐트뽀쟉해 지구뿌셔ㅠㅠㅜ",
-                  "저 루냥이 꼬리 잡아당겨본 적 있는데 그때 진짜 심장멎을뻔했어요ㅠㅠ:heart_eyes:",
-                  "루냥이 쓰다듬다가 좋아하는 표정 보고 심쿵:heart_eyes: 골골송 하는것도 너무 큐트해ㅠㅜ",
-                  "아웅 어뜩행 ㅠㅜ 너무 귀여워 ㅠㅜ",
-                  "루냥이 너무 귀여워! :heart_eyes:"]
+    imcute_str = ["허ㅓㅓㅓㅓㅓㅓㅓㅓㅠㅠㅠㅠㅠㅠㅠㅠㅠ저 너무 끼여워여",
+                  "저 너무 깜찍하고 귀여워여 ㅠㅠㅠㅠㅠㅠ",
+                  "헉 ㅠ ㅜㅠㅜㅜㅜ 나 넘귀엽다 ㅠ ㅠㅠㅠ 넘귀여워 나 엄청귀엽다 :two_hearts::purple_heart::purple_heart::heart::heart:"]
     return random.choice(imcute_str)
 
 def pat():
