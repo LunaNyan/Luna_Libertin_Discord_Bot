@@ -23,7 +23,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.3"
+bot_ver = "1.10.4"
 
 db_path = "luna_config.txt"
 
@@ -179,8 +179,13 @@ async def on_message(message):
         await client.send_message(message.channel, str(len(client.servers)) + "개의 서버에서 " + str(members_sum) + "명에게 귀여움받는중 :two_hearts:")
     elif message.content.startswith(test_glyph + '루냥아 가위바위보'):
         await client.send_message(message.channel, embed=m_rps.rps(message.content))
-    elif message.content == test_glyph + "루냥아 서버목록":
-        await client.send_message(message.channel, embed=m_help.servers_list(client))
+    elif message.content.startswith (test_glyph + "루냥아 서버목록"):
+        page = message.content.replace(test_glyph + "루냥아 서버목록 ", "")
+        try:
+            page = int(page)
+        except:
+            page = 1
+        await client.send_message(message.channel, embed=m_help.servers_list(client, page))
     elif message.content == "_루냥아 테스트기능" and test_glyph == "_":
         await client.send_message(message.channel, embed=m_help.test_features(bot_ver))
     elif message.content.startswith(test_glyph + '루냥아 실행해줘 ') and message.author.id == '280306700324700160':
@@ -209,6 +214,11 @@ async def on_message(message):
         except Exception as e:
             embed = discord.Embed(title="Exception occured", description=str(e), color=0xff0000)
             await client.send_message(message.channel, embed=embed)
+    elif message.content == test_glyph + '루냥아 get_news' and message.author.id == '280306700324700160':
+        embed = discord.Embed(title="기계식 루냥이 공지", description=news_str, color=0xffccff)
+        embed.set_thumbnail(url=client.user.avatar_url)
+        embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
+        await client.send_message(message.channel, embed=embed)
     elif message.content == test_glyph + '루냥아 getinfo' and message.author.id == '280306700324700160':
         process = psutil.Process(os.getpid())
         upt = datetime.now() - startTime

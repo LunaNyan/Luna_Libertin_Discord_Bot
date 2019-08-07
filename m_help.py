@@ -1,4 +1,4 @@
-import discord, cpuinfo, psutil, os
+import discord, cpuinfo, psutil, os, math
 
 def help(client, text, bot_ver):
     a = text
@@ -58,13 +58,35 @@ def help(client, text, bot_ver):
         embed=discord.Embed(title='전체 도움말을 원하신다면 그냥 "루냥아 도와줘"라고만 입력해주세요!')
     return embed
 
-def servers_list(client):
+def servers_list(client, page):
     embed=discord.Embed(title="전체 서버 목록", color=0xff00ff)
-    members_sum = 0
+    n = 0
+    servers = {}
+    sorted_servers = {}
+    lk = []
+    lu = []
+    lo = []
     for s in client.servers:
-        embed.add_field(name=str(s), value="유저 수 : " + str(len(s.members)), inline=True)
-        members_sum+= len(s.members)
-    embed.set_footer(text="전제 서버 수 : " + str(len(client.servers)) + ", 전체 유저 수 : " + str(members_sum))
+        servers[str(s)] = [str(len(s.members)), s.owner.name]
+        n += 1
+    sorted_servers = sorted(servers)
+    for k in sorted_servers:
+        lk.append(k)
+        lu.append(servers[k][0])
+        lo.append(servers[k][1])
+    pages = math.ceil(len(lk) / 20)
+    if page > pages or page <= 0:
+        embed=discord.Embed(title="잘못된 페이지 번호입니다")
+    else:
+        c = (page - 1) * 20
+        ct = c + 19
+        while c <= ct:
+            try:
+                embed.add_field(name=lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=True)
+                c += 1
+            except:
+                break
+        embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 서버목록 (페이지)"')
     return embed
 
 def test_features(bot_ver):
