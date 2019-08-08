@@ -7,12 +7,19 @@ def help(client, text, bot_ver):
     if a == '':
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V) [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160)", color=0xff0080)
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
-        embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역, 루냥아 나 어때", inline=False)
+        embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역", inline=False)
+        embed.add_field(name="정보", value="루냥아 나 어때, 루냥아 서버정보, 루냥아 자가진단, 루냥아 서버목록", inline=False)
         embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 인기도, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 주사위, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
-        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 서버목록", inline=False)
+        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기", inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
+    elif a == ' 정보':
+        embed=discord.Embed(title="도움말", description="정보 항목", color=0x8080ff)
+        embed.add_field(name="루냥아 나 어때", value="사용자 정보를 불러옵니다", inline=False)
+        embed.add_field(name="루냥아 서버정보", value="서버 정보를 불러옵니다", inline=False)
+        embed.add_field(name="루냥아 자가진단", value="봇이 정상 동작할 수 있는지 점검합니다", inline=False)
+        embed.add_field(name="루냥아 서버목록", value="서버 목록을 불러옵니다", inline=False)
     elif a == ' 일상':
         embed=discord.Embed(title="도움말", description="일상 항목", color=0x8080ff)
         embed.add_field(name="루냥아 배고파", value="랜덤으로 음식을 추천해줍니다 (음식을 사주지는 않습니다!)", inline=False)
@@ -82,7 +89,7 @@ def servers_list(client, page):
         ct = c + 19
         while c <= ct:
             try:
-                embed.add_field(name=lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=True)
+                embed.add_field(name="#" + str(c+1) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=True)
                 c += 1
             except:
                 break

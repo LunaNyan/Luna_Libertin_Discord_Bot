@@ -115,3 +115,15 @@ def check_count(conf, user):
 
 def reset_count(conf, user):
     conf.set("count", str(user.id), "0")
+
+def serverinfo(guild):
+    embed=discord.Embed(title=guild.name, color=0xffff00)
+    embed.set_thumbnail(url=guild.icon_url)
+    embed.add_field(name="서버 생성 일시", value=guild.created_at.isoformat(), inline=True)
+    embed.add_field(name="주인", value=guild.owner.name, inline=True)
+    embed.add_field(name="서버 지역", value=str(guild.region), inline=True)
+    embed.add_field(name="서버 인원 수", value=str(len(guild.members)), inline=True)
+    embed.add_field(name="역할 수", value=str(len(guild.roles)), inline=True)
+    embed.add_field(name="채널 수", value=str(len(guild.channels)), inline=True)
+    embed.add_field(name="커스텀 이모지 수", value=str(len(guild.emojis)), inline=True)
+    return embed

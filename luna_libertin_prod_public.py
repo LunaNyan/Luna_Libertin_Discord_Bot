@@ -23,7 +23,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.4"
+bot_ver = "1.10.5"
 
 db_path = "luna_config.txt"
 
@@ -156,6 +156,8 @@ async def on_message(message):
         await client.send_message(message.channel, l_ticket(message.content))
     elif message.content == test_glyph + '루냥아 나 어때':
         await client.send_message(message.channel, embed=m_user.check(db, message.author))
+    elif message.content == test_glyph + '루냥아 서버정보':
+        await client.send_message(message.channel, embed=m_user.serverinfo(message.server))
     elif message.content == test_glyph + '루냥아 관심 가져주기':
         await client.send_message(message.channel, embed=m_user.toggle_sudden_hugging(db, message.author))
     elif message.content == test_glyph + '루냥아 자가진단':
