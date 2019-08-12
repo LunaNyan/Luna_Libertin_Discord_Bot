@@ -23,7 +23,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.10.5"
+bot_ver = "1.10.6"
 
 db_path = "luna_config.txt"
 
@@ -46,6 +46,7 @@ except:
     print("couldn't get hard link to get self MD5 hash. type 'ln -f luna_libertin_prod_public.py for_hash.py' to resolve.")
 
 news_str = ""
+news_title_str = "기계식 루냥이 공지"
 
 comm_count = 0
 
@@ -79,6 +80,7 @@ async def on_message(message):
     global test_glyph
     global hash_str
     global news_str
+    global news_title_str
     global comm_count
     if message.author == client.user:
         return
@@ -100,7 +102,7 @@ async def on_message(message):
         embed = m_help.help(client, message.content, bot_ver)
         await client.send_message(message.channel, embed=embed)
     elif message.content == test_glyph + '루냥아 업데이트내역':
-        await client.send_message(message.channel, m_help.ret_changelog())
+        await client.send_message(message.channel, embed=m_help.ret_changelog(client))
     elif message.content == test_glyph + '루냥아 배고파':
         await client.send_message(message.channel, m_food.return_food())
     elif message.content == test_glyph + '루냥이 귀여워' or message.content == test_glyph + '루냥이 커여워' or message.content == test_glyph + '귀냥이 루여워' or message.content == test_glyph + '커냥이 루여워':
@@ -201,7 +203,16 @@ async def on_message(message):
         news_str = message.content
         news_str = news_str.replace('루냥아 set_news ', '')
         news_str = news_str.replace("&nbsp", "\n")
-        embed = discord.Embed(title="Successfully set news. here is a preview", description=news_str, color=0xffccff)
+        embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
+        embed.set_thumbnail(url=client.user.avatar_url)
+        await client.send_message(message.channel, embed=embed)
+        if news_title_str != "기계식 루냥이 공지":
+            await client.send_message(message.channel, ":warning: custom embed title was set : " + news_title_str)
+    elif message.content.startswith(test_glyph + '루냥아 set_title ') and message.author.id == '280306700324700160':
+        news_title_str = message.content
+        news_title_str = news_title_str.replace('루냥아 set_title ', '')
+        news_title_str = news_title_str.replace("&nbsp", "\n")
+        embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
         embed.set_thumbnail(url=client.user.avatar_url)
         await client.send_message(message.channel, embed=embed)
     elif message.content.startswith(test_glyph + '루냥아 send_news ') and message.author.id == '280306700324700160':
@@ -209,7 +220,7 @@ async def on_message(message):
         channel_str = channel_str.replace('루냥아 send_news ', '')
         try:
             news_channel = discord.Object(id=channel_str)
-            embed = discord.Embed(title="기계식 루냥이 공지", description=news_str, color=0xffccff)
+            embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
             embed.set_thumbnail(url=client.user.avatar_url)
             embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
             await client.send_message(news_channel, embed=embed)
@@ -217,7 +228,7 @@ async def on_message(message):
             embed = discord.Embed(title="Exception occured", description=str(e), color=0xff0000)
             await client.send_message(message.channel, embed=embed)
     elif message.content == test_glyph + '루냥아 get_news' and message.author.id == '280306700324700160':
-        embed = discord.Embed(title="기계식 루냥이 공지", description=news_str, color=0xffccff)
+        embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
         embed.set_thumbnail(url=client.user.avatar_url)
         embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
         await client.send_message(message.channel, embed=embed)

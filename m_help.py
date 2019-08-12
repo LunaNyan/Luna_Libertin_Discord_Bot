@@ -103,15 +103,17 @@ def test_features(bot_ver):
     embed.set_footer(text="ver " + bot_ver)
     return embed
 
-def ret_changelog():
-    changelog = "```v1.10.2 (2019-08-04)\n"
-    changelog+= "- 가위바위보 기능 추가\n"
-    changelog+= "v1.10.1 (2019-07-31)\n"
-    changelog+= "- 관심 가져주기 기능 추가\n"
-    changelog+= "v1.10.0 (2019-07-31)\n"
-    changelog+= "- 명령어 2개 추가\n"
-    changelog+= "- 봇 동작 안정화```"
-    return changelog
+def ret_changelog(client):
+    embed=discord.Embed(title="업데이트 내역", description="1.10.x", color=0xffffff)
+    embed.set_thumbnail(url=client.user.avatar_url)
+    embed.add_field(name="1.10.6 (2019-08-12)", value="- 업데이트 내역 기능 개선", inline=False)
+    embed.add_field(name="1.10.5 (2019-08-08)", value="- 서버 정보 기능 추가", inline=False)
+    embed.add_field(name="1.10.4 (2019-08-07)", value="- 서버 목록에 페이지 기능 추가", inline=False)
+    embed.add_field(name="1.10.3 (2019-08-06)", value="- 섯다 결과를 더 깔끔하게 출력하도록 변경", inline=False)
+    embed.add_field(name="1.10.2 (2019-08-04)", value="- 가위바위보 기능 추가", inline=False)
+    embed.add_field(name="1.10.1 (2019-08-01)", value="- 패시브 기능 1개 추가", inline=False)
+    embed.add_field(name="1.10.0 (2019-07-31)", value="- 호감도 기능 추가\n- 서버 목록 기능 추가\n- 사용자 정보 기능 추가", inline=False)
+    return embed
 
 def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, servers, users):
     embed=discord.Embed(title="System Information")
@@ -124,16 +126,16 @@ def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, se
     embed.add_field(name="Environment", value=str(os.popen("uname -s").read()), inline=True)
     embed.add_field(name="Python version", value=cpuinfo.get_cpu_info()["python_version"], inline=True)
     embed.add_field(name="Processor", value=cpuinfo.get_cpu_info()["brand"], inline=True)
-    embed.add_field(name="Memory", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB of total RAM\n" + str(memkb / 1024) + " KB using by bot", inline=True)
+    embed.add_field(name="Memory", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB of total RAM\n" + str(int(memkb / 1024)) + " KB using by bot", inline=True)
     embed.set_footer(text="ver " + bot_ver)
     return embed
 
 def ret_admincmd(bot_ver):
     embed=discord.Embed(title="Admistrator commands")
-    embed.add_field(name="getinfo", value="Returns system information and bot status.", inline=True)
-    embed.add_field(name="실행해줘", value="executes shell command.\narguments : command", inline=True)
-    embed.add_field(name="set_news", value="sets announcement text.\narguments : text\nuse '&nbsp' as line feed.", inline=True)
-    embed.add_field(name="send_news", value="sends announcement.\narguments : Channel ID", inline=True)
-    embed.add_field(name="자가진단", value="tests bot permission. can used by normal users.", inline=True)
+    embed.add_field(name="getinfo", value="Returns system information and bot status.", inline=False)
+    embed.add_field(name="실행해줘", value="executes shell command.\narguments : command", inline=False)
+    embed.add_field(name="set_news", value="sets announcement text.\narguments : text\nuse '&nbsp' as line feed.", inline=False)
+    embed.add_field(name="set_title", value="sets announcement title.", inline=False)
+    embed.add_field(name="send_news", value="sends announcement.\narguments : Channel ID", inline=False)
     embed.set_footer(text="ver " + bot_ver)
     return embed
