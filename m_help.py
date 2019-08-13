@@ -8,7 +8,7 @@ def help(client, text, bot_ver):
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V) [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160)", color=0xff0080)
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
         embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역", inline=False)
-        embed.add_field(name="정보", value="루냥아 나 어때, 루냥아 서버정보, 루냥아 자가진단, 루냥아 서버목록", inline=False)
+        embed.add_field(name="정보", value="루냥아 나 어때, 루냥아 서버정보, 루냥아 자가진단, 루냥아 서버목록, 루냥아 생일", inline=False)
         embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 인기도, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 주사위, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
@@ -20,6 +20,7 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥아 서버정보", value="서버 정보를 불러옵니다", inline=False)
         embed.add_field(name="루냥아 자가진단", value="봇이 정상 동작할 수 있는지 점검합니다", inline=False)
         embed.add_field(name="루냥아 서버목록", value="서버 목록을 불러옵니다", inline=False)
+        embed.add_field(name="루냥아 생일", value="봇이 언제 탄생했는지 알려줍니다", inline=False)
     elif a == ' 일상':
         embed=discord.Embed(title="도움말", description="일상 항목", color=0x8080ff)
         embed.add_field(name="루냥아 배고파", value="랜덤으로 음식을 추천해줍니다 (음식을 사주지는 않습니다!)", inline=False)
@@ -73,7 +74,7 @@ def servers_list(client, page):
     lk = []
     lu = []
     lo = []
-    for s in client.servers:
+    for s in client.guilds:
         servers[str(s)] = [str(len(s.members)), s.owner.name]
         n += 1
     sorted_servers = sorted(servers)
@@ -103,16 +104,10 @@ def test_features(bot_ver):
     embed.set_footer(text="ver " + bot_ver)
     return embed
 
-def ret_changelog(client):
-    embed=discord.Embed(title="업데이트 내역", description="1.10.x", color=0xffffff)
+def ret_changelog(client, bot_ver):
+    embed=discord.Embed(title="업데이트 내역", description="현재 버전은 " + bot_ver + "이예요!", color=0xffffff)
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.add_field(name="1.10.6 (2019-08-12)", value="- 업데이트 내역 기능 개선", inline=False)
-    embed.add_field(name="1.10.5 (2019-08-08)", value="- 서버 정보 기능 추가", inline=False)
-    embed.add_field(name="1.10.4 (2019-08-07)", value="- 서버 목록에 페이지 기능 추가", inline=False)
-    embed.add_field(name="1.10.3 (2019-08-06)", value="- 섯다 결과를 더 깔끔하게 출력하도록 변경", inline=False)
-    embed.add_field(name="1.10.2 (2019-08-04)", value="- 가위바위보 기능 추가", inline=False)
-    embed.add_field(name="1.10.1 (2019-08-01)", value="- 패시브 기능 1개 추가", inline=False)
-    embed.add_field(name="1.10.0 (2019-07-31)", value="- 호감도 기능 추가\n- 서버 목록 기능 추가\n- 사용자 정보 기능 추가", inline=False)
+    embed.add_field(name="1.11.0 (2019-08-14)", value="- 런타임 기능 개선", inline=False)
     return embed
 
 def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, servers, users):
@@ -138,4 +133,9 @@ def ret_admincmd(bot_ver):
     embed.add_field(name="set_title", value="sets announcement title.", inline=False)
     embed.add_field(name="send_news", value="sends announcement.\narguments : Channel ID", inline=False)
     embed.set_footer(text="ver " + bot_ver)
+    return embed
+
+def bday():
+    embed=discord.Embed(title="저는 2017년 5월 9일에 태어났어요!", color=0xffff00)
+    embed.set_footer(text="(C) 2017 - 2019 libertin")
     return embed

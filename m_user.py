@@ -51,11 +51,11 @@ def check(conf, user):
     embed.add_field(name="호감도", value=ptstr, inline=True)
     embed.add_field(name="Discord 가입 일시", value=user.created_at.isoformat(), inline=True)
     embed.add_field(name="서버 가입 일시", value=user.joined_at.isoformat(), inline=True)
-    if user.server_permissions.administrator:
-        usrperm = "서버 관리자"
-    else:
-        usrperm = "일반"
-    embed.add_field(name="서버에서의 권한", value=usrperm, inline=True)
+#    if user.server_permissions.administrator:
+#        usrperm = "서버 관리자"
+#    else:
+#        usrperm = "일반"
+#    embed.add_field(name="서버에서의 권한", value=usrperm, inline=True)
     return embed
 
 def check_allow_sudden_hugging(conf, user):
@@ -126,4 +126,9 @@ def serverinfo(guild):
     embed.add_field(name="역할 수", value=str(len(guild.roles)), inline=True)
     embed.add_field(name="채널 수", value=str(len(guild.channels)), inline=True)
     embed.add_field(name="커스텀 이모지 수", value=str(len(guild.emojis)), inline=True)
+    if guild.mfa_level == 1:
+        mfa = "예"
+    else:
+        mfa = "아니오"
+    embed.add_field(name="서버 2차 인증", value=mfa, inline=True)
     return embed
