@@ -107,6 +107,7 @@ def test_features(bot_ver):
 def ret_changelog(client, bot_ver):
     embed=discord.Embed(title="업데이트 내역", description="현재 버전은 " + bot_ver + "이예요!", color=0xffffff)
     embed.set_thumbnail(url=client.user.avatar_url)
+    embed.add_field(name="1.11.1 (2019-08-14)", value="- 계산 기능이 동작하지 않는 문제 수정", inline=False)
     embed.add_field(name="1.11.0 (2019-08-14)", value="- 런타임 기능 개선", inline=False)
     return embed
 

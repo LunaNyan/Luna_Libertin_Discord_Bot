@@ -23,7 +23,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.11.0"
+bot_ver = "1.11.1"
 
 db_path = "luna_config.txt"
 
@@ -126,8 +126,8 @@ async def on_message(message):
         message_temp = await message.channel.send("잠시만 기다려주세요!")
         bci_str = message.content
         bci_str = bci_str.replace(test_glyph + "루냥아 계산해줘 이미지 ", "")
-        await client.send_file(message.channel, wa_img(bci_str))
-        await client.delete_message(message_temp)
+        await message.channel.send(file=discord.File(wa_img(bci_str)))
+        await message_temp.delete()
     elif message.content.startswith(test_glyph + "루냥아 계산해줘 "):
         try:
             bc_str = message.content
@@ -139,7 +139,7 @@ async def on_message(message):
             else:
                 bc_tmp = await message.channel.send("잠시만 기다려주세요!")
                 await message.channel.send(wa_calc(bc_str))
-                await client.delete_message(bc_tmp)
+                await bc_tmp.delete()
         except:
             await message.channel.send("연산식을 다시 확인해주세요")
     elif message.content.startswith(test_glyph + '루냥아 골라줘 '):
