@@ -6,13 +6,14 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps
+import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device
 from datetime import datetime, timedelta
 from random import randint
 from m_seotda import *
 from m_wolframalpha import wa_calc, wa_img
 from m_etc import *
 from m_hash import getHash
+import imp
 
 startTime = datetime.now()
 
@@ -23,7 +24,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "1.11.1"
+bot_ver = "1.11.2"
 
 db_path = "luna_config.txt"
 
@@ -162,6 +163,9 @@ async def on_message(message):
         await message.channel.send(embed=m_user.check(db, message.author))
     elif message.content == test_glyph + '루냥아 서버정보':
         await message.channel.send(embed=m_user.serverinfo(message.guild))
+    elif message.content == test_glyph + '루냥아 버전':
+        upt = datetime.now() - startTime
+        await message.channel.send(embed=m_help.get_info_public(client, bot_ver, upt, m_device.SERVER_NAME))
     elif message.content == test_glyph + '루냥아 관심 가져주기':
         await message.channel.send(embed=m_user.toggle_sudden_hugging(db, message.author))
     elif message.content == test_glyph + '루냥아 자가진단':
@@ -240,9 +244,15 @@ async def on_message(message):
         users = 0
         for s in client.guilds:
             users += len(s.members)
-        await message.channel.send(embed=m_help.get_info(client, str(upt), client.user.id, hash_str, process.memory_info().rss, comm_count, db.get("etc", "comm_count"), bot_ver, str(len(client.guilds)), users))
+        await message.channel.send(embed=m_help.get_info(client, str(upt), client.user.id, hash_str, process.memory_info().rss, comm_count, db.get("etc", "comm_count"), bot_ver, str(len(client.guilds)), users, process))
     elif message.content == test_glyph + '루냥아 admincmd' and message.author.id == 280306700324700160:
         await message.channel.send(embed=m_help.ret_admincmd(bot_ver))
+    elif message.content == test_glyph + '루냥아 reload_m' and message.author.id == 280306700324700160:
+        await message.channel.send("reloading command modules..")
+        a = str(imp.reload(m_food))
+        b = str(imp.reload(m_help))
+        c = str(imp.reload(m_user))
+        await message.channel.send(a + "\n" + b + "\n" + c + "\nsuccessfully reloaded")
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 
