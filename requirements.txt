@@ -4,3 +4,4 @@ psutil
 configparser
 requests
 xmltodict
+wolframalpha
