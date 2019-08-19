@@ -56,7 +56,7 @@ def check(conf, user):
         ptstr = "한번씩 놀아주는 사람"
     else:
         ptstr = "안녕하세요!"
-    embed.add_field(name="호감도", value=ptstr, inline=True)
+    embed.add_field(name="호감도", value=ptstr + "(" + str(pt) + ")", inline=True)
     embed.add_field(name="Discord 가입 일시", value=user.created_at.isoformat(), inline=True)
     embed.add_field(name="서버 가입 일시", value=user.joined_at.isoformat(), inline=True)
     if user.guild_permissions.administrator:
