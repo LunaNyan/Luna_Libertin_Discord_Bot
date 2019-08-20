@@ -1,6 +1,6 @@
 import discord, cpuinfo, psutil, os, math, m_food
 
-patch_ver = "-t2"
+patch_ver = "-t3"
 
 def help(client, text, bot_ver):
     a = text
@@ -9,7 +9,8 @@ def help(client, text, bot_ver):
     if a == '':
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160)", color=0xff0080)
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
-        embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역", inline=False)
+        embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역, 루냥아 누구니, 루냥아 소스코드", inline=False)
+        embed.add_field(name="공지사항", value="루냥아 공지사항 목록, 루냥아 공지사항 읽기 (숫자)", inline=False)
         embed.add_field(name="프로필", value="루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개)", inline=False)
         embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 자가진단, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
         embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 인기도, 와! 샌즈!", inline=False)
@@ -17,6 +18,16 @@ def help(client, text, bot_ver):
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기", inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
+    elif a == ' 도움말':
+        embed=discord.Embed(title="도움말", description="도움말 항목", color=0x8080ff)
+        embed.add_field(name="루냥아 도와줘 (항목)", value="각 항목에 대한 도움말을 표시합니다\n항목을 지정하지 않았다면 전체 명령어 목록이 표시됩니다", inline=False)
+        embed.add_field(name="루냥아 업데이트내역", value="업데이트 내역을 표시합니다", inline=False)
+        embed.add_field(name="루냥아 누구니", value="자기소개와 제작자 목록을 표시합니다", inline=False)
+        embed.add_field(name="루냥아 소스코드", value="기계식 루냥이의 GitHub 레포지토리를 표시합니다", inline=False)
+    elif a == ' 공지사항':
+        embed=discord.Embed(title="도움말", description="공지사항 항목", color=0x8080ff)
+        embed.add_field(name="루냥아 공지사항 목록", value="공지사항 목록을 불러옵니다", inline=False)
+        embed.add_field(name="루냥아 공지사항 읽기 (번호)", value="목록에 해당하는 번호의 공지사항을 읽습니다", inline=False)
     elif a == ' 프로필':
         embed=discord.Embed(title="도움말", description="프로필 항목", color=0x8080ff)
         embed.add_field(name="루냥아 나 어때", value="사용자 정보를 불러옵니다", inline=False)
@@ -130,9 +141,6 @@ def ret_changelog(client, bot_ver):
     embed=discord.Embed(title="업데이트 내역", description="현재 버전은 " + bot_ver + "이예요!\n" + patch_guide, color=0xffffff)
     embed.set_thumbnail(url=client.user.avatar_url)
     embed.add_field(name="Error : failed to load list for update log", value="Value : NOT_FOUND", inline=False)
-#    embed.add_field(name="1.11.2 (2019-08-14)", value="- 버전 정보 기능 추가", inline=False)
-#    embed.add_field(name="1.11.1 (2019-08-14)", value="- 계산 기능이 동작하지 않는 문제 수정", inline=False)
-#    embed.add_field(name="1.11.0 (2019-08-14)", value="- 런타임 기능 개선", inline=False)
     return embed
 
 def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, servers, users, pid):
@@ -173,8 +181,20 @@ def get_info_public(client, bot_ver, uptime, servername):
     embed.add_field(name="버전", value="봇 시스템 버전 " + bot_ver + "\n음식 추천 데이터베이스 버전 " + m_food.DB_VERSION + " (항목 " + m_food.ELEMENT_COUNT + "개)", inline=True)
     embed.add_field(name="컨테이너", value=servername, inline=True)
     embed.add_field(name="동작 시간", value=uptime, inline=True)
+    return embed
+
+def source_code():
+    embed=discord.Embed(title="소스 코드", description="[https://github.com/LunaNyan/Luna_Libertin_Discord_Bot](https://github.com/LunaNyan/Luna_Libertin_Discord_Bot)", color=0x7777ff)
+    embed.add_field(name="라이센스", value="기계식 루냥이는 MIT 라이센스로 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
+    return embed
+
+def selfintro(client, bot_ver):
+    embed=discord.Embed(title="기계식 루냥이", description="우리들만의 Discord 봇", color=0xffffff)
     embed.add_field(name="제작자", value="[libertin#2340](https://twitter.com/libertin_ko)", inline=True)
-    embed.add_field(name="도와주신 분들", value="[Katinor#1126](https://twitter.com/icoRayner)\nSeia#8114\n[perillamint#2189](https://twitter.com/perillamint)", inline=True)
+    embed.add_field(name="도와주신 분들", value="[Katinor](https://twitter.com/icoRayner)\nSeia\n[perillamint](https://twitter.com/perillamint)\n[yeoncomi](https://twitter.com/yeoncomi)", inline=True)
     embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160), [공식 트위터](https://twitter.com/luna_libertin)", inline=False)
-    embed.set_footer(text="(C) 2017 - 2019 libertin")
+    embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
+    embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [星海恋詩의 Picrew](https://picrew.me/image_maker/79516/)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
+    embed.set_thumbnail(url=client.user.avatar_url)
+    embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
     return embed

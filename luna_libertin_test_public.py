@@ -6,7 +6,7 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device
+import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device, m_board
 from datetime import datetime, timedelta
 from random import randint
 from m_seotda import *
@@ -51,6 +51,9 @@ except:
 news_str = ""
 news_title_str = "기계식 루냥이 공지"
 
+article_title = ""
+article_content = ""
+
 comm_count = 0
 
 client = discord.Client()
@@ -84,6 +87,8 @@ async def on_message(message):
     global hash_str
     global news_str
     global news_title_str
+    global article_title
+    global article_content
     global comm_count
     if message.author == client.user:
         return
@@ -106,8 +111,21 @@ async def on_message(message):
         await message.channel.send(embed=embed)
     elif message.content == '루냥아 업데이트내역':
         await message.channel.send(embed=m_help.ret_changelog(client, bot_ver))
+    elif message.content == '루냥아 공지사항 목록':
+        await message.channel.send(embed=m_board.list())
+    elif message.content.startswith('루냥아 공지사항 읽기 '):
+        try:
+            ix = int(message.content.replace('루냥아 공지사항 읽기 ', ''))
+            embed = m_board.read(ix)
+        except:
+            embed=discord.Embed(title="잘못된 게시글 번호예요!", description = '공지사항 목록을 보려면 "루냥아 공지사항 목록"을 입력하세요!', color=0xffff00)
+        await message.channel.send(embed=embed)
     elif message.content == '루냥아 후원':
         await message.channel.send(embed=m_help.donation())
+    elif message.content == '루냥아 소스코드':
+        await message.channel.send(embed=m_help.source_code())
+    elif message.content == '루냥아 누구니':
+        await message.channel.send(embed=m_help.selfintro(client, bot_ver))
     elif message.content == '루냥아 배고파':
         await message.channel.send(m_food.return_food())
     elif message.content == '루냥이 귀여워' or message.content == '루냥이 커여워' or message.content == '귀냥이 루여워' or message.content == '커냥이 루여워':
@@ -217,6 +235,7 @@ async def on_message(message):
         await message.channel.send(embed=m_help.servers_list(client, page))
     elif message.content == "루냥아 테스트기능" and test_glyph == "_":
         await message.channel.send(embed=m_help.test_features(bot_ver))
+    # admin only functions
     elif message.content.startswith('루냥아 실행해줘 ') and m_user.ret_check(db, message.author, "") == 2147483647:
         shl_str = message.content
         shl_str = shl_str.replace('루냥아 실행해줘 ','')
@@ -272,6 +291,15 @@ async def on_message(message):
         b = str(imp.reload(m_help))
         c = str(imp.reload(m_user))
         await message.channel.send(a + "\n" + b + "\n" + c + "\nsuccessfully reloaded")
+    elif message.content.startswith('루냥아 article set_title ') and m_user.ret_check(db, message.author, "") == 2147483647:
+        article_title = message.content.replace("루냥아 article set_title ", "")
+    elif message.content.startswith('루냥아 article set_content ') and m_user.ret_check(db, message.author, "") == 2147483647:
+        article_content = message.content.replace("루냥아 article set_content ", "")
+    elif message.content == '루냥아 article preview' and m_user.ret_check(db, message.author, "") == 2147483647:
+        embed = discord.Embed(title=article_title, description=article_content, color=0xffffff)
+        await message.channel.send(embed=embed)
+    elif message.content == '루냥아 article write' and m_user.ret_check(db, message.author, "") == 2147483647:
+        m_board.write(article_title, article_content)
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 

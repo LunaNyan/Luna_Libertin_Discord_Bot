@@ -12,7 +12,7 @@ def get_bio(conf, user):
 
 def increase(conf, user):
     try:
-        if int(conf.get("user_level", str(user.id))) < 2147483647:
+        if int(conf.get("user_level", str(user.id))) < 999999999:
             pt = int(conf.get("user_level", str(user.id))) + 1
             conf.set("user_level", str(user.id), str(pt))
             return True
@@ -42,6 +42,8 @@ def check(conf, user):
     embed.add_field(name="자기소개", value=get_bio(conf, user), inline=False)
     if pt == 2147483647:
         ptstr = "개발자"
+    if pt == 1000000000:
+        ptstr = "후원자"
     elif pt >= 500:
         ptstr = "애인"
     elif pt >= 300:
