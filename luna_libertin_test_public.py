@@ -59,6 +59,14 @@ comm_count = 0
 client = discord.Client()
 
 @client.event
+async def attendance_reset():
+    while True:
+        dt = datetime.now()
+        if dt.hour == 0 and dt.minute == 0 and dt.second == 0:
+            db.set("attendance", "today", "0")
+        await asyncio.sleep(1)
+
+@client.event
 async def bgjob_change_playing():
     while True:
         members_sum = 0
@@ -80,6 +88,7 @@ async def on_ready():
     print('version : ' + bot_ver)
     print('MD5 hash: ' + hash_str)
     client.loop.create_task(bgjob_change_playing())
+    client.loop.create_task(attendance_reset())
 
 @client.event
 async def on_message(message):
@@ -113,6 +122,8 @@ async def on_message(message):
         await message.channel.send(embed=m_help.ret_changelog(client, bot_ver))
     elif message.content == '루냥아 공지사항 목록':
         await message.channel.send(embed=m_board.list())
+    elif message.content == '루냥아 공지사항':
+        await message.channel.send(embed=m_board.read(1))
     elif message.content.startswith('루냥아 공지사항 읽기 '):
         try:
             ix = int(message.content.replace('루냥아 공지사항 읽기 ', ''))
@@ -140,6 +151,12 @@ async def on_message(message):
         bio_str = message.content.replace("루냥아 소개말 ", "")
         m_user.set_bio(db, message.author, bio_str)
         await message.channel.send("소개말을 설정했어요!")
+    elif message.content == '루냥아 방명록':
+        await message.channel.send(embed=m_board.gbook_view())
+    elif message.content.startswith('루냥아 방명록 쓰기 '):
+        m_board.gbook_write(message.content.replace("루냥아 방명록 쓰기 ", ""), message.author.name)
+        embed=discord.Embed(title="방명록에 글을 썼어요!", description='"루냥아 방명록"으로 목록을 볼 수 있어요!', color=0xffffff)
+        await message.channel.send(embed=embed)
     elif message.content.startswith('루냥아 확성기 '):
         if re.search(db.get("string", "hatespeech"), message.content):
             await message.delete()
@@ -186,6 +203,8 @@ async def on_message(message):
         await message.channel.send(l_dog())
     elif message.content == '루냥아 사랑해':
         await message.channel.send(l_lv(db, message.author, test_glyph))
+    elif message.content == '루냥아 출석체크':
+        await message.channel.send(embed=m_user.attendance(db, message.author))
     elif message.content == '루냥아 손':
         await message.channel.send(':raised_hand:')
     elif message.content.startswith('루냥아 생일'):
@@ -236,30 +255,30 @@ async def on_message(message):
     elif message.content == "루냥아 테스트기능" and test_glyph == "_":
         await message.channel.send(embed=m_help.test_features(bot_ver))
     # admin only functions
-    elif message.content.startswith('루냥아 실행해줘 ') and m_user.ret_check(db, message.author, "") == 2147483647:
+    elif message.content.startswith('루냥아 shellcmd ') and m_user.ret_check(db, message.author, "") == 2147483647:
         shl_str = message.content
-        shl_str = shl_str.replace('루냥아 실행해줘 ','')
+        shl_str = shl_str.replace('루냥아 shellcmd ','')
         try:
             await message.channel.send(str(os.popen(shl_str).read()))
         except:
             await message.channel.send(':facepalm:')
-    elif message.content.startswith('루냥아 set_news ') and m_user.ret_check(db, message.author, "") == 2147483647:
+    elif message.content.startswith('루냥아 news set_content ') and m_user.ret_check(db, message.author, "") == 2147483647:
         news_str = message.content
-        news_str = news_str.replace('루냥아 set_news ', '')
+        news_str = news_str.replace('루냥아 news set_content ', '')
         news_str = news_str.replace("&nbsp", "\n")
         embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
         embed.set_thumbnail(url=client.user.avatar_url)
         await message.channel.send(embed=embed)
         if news_title_str != "기계식 루냥이 공지":
             await message.channel.send(":warning: custom embed title was set : " + news_title_str)
-    elif message.content.startswith('루냥아 set_title ') and m_user.ret_check(db, message.author, "") == 2147483647:
+    elif message.content.startswith('루냥아 news set_title ') and m_user.ret_check(db, message.author, "") == 2147483647:
         news_title_str = message.content
-        news_title_str = news_title_str.replace('루냥아 set_title ', '')
+        news_title_str = news_title_str.replace('루냥아 news set_title ', '')
         news_title_str = news_title_str.replace("&nbsp", "\n")
         embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
         embed.set_thumbnail(url=client.user.avatar_url)
         await message.channel.send(embed=embed)
-    elif message.content.startswith('루냥아 send_news ') and m_user.ret_check(db, message.author, "") == 2147483647:
+    elif message.content.startswith('루냥아 news send ') and m_user.ret_check(db, message.author, "") == 2147483647:
         channel_str = message.content
         channel_str = channel_str.replace('루냥아 send_news ', '')
         try:
@@ -271,7 +290,7 @@ async def on_message(message):
         except Exception as e:
             embed = discord.Embed(title="Exception occured", description=str(e), color=0xff0000)
             await message.channel.send(embed=embed)
-    elif message.content == '루냥아 get_news' and m_user.ret_check(db, message.author, "") == 2147483647:
+    elif message.content == '루냥아 news preview' and m_user.ret_check(db, message.author, "") == 2147483647:
         embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
         embed.set_thumbnail(url=client.user.avatar_url)
         embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
@@ -300,6 +319,10 @@ async def on_message(message):
         await message.channel.send(embed=embed)
     elif message.content == '루냥아 article write' and m_user.ret_check(db, message.author, "") == 2147483647:
         m_board.write(article_title, article_content)
+    elif message.content == '루냥아 article clear' and m_user.ret_check(db, message.author, "") == 2147483647:
+        m_board.clear()
+    elif message.content == '루냥아 attendance reset' and m_user.ret_check(db, message.author, "") == 2147483647:
+        db.set("attendance", "today", "0")
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 

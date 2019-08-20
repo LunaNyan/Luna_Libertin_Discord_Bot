@@ -45,5 +45,35 @@ def list():
         i += 1
     return embed
 
-# todo
-# - db file itself
+def clear():
+    i = 1
+    while i <= 10:
+        db.set("article_" + str(i), "title", "empty")
+        db.set("article_" + str(i), "content", "empty")
+        db.set("article_" + str(i), "datetime", "empty")
+        i += 1
+
+def gbook_view():
+    embed = discord.Embed(title="방명록", color=0xffffff)
+    i = 1
+    while i <= 15:
+        content = db.get("gbook_" + str(i), "content")
+        author = db.get("gbook_" + str(i), "author")
+        dtstr = db.get("gbook_" + str(i), "datetime")
+        if dtstr != "empty":
+            embed.add_field(name = content, value = "작성자 : " + author + ", 작성 일자 : " + dtstr, inline=False)
+        i += 1
+    return embed
+
+def gbook_write(content, author):
+    shift_i = 14
+    while shift_i >= 1:
+        db.set("gbook_" + str(shift_i + 1), "author", db.get("gbook_" + str(shift_i), "author"))
+        db.set("gbook_" + str(shift_i + 1), "content", db.get("gbook_" + str(shift_i), "content"))
+        db.set("gbook_" + str(shift_i + 1), "datetime", db.get("gbook_" + str(shift_i), "datetime"))
+        shift_i -= 1
+    db.set("gbook_1", "author", author)
+    db.set("gbook_1", "content", content)
+    db.set("gbook_1", "datetime", str(datetime.datetime.now().isoformat()))
+    with open(db_path, 'w') as configfile:
+        db.write(configfile)

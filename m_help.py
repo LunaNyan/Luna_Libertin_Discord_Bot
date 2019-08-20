@@ -1,6 +1,6 @@
 import discord, cpuinfo, psutil, os, math, m_food
 
-patch_ver = "-t3"
+patch_ver = "-t4"
 
 def help(client, text, bot_ver):
     a = text
@@ -10,10 +10,10 @@ def help(client, text, bot_ver):
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160)", color=0xff0080)
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
         embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역, 루냥아 누구니, 루냥아 소스코드", inline=False)
-        embed.add_field(name="공지사항", value="루냥아 공지사항 목록, 루냥아 공지사항 읽기 (숫자)", inline=False)
+        embed.add_field(name="커뮤니티", value="루냥아 공지사항, 루냥아 공지사항 목록, 루냥아 공지사항 읽기 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
         embed.add_field(name="프로필", value="루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개)", inline=False)
         embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 자가진단, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
-        embed.add_field(name="일상", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 인기도, 와! 샌즈!", inline=False)
+        embed.add_field(name="일상", value="루냥아 출석체크, 루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 인기도, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 주사위, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기", inline=False)
@@ -24,10 +24,13 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥아 업데이트내역", value="업데이트 내역을 표시합니다", inline=False)
         embed.add_field(name="루냥아 누구니", value="자기소개와 제작자 목록을 표시합니다", inline=False)
         embed.add_field(name="루냥아 소스코드", value="기계식 루냥이의 GitHub 레포지토리를 표시합니다", inline=False)
-    elif a == ' 공지사항':
-        embed=discord.Embed(title="도움말", description="공지사항 항목", color=0x8080ff)
+    elif a == ' 커뮤니티':
+        embed=discord.Embed(title="도움말", description="커뮤니티 항목", color=0x8080ff)
+        embed.add_field(name="루냥아 공지사항", value="첫번째 공지사항을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 공지사항 목록", value="공지사항 목록을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 공지사항 읽기 (번호)", value="목록에 해당하는 번호의 공지사항을 읽습니다", inline=False)
+        embed.add_field(name="루냥아 방명록", value="방명록을 표시합니다", inline=False)
+        embed.add_field(name="루냥아 방명록 쓰기 (할 말)", value="방명록에 글을 씁니다", inline=False)
     elif a == ' 프로필':
         embed=discord.Embed(title="도움말", description="프로필 항목", color=0x8080ff)
         embed.add_field(name="루냥아 나 어때", value="사용자 정보를 불러옵니다", inline=False)
@@ -43,6 +46,7 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥아 후원", value="후원 계좌와 리워드를 표시합니다", inline=False)
     elif a == ' 일상':
         embed=discord.Embed(title="도움말", description="일상 항목", color=0x8080ff)
+        embed.add_field(name="루냥아 출석체크", value="출석을 체크합니다", inline=False)
         embed.add_field(name="루냥아 배고파", value="랜덤으로 음식을 추천해줍니다 (음식을 사주지는 않습니다!)", inline=False)
         embed.add_field(name="루냥이 귀여워", value="자기 자신을 귀여워합니다 (루냥이 커여워, 귀냥이 루여워, 커냥이 루여워 도 가능합니다)", inline=False)
         embed.add_field(name="루냥이 쓰담쓰담", value="자기 자신한테 사이버(?) 쓰다듬을 선물해줍니다", inline=False)
@@ -160,14 +164,7 @@ def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, se
     return embed
 
 def ret_admincmd(bot_ver):
-    embed=discord.Embed(title="Admistrator commands")
-    embed.add_field(name="getinfo", value="Returns system information and bot status.", inline=False)
-    embed.add_field(name="실행해줘", value="executes shell command.\narguments : command", inline=False)
-    embed.add_field(name="set_news", value="sets announcement text.\narguments : text\nuse '&nbsp' as line feed.", inline=False)
-    embed.add_field(name="set_title", value="sets announcement title.", inline=False)
-    embed.add_field(name="send_news", value="sends announcement.\narguments : Channel ID", inline=False)
-    embed.add_field(name="reload_m", value="reload command modules", inline=False)
-    embed.set_footer(text="ver " + bot_ver)
+    embed=discord.Embed(title="see the manpage k thx")
     return embed
 
 def bday():

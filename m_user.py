@@ -142,3 +142,25 @@ def serverinfo(guild):
         mfa = "아니오"
     embed.add_field(name="서버 2차 인증", value=mfa, inline=True)
     return embed
+
+def attendance(conf, user):
+    a = []
+    u = []
+    t = []
+    try:
+        a = conf.get("attendance", "today").split(", ")
+        if str(user.id) in a:
+            embed=discord.Embed(title="오늘 이미 출석을 했어요!", description="누적 출석 횟수 : " + str(conf.get("attendance", str(user.id))), color=0xffff00)
+        else:
+            raise
+    except:
+        try:
+            c = int(conf.get("attendance", str(user.id)))
+            c += 1
+            conf.set("attendance", str(user.id), str(c))
+            embed=discord.Embed(title="출석 체크를 했어요!", description="누적 출석 횟수 : " + str(conf.get("attendance", str(user.id))), color=0x00ff00)
+        except:
+            conf.set("attendance", str(user.id), "1")
+            embed=discord.Embed(title="처음으로 출석체크를 했어요!", color=0x00ff00)
+        conf.set("attendance", "today", conf.get("attendance", "today") + ", " + str(user.id))
+    return embed
