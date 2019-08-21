@@ -135,10 +135,14 @@ def seotda_ready():
     shuffle(deck)
     deck = deck[:10]
 
-def seotda(message_content):
+def seotda(message_content, user):
     global result_str_player
     global result_str_cpu
     global winning_percentage
+    if user.display_name == user.name:
+        usrname = user.name
+    else:
+        usrname = user.display_name + "(" + user.name + ")"
     try:
         message_content = message_content.replace("_", "")
         message_content = message_content.replace("루냥아 섯다 ", "")
@@ -148,7 +152,7 @@ def seotda(message_content):
         if x == y:
             embed = discord.Embed(title="같은 카드를 두 번 고를 수 없습니다")
         elif x < 0 or y < 0 or x > 9 or y > 9:
-            embed = discord.Embed(title="0에서 9까지의 숫자 두개를 골라주세요")
+            embed = discord.Embed(title="0에서 9까지의 숫자 두개를 골라주세요", description="예시 : 루냥아 섯다 " + str(randint(0, 9)) + " " + str(randint(0, 9)))
         else:
             while 1 == 1:
                 seotda_ready()
@@ -174,8 +178,8 @@ def seotda(message_content):
                         result = "패배!"
                     break
             embed = discord.Embed(title="섯다 진행 결과", color=0xffff00)
-            embed.add_field(name="사용자 선택", value=str(xa) + ", " + str(xb) + "(" + str(xaa) + "월, " + str(xbb) + "월), " + result_str_player, inline=True)
-            embed.add_field(name="CPU 선택", value=str(ya) + ", " + str(yb) + "(" + str(yaa) + "월, " + str(ybb) + "월), " + result_str_cpu, inline=True)
+            embed.add_field(name=usrname + "의 선택", value=str(xa) + ", " + str(xb) + "(" + str(xaa) + "월, " + str(xbb) + "월), " + result_str_player, inline=True)
+            embed.add_field(name="루냥이의 선택", value=str(ya) + ", " + str(yb) + "(" + str(yaa) + "월, " + str(ybb) + "월), " + result_str_cpu, inline=True)
             embed.add_field(name="결과", value=result, inline=True)
             d0 = ""
             d2 = 0

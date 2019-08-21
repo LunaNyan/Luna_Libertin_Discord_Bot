@@ -1,5 +1,5 @@
-import psutil
-import random
+import psutil, random
+from m_user import ret_check
 
 def checkIfProcessRunning(processName):
     for proc in psutil.process_iter():
@@ -18,18 +18,61 @@ def sans():
                 "와 샌즈! 와 파피루스!"]
     return random.choice(sans_str)
 
-def imcute():
-    imcute_str = ["허ㅓㅓㅓㅓㅓㅓㅓㅓㅠㅠㅠㅠㅠㅠㅠㅠㅠ저 너무 끼여워여",
+def imcute(conf, user, test_glyph):
+    # int 500 or over
+    imcute_str_1 = ["허ㅓㅓㅓㅓㅓㅓㅓㅓㅠㅠㅠㅠㅠㅠㅠㅠㅠ저 너무 끼여워여",
                   "저 너무 깜찍하고 귀여워여 ㅠㅠㅠㅠㅠㅠ",
                   "헉 ㅠ ㅜㅠㅜㅜㅜ 나 넘귀엽다 ㅠ ㅠㅠㅠ 넘귀여워 나 엄청귀엽다 :two_hearts::purple_heart::purple_heart::heart::heart:"]
-    return random.choice(imcute_str)
+    # int 100 or over
+    imcute_str_2 = ["흐아아ㅠㅠㅠㅠ나 너무기엽구이뻐ㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠ흐앙하읗아ㅏㅇ훙흐아ㅠㅠㅠ사랑해ㅠㅠㅠ진짜 귀엽다ㅠㅠㅠㅠ이거완전...행복해..너무행복해..ㅠㅠㅠㅠㅠ사랑해ㅠㅠㅠ",
+                   "저 ㄴ너무귀여워요오오오오오오ㅠ.ㅠ.ㅠ.ㅠ .아으 깨물어주고싶어요ㅠ.ㅠ",
+                   "대박.... 나 귀엽다....진짜...최고야 !!!!!"]
+    # else
+    imcute_str_3 = ["우왕..! 나 귀여워..! 저 꼬리는 얼마나 폭신폭신할까..!",
+                   "우응~ 어뜩해.. 하우우.."]
+    if ret_check(conf, user, test_glyph) >= 500:
+        s = random.choice(imcute_str_1)
+    elif ret_check(conf, user, test_glyph) >= 200:
+        s = random.choice(imcute_str_2)
+    else:
+        s = random.choice(imcute_str_3)
+    return s
 
-def pat():
-    pat_str =  [">_<~ :two_hearts:",
-                "냐앙~ :heart_eyes: :two_hearts:",
-                "하우우..:blush:",
-                "하앙~(꼬리펑"]
-    return random.choice(pat_str)
+def pat(conf, user, test_glyph):
+    # int 500 or over
+    pat_str_1 =  ["언니잉!(와락",
+                 "하앙~ (꼬리펑",
+                 ">_<~:two_hearts:"]
+    # int 200 or over
+    pat_str_2 = ["(부비부비",
+                ">_<~ (부비부비",
+                "하앙~ (와락"]
+    # else
+    pat_str_3 = ["아앗.. //ㅅ//",
+                "후앗.. ///",
+                "앗.. :blush:"]
+    if ret_check(conf, user, test_glyph) >= 500:
+        s = random.choice(pat_str_1)
+    elif ret_check(conf, user, test_glyph) >= 200:
+        s = random.choice(pat_str_2)
+    else:
+        s = random.choice(pat_str_3)
+    return s
+
+def l_lv(conf, user, test_glyph):
+    # int 500 or over
+    lv_str_1 = ["저두우~:two_hearts:", "헤헤~(방긋"]
+    # int 200 or over
+    lv_str_2 = [">_<~", "헤헤~:two_hearts"]
+    # else
+    lv_str_3 = ["헤헤~", "후히히~"]
+    if ret_check(conf, user, test_glyph) >= 500:
+        s = random.choice(lv_str_1)
+    elif ret_check(conf, user, test_glyph) >= 200:
+        s = random.choice(lv_str_2)
+    else:
+        s = random.choice(lv_str_3)
+    return s
 
 def l_ping():
     lp_str = ["우웅? (쫑긋",
@@ -78,7 +121,3 @@ def l_ticket(message):
 def say_lv():
     say_lv_str = ["(꼬옥", "(껴안"]
     return random.choice(say_lv_str)
-
-def l_lv():
-    l_lv_str = ["저두우~:two_hearts:", "헤헤~(방긋"]
-    return random.choice(l_lv_str)

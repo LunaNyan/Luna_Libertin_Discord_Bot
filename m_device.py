@@ -1,2 +1,2 @@
-SERVER_NAME = ""
+SERVER_NAME = "2호기"
 

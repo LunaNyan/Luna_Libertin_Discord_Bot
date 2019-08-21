@@ -1,5 +1,5 @@
 import discord
-from random import randint
+from random import randint, choice
 
 def rps_arg(text):
     if text == " 가위":
@@ -23,22 +23,32 @@ def rps_judge(player, cpu):
     else:
         return "패배!"
 
-def rps(message):
+def rps(message, user):
+    if user.display_name == user.name:
+        usrname = user.name
+    else:
+        usrname = user.display_name + "(" + user.name + ")"
     m = message.replace("루냥아 가위바위보", "")
+    m = m.replace("_", "")
     p = rps_arg(m)
     if p != False:
-        c = randint(1, 3)
-        if c == 1:
-            cm = "가위"
-        elif c == 2:
-            cm = "바위"
-        elif c == 3:
-            cm = "보"
-        r = rps_judge(p, c)
+        while True:
+            c = randint(1, 3)
+            if c == 1:
+                cm = "가위"
+            elif c == 2:
+                cm = "바위"
+            elif c == 3:
+                cm = "보"
+            r = rps_judge(p, c)
+            if r == "패배!" and randint(1, 10) >= 5:
+                continue
+            else:
+                break
         embed=discord.Embed(title="가위바위보 결과!", color=0xffff00)
-        embed.add_field(name="사용자의 선택", value=m, inline=True)
-        embed.add_field(name="CPU의 선택", value=cm, inline=True)
+        embed.add_field(name=usrname + "의 선택", value=m, inline=True)
+        embed.add_field(name="루냥이의 선택", value=cm, inline=True)
         embed.add_field(name="결과", value=r, inline=False)
     else:
-        embed=discord.Embed(title="선택지로 가위, 바위, 보 중 하나를 골라주세요!")
+        embed=discord.Embed(title="선택지로 가위, 바위, 보 중 하나를 골라주세요!", description="예시 : 루냥아 가위바위보 " + choice(["가위", "바위", "보"]))
     return embed

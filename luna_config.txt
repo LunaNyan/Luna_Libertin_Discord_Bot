@@ -16,3 +16,12 @@ appid =
 [sudden_hugging]
 
 [hug_count]
+
+[etc]
+comm_count = 0
+news_channel = 0
+
+[bio]
+
+[attendance]
+today = 0, 
