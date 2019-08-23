@@ -2,7 +2,7 @@ import discord, cpuinfo, psutil, os, math, m_food
 
 patch_ver = ""
 
-def help(client, text, bot_ver):
+def help(user, client, text, bot_ver):
     a = text
     a = a.replace('_', '')
     a = a.replace('루냥아 도와줘', '')
@@ -12,11 +12,13 @@ def help(client, text, bot_ver):
         embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역, 루냥아 누구니, 루냥아 소스코드", inline=False)
         embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
         embed.add_field(name="프로필", value="루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개)", inline=False)
-        embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 자가진단, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
-        embed.add_field(name="일상", value="루냥아 출석체크, 루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 인기도, 와! 샌즈!", inline=False)
+        embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 인기도, 루냥아 자가진단, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
+        embed.add_field(name="일상", value="루냥아 출석체크, 루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 (물체) 먹어, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 주사위, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기", inline=False)
+        if user.guild_permissions.administrator:
+            embed.add_field(name="관리자 기능", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제", inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
     elif a == ' 도움말':
         embed=discord.Embed(title="도움말", description="도움말 항목", color=0x8080ff)
@@ -38,6 +40,7 @@ def help(client, text, bot_ver):
     elif a == ' 정보':
         embed=discord.Embed(title="도움말", description="정보 항목", color=0x8080ff)
         embed.add_field(name="루냥아 서버정보", value="서버 정보를 불러옵니다", inline=False)
+        embed.add_field(name="루냥아 인기도", value="몇개의 서버에서 몇명의 유저들이 저를 보고 있는지 알려줘요!", inline=False)
         embed.add_field(name="루냥아 자가진단", value="봇이 정상 동작할 수 있는지 점검합니다", inline=False)
         embed.add_field(name="루냥아 서버목록", value="서버 목록을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 생일", value="봇이 언제 탄생했는지 알려줍니다", inline=False)
@@ -51,7 +54,7 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥이 쓰담쓰담", value="자기 자신한테 사이버(?) 쓰다듬을 선물해줍니다", inline=False)
         embed.add_field(name="루냥아 짖어봐", value="멍", inline=False)
         embed.add_field(name="루냥아 손", value=":raised_hand:", inline=False)
-        embed.add_field(name="루냥아 인기도", value="몇개의 서버에서 몇명의 유저들이 저를 보고 있는지 알려줘요!", inline=False)
+        embed.add_field(name="루냥아 (물체) 먹어", value="물체를 먹습니다(?)", inline=False)
         embed.add_field(name="와! 샌즈!", value="언더테일 아시는구나!", inline=False)
     elif a == ' 게임':
         embed=discord.Embed(title="도움말", description="게임", color=0xffff00)
@@ -85,6 +88,16 @@ def help(client, text, bot_ver):
     elif a == ' 패시브':
         embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
         embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
+    elif a == ' 관리자 기능':
+        if user.guild_permissions.administrator:
+            embed=discord.Embed(title="도움말", description="관리자 기능", color=0xff0000)
+            embed.add_field(name="루냥아 공지채널 추가", value="현재 채널을 알림 채널로 추가합니다", inline=False)
+            embed.add_field(name="루냥아 공지채널 삭제", value="현재 채널을 알림 채널에서 삭제합니다", inline=False)
+            embed.add_field(name="루냥아 채널연결 생성", value="채널 간 1:1 텍스트 채팅 연결을 준비합니다", inline=False)
+            embed.add_field(name="루냥아 채널연결 접속 (코드)", value="부여받은 접속 코드로 채널을 연결합니다", inline=False)
+            embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
+        else:
+            embed=discord.Embed(title="서버 관리자만 해당 기능을 사용할 수 있습니다", color=0xff0000)
     else:
         embed=discord.Embed(title='전체 도움말을 원하신다면 그냥 "루냥아 도와줘"라고만 입력해주세요!')
     return embed

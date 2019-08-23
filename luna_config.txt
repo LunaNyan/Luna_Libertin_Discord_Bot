@@ -25,3 +25,6 @@ news_channel = 0
 
 [attendance]
 today = 0, 
+
+[ctclink]
+0 = pending_0

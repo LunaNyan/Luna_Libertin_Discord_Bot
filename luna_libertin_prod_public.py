@@ -6,7 +6,7 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device, m_board
+import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink
 from datetime import datetime, timedelta
 from random import randint
 from m_seotda import *
@@ -25,7 +25,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.12.0"
+bot_ver = "1.12.2"
 bot_ver += m_help.patch_ver
 
 db_path = "luna_config.txt"
@@ -118,6 +118,10 @@ async def on_message(message):
         return
     elif message.author.bot:
         return
+    cr0 = m_ctclink.get_link(message.channel.id, db)
+    if cr0 != False:
+        cr = client.get_channel(int(cr0))
+        await cr.send(message.author.name + " : " + message.content)
     if message.content.startswith('루냥아') or message.content.startswith('루냥이') or message.content.startswith('커냥이') or message.content.startswith('귀냥이'):
         m_user.increase(db, message.author)
         comm_count+= 1
@@ -131,7 +135,7 @@ async def on_message(message):
         m_user.hug_count(db, message.author)
         m_user.reset_count(db, message.author)
     if message.content.startswith('루냥아 도와줘'):
-        embed = m_help.help(client, message.content, bot_ver)
+        embed = m_help.help(message.author, client, message.content, bot_ver)
         await message.channel.send(embed=embed)
     elif message.content == '루냥아 업데이트내역':
         await message.channel.send(embed=m_help.ret_changelog(client, bot_ver))
@@ -234,6 +238,13 @@ async def on_message(message):
         await message.channel.send(embed=m_user.check(db, message.author))
     elif message.content.startswith('루냥아 ') and message.content.endswith(' 어때'):
         await message.channel.send(embed=m_user.check(db, message.mentions[0]))
+    elif message.content.startswith('루냥아 ') and message.content.endswith(' 먹어'):
+        e = message.content.replace('루냥아 ', '').replace(' 먹어', '')
+        if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
+            embed = discord.Embed(title="그런 물체는 먹을 수 없어요!", color=0xff0000)
+        else:
+            embed = discord.Embed(title=e + "을(를) 먹었어요!", description="옴뇸뇸뇸뇸", color=0xff77ff)
+        await message.channel.send(embed=embed)
     elif message.content == '루냥아 서버정보':
         await message.channel.send(embed=m_user.serverinfo(message.guild))
     elif message.content == '루냥아 버전':
@@ -271,18 +282,57 @@ async def on_message(message):
         await message.channel.send(embed=m_help.servers_list(client, page))
     elif message.content == "루냥아 테스트기능" and test_glyph == "_":
         await message.channel.send(embed=m_help.test_features(bot_ver))
-    # commands for server admins
-    elif message.content == '루냥아 공지채널 추가' and message.author.guild_permissions.administrator:
-        db.set("etc", "news_channel", db.get("etc", "news_channel") + ", " + str(message.channel.id))
-        embed=discord.Embed(title="공지를 받을 채널에 추가했어요!", description="이제 새 공지사항이나 업데이트가 있으면 여기에 알릴게요!", color=0x00ff00)
-        await message.channel.send(embed=embed)
-    elif message.content == '루냥아 공지채널 삭제' and message.author.guild_permissions.administrator:
-        if ", " + str(message.channel.id) in db.get("etc", "news_channel"):
-            db.set("etc", "news_channel", db.get("etc", "news_channel").replace(", " + str(message.channel.id), ""))
-            embed=discord.Embed(title="공지를 받을 채널에서 삭제했어요!", color=0x00ff00)
+    elif message.content.startswith("루냥아 문의 "):
+        call_s = message.content.replace("루냥아 문의 ", "")
+        admin = await client.fetch_user(280306700324700160)
+        if admin.dm_channel == None:
+            await admin.create_dm()
         else:
-            embed=discord.Embed(title="공지 채널에 등록되어 있지 않아요!", color=0xffff00)
-        await message.channel.send(embed=embed)
+            await admin.dm_channel.send(message.author.name + "(" + str(message.author.id) + ")\n" + call_s)
+    # commands for server admins
+    elif message.author.guild_permissions.administrator or m_user.ret_check(db, message.author, "") == 2147483647:
+        if message.content == '루냥아 공지채널 추가':
+            if ", " + str(message.channel.id) in db.get("etc", "news_channel"):
+                embed=discord.Embed(title="이미 공지를 받을 채널에 등록되어 있어요!", color=0xffff00)
+            else:
+                db.set("etc", "news_channel", db.get("etc", "news_channel") + ", " + str(message.channel.id))
+                embed=discord.Embed(title="공지를 받을 채널에 추가했어요!", description="이제 새 공지사항이나 업데이트가 있으면 여기에 알릴게요!", color=0x00ff00)
+            await message.channel.send(embed=embed)
+        elif message.content == '루냥아 공지채널 삭제':
+            if ", " + str(message.channel.id) in db.get("etc", "news_channel"):
+                db.set("etc", "news_channel", db.get("etc", "news_channel").replace(", " + str(message.channel.id), ""))
+                embed=discord.Embed(title="공지를 받을 채널에서 삭제했어요!", color=0x00ff00)
+            else:
+                embed=discord.Embed(title="공지 채널에 등록되어 있지 않아요!", color=0xffff00)
+            await message.channel.send(embed=embed)
+        elif message.content == '루냥아 채널연결 생성':
+            try:
+                i = m_ctclink.generate_code(message.channel.id, db)
+                embed = discord.Embed(title='연결 코드를 생성했어요!', description='연결하려는 서버나 채널에 "루냥아 채널연결 접속 (코드) 형태로 붙여넣으세요!\n\n접속 코드 : ' + i, color=0x00ff00)
+            except:
+                embed = discord.Embed(title="이미 채널 연결에 등록되어 있어요!", color=0xff0000)
+            await message.channel.send(embed=embed)
+        elif message.content.startswith('루냥아 채널연결 접속 '):
+            i = message.content.replace("루냥아 채널연결 접속 ", "")
+            c = m_ctclink.get_channel_code(message.channel.id, i, db)
+            if c == False:
+                embed = discord.Embed(title="잘못된 연결 코드예요", color=0xff0000)
+            else:
+                ch = client.get_channel(int(c))
+                embed = discord.Embed(title="채널 연결 완료!", description=ch.guild.name + "의 " + ch.name + "에 연결되었어요!", color=0x00ff00)
+                embed2 = discord.Embed(title="채널 연결 완료!", description=message.guild.name + "의 " + message.channel.name + "과 연결되었어요!", color=0x00ff00)
+                await ch.send(embed=embed2)
+            await message.channel.send(embed=embed)
+        elif message.content == '루냥아 채널연결 삭제':
+            if cr0 == False:
+                embed = discord.Embed(title="연결되지 않은 채널이예요!", color=0xff0000)
+            else:
+                m_ctclink.remove_link(message.channel.id, db)
+                cr = client.get_channel(int(cr0))
+                embed2 = discord.Embed(title=message.guild.name + "의 " + message.channel.name + " 채널과의 연결이 " + message.author.name + "에 의해 삭제되었어요!", color=0xff0000)
+                await cr.send(embed=embed2)
+                embed = discord.Embed(title="채널 연결을 삭제했어요!", color=0x00ff00)
+            await message.channel.send(embed=embed)
     # admin only functions
     elif message.content.startswith('루냥아 shellcmd ') and m_user.ret_check(db, message.author, "") == 2147483647:
         shl_str = message.content
