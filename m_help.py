@@ -1,6 +1,6 @@
 import discord, cpuinfo, psutil, os, math, m_food
 
-patch_ver = ""
+patch_ver = "p1"
 
 def help(user, client, text, bot_ver):
     a = text
