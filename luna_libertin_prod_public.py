@@ -25,7 +25,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.12.2"
+bot_ver = "1.12.5"
 bot_ver += m_help.patch_ver
 
 db_path = "luna_config.txt"
@@ -125,7 +125,10 @@ async def on_message(message):
         db.set("etc", "comm_count", str(int(db.get("etc", "comm_count")) + 1))
     elif cr0 != False:
         cr = client.get_channel(int(cr0))
-        await cr.send(message.author.name + " : " + message.content)
+        if cr == None:
+            m_ctclink.remove_link(message.channel.id, db)
+        else:
+            await cr.send(message.author.name + " : " + message.content)
     m_user.count(db, message.author)
     if m_user.ret_check(db, message.author, test_glyph) >= 200 and m_user.check_count(db, message.author) >= 30 and randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True:
         await message.channel.send(message.author.mention + " " + say_lv())
@@ -134,7 +137,7 @@ async def on_message(message):
             await message.channel.send(embed=embed)
         m_user.hug_count(db, message.author)
         m_user.reset_count(db, message.author)
-    if message.author.id == int(db.get("config", "bot_owner")) and message.author.guild_permissions.administrator:
+    if message.author.id == int(db.get("config", "bot_owner")) or message.author.guild_permissions.administrator:
         ifadmin = True
     else:
         ifadmin = False
@@ -192,6 +195,14 @@ async def on_message(message):
             say_str = say_str.replace('루냥아 확성기 ','')
             await message.delete()
             await message.channel.send(say_str)
+            try:
+                cid = db.get("server_log", str(message.guild.id))
+                cid = client.get_channel(int(cid))
+                embed=discord.Embed(title="확성기 기능을 사용함", description=message.author.name + " : " + say_str, color=0xffff00)
+                embed.set_footer(text="채널 : " + message.channel.name)
+                await cid.send(embed=embed)
+            except:
+                pass
     elif message.content.startswith("루냥아 계산해줘 이미지 "):
         message_temp = await message.channel.send("잠시만 기다려주세요!")
         bci_str = message.content
@@ -295,6 +306,19 @@ async def on_message(message):
         else:
             await admin.dm_channel.send(message.author.name + "(" + str(message.author.id) + ")\n" + call_s)
     # commands for server admins
+    elif message.content == '루냥아 로그채널 생성' and ifadmin:
+        try:
+            try:
+                cid = db.get("server_log", str(message.guild.id))
+                cid = client.get_channel(int(cid))
+                embed=discord.Embed(title="로그 채널이 이미 존재하고 있어요!", description=cid.mention + "에서 기록하고 있어요!", color=0x00ff00)
+            except:
+                cid = await message.guild.create_text_channel("message_log", reason="메시지 삭제, 수정 시 여기에 기록됩니다")
+                db.set("server_log", str(message.guild.id), str(cid.id))
+                embed=discord.Embed(title="로그 채널이 생성되었어요!", description="메시지 수정, 삭제는 " + cid.mention + "에 알릴게요!\n권한 설정을 반드시 해주세요!", color=0x00ff00)
+        except:
+            embed=discord.Embed(title="채널 관리 권한이 없어요!", description='서버 설정 -> 역할에서 "기계식 루냥이"를 선택한 뒤 "채널 관리"를 활성화해주세요!', color=0xff0000)
+        await message.channel.send(embed=embed)
     elif message.content == '루냥아 공지채널 추가' and ifadmin:
         if ", " + str(message.channel.id) in db.get("etc", "news_channel"):
             embed=discord.Embed(title="이미 공지를 받을 채널에 등록되어 있어요!", color=0xffff00)
@@ -410,5 +434,44 @@ async def on_message(message):
         db.set("attendance", "today", "0")
     with open(db_path, 'w') as configfile:
         db.write(configfile)
+
+@client.event
+async def on_message_delete(message):
+    if message.author == client.user:
+        return
+    elif message.author.bot:
+        return
+    elif message.content.startswith("루냥아 확성기 "):
+        return
+    try:
+        cid = db.get("server_log", str(message.guild.id))
+        cid = client.get_channel(int(cid))
+        embed=discord.Embed(title="메시지 삭제 감지", description=message.author.name + " : " + message.content, color=0xff0000)
+        embed.set_footer(text="채널 : " + message.channel.name)
+        await cid.send(embed=embed)
+    except:
+        pass
+
+@client.event
+async def on_message_edit(before, after):
+    if before.author == client.user:
+        return
+    elif before.author.bot:
+        return
+    try:
+        cid = db.get("server_log", str(before.guild.id))
+        cid = client.get_channel(int(cid))
+        embed=discord.Embed(title="메시지 수정 감지", description=before.author.name + "\n이전 : " + before.content + "\n이후 : " + after.content, color=0xffff00)
+        embed.set_footer(text="채널 : " + before.channel.name)
+        await cid.send(embed=embed)
+    except:
+        pass
+
+@client.event
+async def on_guild_remove(guild):
+    try:
+        db.remove_option("server_log", str(message.guild.id))
+    except:
+        pass
 
 client.run(db.get("config", "bot_token"))
