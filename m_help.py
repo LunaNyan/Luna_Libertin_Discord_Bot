@@ -18,7 +18,7 @@ def help(user, client, text, bot_ver):
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기", inline=False)
         if user.guild_permissions.administrator:
-            embed.add_field(name="관리자 기능", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제, 루냥아 로그채널 생성, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제", inline=False)
+            embed.add_field(name="관리자 기능", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제, 루냥아 로그채널 생성, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션)", inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
     elif a == ' 도움말':
         embed=discord.Embed(title="도움말", description="도움말 항목", color=0x8080ff)
@@ -97,6 +97,8 @@ def help(user, client, text, bot_ver):
             embed.add_field(name="루냥아 채널연결 생성", value="채널 간 1:1 텍스트 채팅 연결을 준비합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 접속 (코드)", value="부여받은 접속 코드로 채널을 연결합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
+            embed.add_field(name="루냥아 뮤트 (멘션)", value="멘션된 사용자를 뮤트(채팅금지)합니다", inline=False)
+            embed.add_field(name="루냥아 언뮤트 (멘션)", value="멘션된 사용자의 뮤트(채팅금지)를 해제합니다", inline=False)
         else:
             embed=discord.Embed(title="서버 관리자만 해당 기능을 사용할 수 있습니다", color=0xff0000)
     else:
@@ -157,7 +159,11 @@ def ret_changelog(client, bot_ver):
         patch_guide = ""
     embed=discord.Embed(title="업데이트 내역", description="현재 버전은 " + bot_ver + "이예요!\n" + patch_guide, color=0xffffff)
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.add_field(name="Error : failed to load list for update log", value="Value : NOT_FOUND", inline=False)
+    embed.add_field(name="1.12.6 (2019-08-29)", value="사용자 뮤트 기능 추가", inline=False)
+    embed.add_field(name="1.12.5 (2019-08-27)", value="메시지 기록 채널 기능 추가", inline=False)
+    embed.add_field(name="1.12.2 (2019-08-24)", value="일상 명령어 1개 추가", inline=False)
+    embed.add_field(name="1.12.1 (2019-08-24)", value="채널 간 채팅 연결 기능 추가", inline=False)
+    embed.add_field(name="1.12.0 (2019-08-21)", value="공지사항, 방명록, 출석체크 기능 추가, 프로필 기능 강화", inline=False)
     return embed
 
 def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, servers, users, pid):

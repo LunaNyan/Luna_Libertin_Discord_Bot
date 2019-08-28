@@ -25,7 +25,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.12.5"
+bot_ver = "1.12.6"
 bot_ver += m_help.patch_ver
 
 db_path = "luna_config.txt"
@@ -118,6 +118,13 @@ async def on_message(message):
         return
     elif message.author.bot:
         return
+    try:
+        m = db.get("user_mute", str(message.guild.id))
+        if str(message.author.id) in m:
+            await message.delete()
+            return
+    except:
+        pass
     cr0 = m_ctclink.get_link(message.channel.id, db)
     if message.content.startswith('루냥아') or message.content.startswith('루냥이') or message.content.startswith('커냥이') or message.content.startswith('귀냥이'):
         m_user.increase(db, message.author)
@@ -198,9 +205,12 @@ async def on_message(message):
             try:
                 cid = db.get("server_log", str(message.guild.id))
                 cid = client.get_channel(int(cid))
-                embed=discord.Embed(title="확성기 기능을 사용함", description=message.author.name + " : " + say_str, color=0xffff00)
-                embed.set_footer(text="채널 : " + message.channel.name)
-                await cid.send(embed=embed)
+                if cid != None:
+                    embed=discord.Embed(title="확성기 기능을 사용함", description=message.author.name + " : " + say_str, color=0xffff00)
+                    embed.set_footer(text="채널 : " + message.channel.name)
+                    await cid.send(embed=embed)
+                else:
+                    db.remove_option("server_log", str(message.guild.id))
             except:
                 pass
     elif message.content.startswith("루냥아 계산해줘 이미지 "):
@@ -306,6 +316,58 @@ async def on_message(message):
         else:
             await admin.dm_channel.send(message.author.name + "(" + str(message.author.id) + ")\n" + call_s)
     # commands for server admins
+    elif message.content.startswith('루냥아 뮤트 ') and ifadmin:
+        ife = False
+        try:
+            m = db.get("user_mute", str(message.guild.id))
+        except:
+            m = "0"
+        if str(message.mentions[0].id) in m:
+            embed=discord.Embed(title="이미 뮤트되어있어요!", color=0xff0000)
+            ife = True
+        else:
+            db.set("user_mute", str(message.guild.id), m + ", " + str(message.mentions[0].id))
+            embed=discord.Embed(title=message.mentions[0].name + "을(를) 뮤트했어요!", color=0xff0000)
+        await message.channel.send(embed=embed)
+        if ife == False:
+            try:
+                cid = db.get("server_log", str(message.guild.id))
+                cid = client.get_channel(int(cid))
+                if cid != None:
+                    embed=discord.Embed(title=message.mentions[0].name + "을(를) 뮤트함", color=0xffff00)
+                    embed.set_footer(text=message.author.name)
+                    await cid.send(embed=embed)
+                else:
+                    db.remove_option("server_log", str(message.guild.id))
+            except:
+                pass
+    elif message.content.startswith('루냥아 언뮤트 ') and ifadmin:
+        ife = False
+        try:
+            m = db.get("user_mute", str(message.guild.id))
+            if str(message.mentions[0].id) in m:
+                m = m.replace(", " + str(message.mentions[0].id), "")
+                db.set("user_mute", str(message.guild.id), m)
+                embed=discord.Embed(title=message.mentions[0].name + "을(를) 언뮤트했어요!", color=0x00ff00)
+            else:
+                embed=discord.Embed(title="뮤트되어있지 않은 사용자예요!", color=0xffff00)
+                ife = True
+        except:
+            embed=discord.Embed(title="현재 아무도 뮤트하고 있지 않아요!", color=0x00ff00)
+            ife = True
+        await message.channel.send(embed=embed)
+        if ife == False:
+            try:
+                cid = db.get("server_log", str(message.guild.id))
+                cid = client.get_channel(int(cid))
+                if cid != None:
+                    embed=discord.Embed(title=message.mentions[0].name + "을(를) 언뮤트함", color=0xffff00)
+                    embed.set_footer(text=message.author.name)
+                    await cid.send(embed=embed)
+                else:
+                    db.remove_option("server_log", str(message.guild.id))
+            except:
+                pass
     elif message.content == '루냥아 로그채널 생성' and ifadmin:
         try:
             try:
@@ -437,6 +499,14 @@ async def on_message(message):
 
 @client.event
 async def on_message_delete(message):
+    try:
+        m = db.get("user_mute", str(message.guild.id))
+        if str(message.author.id) in m:
+            return
+        else:
+            pass
+    except:
+        pass
     if message.author == client.user:
         return
     elif message.author.bot:
@@ -446,9 +516,12 @@ async def on_message_delete(message):
     try:
         cid = db.get("server_log", str(message.guild.id))
         cid = client.get_channel(int(cid))
-        embed=discord.Embed(title="메시지 삭제 감지", description=message.author.name + " : " + message.content, color=0xff0000)
-        embed.set_footer(text="채널 : " + message.channel.name)
-        await cid.send(embed=embed)
+        if cid != None:
+            embed=discord.Embed(title="메시지 삭제 감지", description=message.author.name + " : " + message.content, color=0xff0000)
+            embed.set_footer(text="채널 : " + message.channel.name)
+            await cid.send(embed=embed)
+        else:
+            db.remove_option("server_log", str(message.guild.id))
     except:
         pass
 
@@ -461,16 +534,23 @@ async def on_message_edit(before, after):
     try:
         cid = db.get("server_log", str(before.guild.id))
         cid = client.get_channel(int(cid))
-        embed=discord.Embed(title="메시지 수정 감지", description=before.author.name + "\n이전 : " + before.content + "\n이후 : " + after.content, color=0xffff00)
-        embed.set_footer(text="채널 : " + before.channel.name)
-        await cid.send(embed=embed)
+        if cid != None:
+            embed=discord.Embed(title="메시지 수정 감지", description=before.author.name + "\n이전 : " + before.content + "\n이후 : " + after.content, color=0xffff00)
+            embed.set_footer(text="채널 : " + before.channel.name)
+            await cid.send(embed=embed)
+        else:
+            db.remove_option("server_log", str(before.guild.id))
     except:
         pass
 
 @client.event
 async def on_guild_remove(guild):
     try:
-        db.remove_option("server_log", str(message.guild.id))
+        db.remove_option("server_log", str(guild.id))
+    except:
+        pass
+    try:
+        db.remove_option("user_mute", str(guild.id))
     except:
         pass
 
