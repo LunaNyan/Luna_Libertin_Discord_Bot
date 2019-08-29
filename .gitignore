@@ -1,8 +1,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
-luna_config.txt
 log.txt
 for_hash.py
 m_device.py
