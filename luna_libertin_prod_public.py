@@ -24,7 +24,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.12.6"
+bot_ver = "1.12.7"
 bot_ver += m_help.patch_ver
 
 try:
@@ -440,6 +440,37 @@ async def on_message(message):
             await cr.send(embed=embed2)
             embed = discord.Embed(title="채널 연결을 삭제했어요!", color=0x00ff00)
         await message.channel.send(embed=embed)
+    elif message.content.startswith('루냥아 킥') and ifadmin:
+        try:
+            if not message.mentions:
+                embed=discord.Embed(title="킥할 상대방을 멘션으로 지정해주세요!", color=0xffff00)
+            else:
+                await message.mentions[0].kick()
+                embed=discord.Embed(title=message.mentions[0].name + "을(를) 킥했어요!", color=0xffff00)
+        except Exception as e:
+            print(str(e))
+            embed=discord.Embed(title="사용자 관리 권한이 없어요!", description='관리자 유저이거나 권한이 부족합니다\n팁 : 서버 설정 -> 역할에서 "기계식 루냥이"를 선택한 뒤 "사용자 추방", "사용자 차단"을 활성화해주세요!', color=0xffff00)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith('루냥아 밴') and ifadmin:
+        try:
+            if message.content == '루냥아 밴':
+                embed=discord.Embed(title="밴할 상대방을 멘션이나 고유 ID로 지정해주세요!", color=0xff0000)
+            else:
+                b = message.content.replace('루냥아 밴 ', '')
+                if not message.mentions:
+                    b = int(b)
+                    busr = await client.fetch_user(b)
+                    if b == None:
+                        embed=discord.Embed(title="없는 계정이예요!", color=0xff0000)
+                    else:
+                        await message.guild.ban(user=busr)
+                else:
+                    busr = message.mentions[0]
+                    await message.guild.ban(user=busr)
+                embed=discord.Embed(title=busr.name + "을(를) 밴했어요!", color=0xff0000)
+        except:
+            embed=discord.Embed(title="사용자 관리 권한이 없어요!", description='관리자 유저이거나 권한이 부족합니다\n서버 설정 -> 역할에서 "기계식 루냥이"를 선택한 뒤 "사용자 추방", "사용자 차단"을 활성화해주세요!', color=0xffff00)
+        await message.channel.send(embed=embed)
     # admin only functions
     elif message.content.startswith('루냥아 shellcmd ') and message.author.id == int(conf.get("config", "bot_owner")):
         shl_str = message.content
@@ -511,6 +542,14 @@ async def on_message(message):
         m_board.clear()
     elif message.content == '루냥아 attendance reset' and message.author.id == int(conf.get("config", "bot_owner")):
         db.set("attendance", "today", "0")
+    elif message.content.startswith('루냥아 user_level change ') and message.author.id == int(conf.get("config", "bot_owner")):
+        try:
+            lc = message.content.replace("루냥아 user_level change ", "")
+            lc = lc.split(" ")
+            db.set("user_level", lc[0], lc[1])
+            await message.channel.send("user level of " + lc[0] + " was changed to " + lc[1])
+        except Exception as e:
+            await message.channel.send(str(e))
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 

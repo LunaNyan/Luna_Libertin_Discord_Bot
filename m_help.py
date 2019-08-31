@@ -1,6 +1,6 @@
 import discord, cpuinfo, psutil, os, math, m_food
 
-patch_ver = "p1"
+patch_ver = ""
 
 def help(user, client, text, bot_ver):
     a = text
@@ -18,7 +18,7 @@ def help(user, client, text, bot_ver):
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기", inline=False)
         if user.guild_permissions.administrator:
-            embed.add_field(name="관리자 기능", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제, 루냥아 로그채널 생성, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션)", inline=False)
+            embed.add_field(name="관리자", value='자세한 사항은 "루냥아 도와줘 관리자"를 입력하세요!', inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
     elif a == ' 도움말':
         embed=discord.Embed(title="도움말", description="도움말 항목", color=0x8080ff)
@@ -88,19 +88,32 @@ def help(user, client, text, bot_ver):
     elif a == ' 패시브':
         embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
         embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
-    elif a == ' 관리자 기능':
-        if user.guild_permissions.administrator:
-            embed=discord.Embed(title="도움말", description="관리자 기능", color=0xff0000)
+    elif user.guild_permissions.administrator:
+        if a == ' 관리자':
+            embed=discord.Embed(title="관리자 기능 도움말", description="명령어 목록", color=0xff0000)
+            embed.add_field(name="공지", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제", inline=False)
+            embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
+            embed.add_field(name="채널연결", value="루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제", inline=False)
+            embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
+        elif a == ' 관리자 공지':
+            embed=discord.Embed(title="관리자 기능 도움말", description="공지", color=0xff0000)
             embed.add_field(name="루냥아 공지채널 추가", value="현재 채널을 알림 채널로 추가합니다", inline=False)
             embed.add_field(name="루냥아 공지채널 삭제", value="현재 채널을 알림 채널에서 삭제합니다", inline=False)
-            embed.add_field(name="루냥아 로그채널 생성", value="메시지 수정, 삭제, 확성기 사용을 기록해주는 채널을 생성합니다", inline=False)
+        elif a == ' 관리자 기록':
+            embed=discord.Embed(title="관리자 기능 도움말", description="기록", color=0xff0000)
+            embed.add_field(name="루냥아 로그채널 생성", value="메시지 수정, 삭제, 확성기 사용을 기록해주는 채널을 생성합니다\n비활성화를 원할 시 기록 채널을 삭제하면 됩니다", inline=False)
+        elif a == ' 관리자 채널연결':
+            embed=discord.Embed(title="관리자 기능 도움말", description="채널연결", color=0xff0000)
             embed.add_field(name="루냥아 채널연결 생성", value="채널 간 1:1 텍스트 채팅 연결을 준비합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 접속 (코드)", value="부여받은 접속 코드로 채널을 연결합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
+        elif a == ' 관리자 모더레이션':
+            embed=discord.Embed(title="관리자 기능 도움말", description="모더레이션", color=0xff0000)
             embed.add_field(name="루냥아 뮤트 (멘션)", value="멘션된 사용자를 뮤트(채팅금지)합니다", inline=False)
             embed.add_field(name="루냥아 언뮤트 (멘션)", value="멘션된 사용자의 뮤트(채팅금지)를 해제합니다", inline=False)
-        else:
-            embed=discord.Embed(title="서버 관리자만 해당 기능을 사용할 수 있습니다", color=0xff0000)
+            embed.add_field(name="루냥아 킥 (멘션)", value="사용자를 추방(kick)합니다", inline=False)
+            embed.add_field(name="루냥아 밴 (멘션 또는 고유 ID)", value="사용자를 차단(ban)합니다", inline=False)
+            embed.set_footer(text="주의 : 모든 모더레이션 기능은 사전 확인 없이 바로 진행되므로 신중히 사용하시기 바랍니다")
     else:
         embed=discord.Embed(title='전체 도움말을 원하신다면 그냥 "루냥아 도와줘"라고만 입력해주세요!')
     return embed
@@ -159,6 +172,7 @@ def ret_changelog(client, bot_ver):
         patch_guide = ""
     embed=discord.Embed(title="업데이트 내역", description="현재 버전은 " + bot_ver + "이예요!\n" + patch_guide, color=0xffffff)
     embed.set_thumbnail(url=client.user.avatar_url)
+    embed.add_field(name="1.12.7 (2019-08-31)", value="사용자 킥, 밴 기능 추가", inline=False)
     embed.add_field(name="1.12.6 (2019-08-29)", value="사용자 뮤트 기능 추가", inline=False)
     embed.add_field(name="1.12.5 (2019-08-27)", value="메시지 기록 채널 기능 추가", inline=False)
     embed.add_field(name="1.12.2 (2019-08-24)", value="일상 명령어 1개 추가", inline=False)
@@ -177,6 +191,7 @@ def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, se
     embed.add_field(name="Environment", value=str(os.popen("uname -s").read()), inline=True)
     embed.add_field(name="Process ID", value=str(pid), inline=True)
     embed.add_field(name="Python version", value=cpuinfo.get_cpu_info()["python_version"], inline=True)
+    embed.add_field(name="Discord.py version", value=discord.__version__, inline=True)
     embed.add_field(name="Processor", value=cpuinfo.get_cpu_info()["brand"], inline=True)
     embed.add_field(name="Memory", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB of total RAM\n" + str(int(memkb / 1024)) + " KB using by bot", inline=True)
     embed.set_footer(text="ver " + bot_ver + ", food database ver " + m_food.DB_VERSION)
