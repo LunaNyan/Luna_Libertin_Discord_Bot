@@ -135,6 +135,8 @@ async def on_message(message):
         return
     elif message.author.bot:
         return
+    elif str(message.channel.id) in db.get("etc", "denied_channel"):
+        return
     try:
         m = db.get("user_mute", str(message.guild.id))
         if str(message.author.id) in m:
