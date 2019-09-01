@@ -1,6 +1,6 @@
 import configparser, discord, datetime
 
-db_path = "board_db.txt"
+db_path = "board_db.dat"
 
 db = configparser.ConfigParser()
 db.read(db_path)

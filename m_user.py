@@ -42,7 +42,7 @@ def check(conf, user):
     embed.add_field(name="자기소개", value=get_bio(conf, user), inline=False)
     if pt == 2147483647:
         ptstr = "개발자"
-    if pt == 1000000000:
+    elif pt == 1000000000:
         ptstr = "후원자"
     elif pt >= 500:
         ptstr = "애인"
@@ -145,8 +145,6 @@ def serverinfo(guild):
 
 def attendance(conf, user):
     a = []
-    u = []
-    t = []
     try:
         a = conf.get("attendance", "today").split(", ")
         if str(user.id) in a:

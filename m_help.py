@@ -1,22 +1,24 @@
 import discord, cpuinfo, psutil, os, math, m_food
 
-patch_ver = "-t4"
+patch_ver = "-t0"
 
-def help(client, text, bot_ver):
+def help(user, client, text, bot_ver):
     a = text
     a = a.replace('_', '')
     a = a.replace('루냥아 도와줘', '')
     if a == '':
-        embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160)", color=0xff0080)
+        embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)", color=0xff0080)
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
         embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역, 루냥아 누구니, 루냥아 소스코드", inline=False)
-        embed.add_field(name="커뮤니티", value="루냥아 공지사항, 루냥아 공지사항 목록, 루냥아 공지사항 읽기 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
+        embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
         embed.add_field(name="프로필", value="루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개)", inline=False)
-        embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 자가진단, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
-        embed.add_field(name="일상", value="루냥아 출석체크, 루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 인기도, 와! 샌즈!", inline=False)
+        embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 인기도, 루냥아 자가진단, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
+        embed.add_field(name="일상", value="루냥아 출석체크, 루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 (물체) 먹어, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 주사위, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기", inline=False)
+        if user.guild_permissions.administrator:
+            embed.add_field(name="관리자", value='자세한 사항은 "루냥아 도와줘 관리자"를 입력하세요!', inline=False)
         embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
     elif a == ' 도움말':
         embed=discord.Embed(title="도움말", description="도움말 항목", color=0x8080ff)
@@ -26,9 +28,8 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥아 소스코드", value="기계식 루냥이의 GitHub 레포지토리를 표시합니다", inline=False)
     elif a == ' 커뮤니티':
         embed=discord.Embed(title="도움말", description="커뮤니티 항목", color=0x8080ff)
-        embed.add_field(name="루냥아 공지사항", value="첫번째 공지사항을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 공지사항 목록", value="공지사항 목록을 불러옵니다", inline=False)
-        embed.add_field(name="루냥아 공지사항 읽기 (번호)", value="목록에 해당하는 번호의 공지사항을 읽습니다", inline=False)
+        embed.add_field(name="루냥아 공지사항 (번호)", value="목록에 해당하는 번호의 공지사항을 읽습니다\n번호가 없으면 첫번째 공지사항을 읽습니다", inline=False)
         embed.add_field(name="루냥아 방명록", value="방명록을 표시합니다", inline=False)
         embed.add_field(name="루냥아 방명록 쓰기 (할 말)", value="방명록에 글을 씁니다", inline=False)
     elif a == ' 프로필':
@@ -39,6 +40,7 @@ def help(client, text, bot_ver):
     elif a == ' 정보':
         embed=discord.Embed(title="도움말", description="정보 항목", color=0x8080ff)
         embed.add_field(name="루냥아 서버정보", value="서버 정보를 불러옵니다", inline=False)
+        embed.add_field(name="루냥아 인기도", value="몇개의 서버에서 몇명의 유저들이 저를 보고 있는지 알려줘요!", inline=False)
         embed.add_field(name="루냥아 자가진단", value="봇이 정상 동작할 수 있는지 점검합니다", inline=False)
         embed.add_field(name="루냥아 서버목록", value="서버 목록을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 생일", value="봇이 언제 탄생했는지 알려줍니다", inline=False)
@@ -52,7 +54,7 @@ def help(client, text, bot_ver):
         embed.add_field(name="루냥이 쓰담쓰담", value="자기 자신한테 사이버(?) 쓰다듬을 선물해줍니다", inline=False)
         embed.add_field(name="루냥아 짖어봐", value="멍", inline=False)
         embed.add_field(name="루냥아 손", value=":raised_hand:", inline=False)
-        embed.add_field(name="루냥아 인기도", value="몇개의 서버에서 몇명의 유저들이 저를 보고 있는지 알려줘요!", inline=False)
+        embed.add_field(name="루냥아 (물체) 먹어", value="물체를 먹습니다(?)", inline=False)
         embed.add_field(name="와! 샌즈!", value="언더테일 아시는구나!", inline=False)
     elif a == ' 게임':
         embed=discord.Embed(title="도움말", description="게임", color=0xffff00)
@@ -86,6 +88,32 @@ def help(client, text, bot_ver):
     elif a == ' 패시브':
         embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
         embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
+    elif user.guild_permissions.administrator:
+        if a == ' 관리자':
+            embed=discord.Embed(title="관리자 기능 도움말", description="명령어 목록", color=0xff0000)
+            embed.add_field(name="공지", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제", inline=False)
+            embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
+            embed.add_field(name="채널연결", value="루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제", inline=False)
+            embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
+        elif a == ' 관리자 공지':
+            embed=discord.Embed(title="관리자 기능 도움말", description="공지", color=0xff0000)
+            embed.add_field(name="루냥아 공지채널 추가", value="현재 채널을 알림 채널로 추가합니다", inline=False)
+            embed.add_field(name="루냥아 공지채널 삭제", value="현재 채널을 알림 채널에서 삭제합니다", inline=False)
+        elif a == ' 관리자 기록':
+            embed=discord.Embed(title="관리자 기능 도움말", description="기록", color=0xff0000)
+            embed.add_field(name="루냥아 로그채널 생성", value="메시지 수정, 삭제, 확성기 사용을 기록해주는 채널을 생성합니다\n비활성화를 원할 시 기록 채널을 삭제하면 됩니다", inline=False)
+        elif a == ' 관리자 채널연결':
+            embed=discord.Embed(title="관리자 기능 도움말", description="채널연결", color=0xff0000)
+            embed.add_field(name="루냥아 채널연결 생성", value="채널 간 1:1 텍스트 채팅 연결을 준비합니다", inline=False)
+            embed.add_field(name="루냥아 채널연결 접속 (코드)", value="부여받은 접속 코드로 채널을 연결합니다", inline=False)
+            embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
+        elif a == ' 관리자 모더레이션':
+            embed=discord.Embed(title="관리자 기능 도움말", description="모더레이션", color=0xff0000)
+            embed.add_field(name="루냥아 뮤트 (멘션)", value="멘션된 사용자를 뮤트(채팅금지)합니다", inline=False)
+            embed.add_field(name="루냥아 언뮤트 (멘션)", value="멘션된 사용자의 뮤트(채팅금지)를 해제합니다", inline=False)
+            embed.add_field(name="루냥아 킥 (멘션)", value="사용자를 추방(kick)합니다", inline=False)
+            embed.add_field(name="루냥아 밴 (멘션 또는 고유 ID)", value="사용자를 차단(ban)합니다", inline=False)
+            embed.set_footer(text="주의 : 모든 모더레이션 기능은 사전 확인 없이 바로 진행되므로 신중히 사용하시기 바랍니다")
     else:
         embed=discord.Embed(title='전체 도움말을 원하신다면 그냥 "루냥아 도와줘"라고만 입력해주세요!')
     return embed
@@ -144,7 +172,12 @@ def ret_changelog(client, bot_ver):
         patch_guide = ""
     embed=discord.Embed(title="업데이트 내역", description="현재 버전은 " + bot_ver + "이예요!\n" + patch_guide, color=0xffffff)
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.add_field(name="Error : failed to load list for update log", value="Value : NOT_FOUND", inline=False)
+    embed.add_field(name="1.12.7 (2019-08-31)", value="사용자 킥, 밴 기능 추가", inline=False)
+    embed.add_field(name="1.12.6 (2019-08-29)", value="사용자 뮤트 기능 추가", inline=False)
+    embed.add_field(name="1.12.5 (2019-08-27)", value="메시지 기록 채널 기능 추가", inline=False)
+    embed.add_field(name="1.12.2 (2019-08-24)", value="일상 명령어 1개 추가", inline=False)
+    embed.add_field(name="1.12.1 (2019-08-24)", value="채널 간 채팅 연결 기능 추가", inline=False)
+    embed.add_field(name="1.12.0 (2019-08-21)", value="공지사항, 방명록, 출석체크 기능 추가, 프로필 기능 강화", inline=False)
     return embed
 
 def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, servers, users, pid):
@@ -158,13 +191,10 @@ def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, se
     embed.add_field(name="Environment", value=str(os.popen("uname -s").read()), inline=True)
     embed.add_field(name="Process ID", value=str(pid), inline=True)
     embed.add_field(name="Python version", value=cpuinfo.get_cpu_info()["python_version"], inline=True)
+    embed.add_field(name="Discord.py version", value=discord.__version__, inline=True)
     embed.add_field(name="Processor", value=cpuinfo.get_cpu_info()["brand"], inline=True)
     embed.add_field(name="Memory", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB of total RAM\n" + str(int(memkb / 1024)) + " KB using by bot", inline=True)
     embed.set_footer(text="ver " + bot_ver + ", food database ver " + m_food.DB_VERSION)
-    return embed
-
-def ret_admincmd(bot_ver):
-    embed=discord.Embed(title="see the manpage k thx")
     return embed
 
 def bday():
@@ -189,7 +219,7 @@ def selfintro(client, bot_ver):
     embed=discord.Embed(title="기계식 루냥이", description="우리들만의 Discord 봇", color=0xffffff)
     embed.add_field(name="제작자", value="[libertin#2340](https://twitter.com/libertin_ko)", inline=True)
     embed.add_field(name="도와주신 분들", value="[Katinor](https://twitter.com/icoRayner)\nSeia\n[perillamint](https://twitter.com/perillamint)\n[yeoncomi](https://twitter.com/yeoncomi)", inline=True)
-    embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388160), [공식 트위터](https://twitter.com/luna_libertin)", inline=False)
+    embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190), [공식 트위터](https://twitter.com/luna_libertin)", inline=False)
     embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
     embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [星海恋詩의 Picrew](https://picrew.me/image_maker/79516/)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
     embed.set_thumbnail(url=client.user.avatar_url)

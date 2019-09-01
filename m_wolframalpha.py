@@ -1,19 +1,19 @@
 import requests
 import wolframalpha
-import configparser
 import xmltodict
 
-conf = configparser.ConfigParser()
-conf.read("luna_config.txt")
+client = ""
 
-client = wolframalpha.Client(conf.get("wolframalpha", "appid"))
+def load(conf):
+    global client
+    client = wolframalpha.Client(conf.get("wolframalpha", "appid"))
 
 def wa_calc(query):
     res = client.query(query)
     answer = next(res.results).text
     return answer
 
-def wa_img(query):
+def wa_img(conf, query):
     url = 'http://api.wolframalpha.com/v1/query?input=%s&appid=%s' %(query, conf.get("wolframalpha", "appid"))
     res = requests.get(url)
     xml_content = res.content
