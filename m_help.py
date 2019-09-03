@@ -11,7 +11,7 @@ def help(user, client, text, bot_ver):
         embed.set_author(name="기계식 루냥이 사용 방법",icon_url=client.user.avatar_url)
         embed.add_field(name="도움말", value="루냥아 도와줘 (항목), 루냥아 업데이트내역, 루냥아 누구니, 루냥아 소스코드", inline=False)
         embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
-        embed.add_field(name="프로필", value="루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개)", inline=False)
+        embed.add_field(name="프로필", value="루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션)", inline=False)
         embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 인기도, 루냥아 자가진단, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
         embed.add_field(name="일상", value="루냥아 출석체크, 루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 짖어봐, 루냥아 손, 루냥아 (물체) 먹어, 와! 샌즈!", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 주사위, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
@@ -32,6 +32,7 @@ def help(user, client, text, bot_ver):
         embed.add_field(name="루냥아 공지사항 (번호)", value="목록에 해당하는 번호의 공지사항을 읽습니다\n번호가 없으면 첫번째 공지사항을 읽습니다", inline=False)
         embed.add_field(name="루냥아 방명록", value="방명록을 표시합니다", inline=False)
         embed.add_field(name="루냥아 방명록 쓰기 (할 말)", value="방명록에 글을 씁니다", inline=False)
+        embed.add_field(name="루냥아 거울 (멘션)", value="자신 또는 멘션된 계정의 프로필 사진을 보여줍니다", inline=False)
     elif a == ' 프로필':
         embed=discord.Embed(title="도움말", description="프로필 항목", color=0x8080ff)
         embed.add_field(name="루냥아 나 어때", value="사용자 정보를 불러옵니다", inline=False)
@@ -95,6 +96,7 @@ def help(user, client, text, bot_ver):
             embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
             embed.add_field(name="채널연결", value="루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제", inline=False)
             embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
+            embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단", inline=False)
         elif a == ' 관리자 공지':
             embed=discord.Embed(title="관리자 기능 도움말", description="공지", color=0xff0000)
             embed.add_field(name="루냥아 공지채널 추가", value="현재 채널을 알림 채널로 추가합니다", inline=False)
@@ -114,6 +116,11 @@ def help(user, client, text, bot_ver):
             embed.add_field(name="루냥아 킥 (멘션)", value="사용자를 추방(kick)합니다", inline=False)
             embed.add_field(name="루냥아 밴 (멘션 또는 고유 ID)", value="사용자를 차단(ban)합니다", inline=False)
             embed.set_footer(text="주의 : 모든 모더레이션 기능은 사전 확인 없이 바로 진행되므로 신중히 사용하시기 바랍니다")
+        elif a == ' 관리자 기타':
+            embed=discord.Embed(title="관리자 기능 도움말", description="기타", color=0xff0000)
+            embed.add_field(name="루냥아 지워줘 (5~100)", value="주어진 개수만큼 메시지를 삭제합니다", inline=False)
+            embed.add_field(name="루냥아 초대링크 생성", value="즉석 초대 링크를 생성합니다", inline=False)
+            embed.add_field(name="루냥아 자가진단", value="봇이 사용 가능한 권한을 확인합니다", inline=False)
     else:
         embed=discord.Embed(title='전체 도움말을 원하신다면 그냥 "루냥아 도와줘"라고만 입력해주세요!')
     return embed
@@ -224,4 +231,45 @@ def selfintro(client, bot_ver):
     embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [星海恋詩의 Picrew](https://picrew.me/image_maker/79516/)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
     embed.set_thumbnail(url=client.user.avatar_url)
     embed.set_footer(text="Copyright (C) 2017 - 2019 libertin | v" + bot_ver)
+    return embed
+
+def permcheck(me):
+    embed=discord.Embed(title="권한 자가진단 결과", color=0xff77ff)
+    heart_yes = ":green_heart: 정상"
+    heart_no = ":broken_heart: 오류"
+    if me.administrator:
+        l_admin = heart_yes
+    else:
+        l_admin = heart_no
+    if me.manage_channels:
+        l_manch = heart_yes
+    else:
+        l_manch = heart_no
+    if me.kick_members:
+        l_kick = heart_yes
+    else:
+        l_kick = heart_no
+    if me.ban_members:
+        l_ban = heart_yes
+    else:
+        l_ban = heart_no
+    if me.read_message_history:
+        l_history = heart_yes
+    else:
+        l_history = heart_no
+    if me.manage_messages:
+        l_manm = heart_yes
+    else:
+        l_manm = heart_no
+    if me.create_instant_invite:
+        l_inv = heart_yes
+    else:
+        l_inv = heart_no
+    embed.add_field(name="관리자", value=l_admin, inline=True)
+    embed.add_field(name="채널 관리하기", value=l_manch, inline=True)
+    embed.add_field(name="멤버 추방하기", value=l_kick, inline=True)
+    embed.add_field(name="멤버 차단하기", value=l_ban, inline=True)
+    embed.add_field(name="메시지 기록 보기", value=l_history, inline=True)
+    embed.add_field(name="메시지 관리하기", value=l_manm, inline=True)
+    embed.add_field(name="즉석 초대 만들기", value=l_inv, inline=True)
     return embed

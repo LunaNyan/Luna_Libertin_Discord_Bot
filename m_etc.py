@@ -1,5 +1,14 @@
-import psutil, random
+import psutil, random, base64
 from m_user import ret_check
+
+def base64e(s):
+    e = base64.b64encode(s.encode('utf-8'))
+    e = str(e).replace("b'", "")
+    e = e.replace("'", "")
+    return e
+
+def base64d(b):
+    return str(base64.b64decode(b).decode('utf-8'))
 
 def checkIfProcessRunning(processName):
     for proc in psutil.process_iter():
