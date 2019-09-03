@@ -179,12 +179,8 @@ def ret_changelog(client, bot_ver):
         patch_guide = ""
     embed=discord.Embed(title="업데이트 내역", description="현재 버전은 " + bot_ver + "이예요!\n" + patch_guide, color=0xffffff)
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.add_field(name="1.12.7 (2019-08-31)", value="사용자 킥, 밴 기능 추가", inline=False)
-    embed.add_field(name="1.12.6 (2019-08-29)", value="사용자 뮤트 기능 추가", inline=False)
-    embed.add_field(name="1.12.5 (2019-08-27)", value="메시지 기록 채널 기능 추가", inline=False)
-    embed.add_field(name="1.12.2 (2019-08-24)", value="일상 명령어 1개 추가", inline=False)
-    embed.add_field(name="1.12.1 (2019-08-24)", value="채널 간 채팅 연결 기능 추가", inline=False)
-    embed.add_field(name="1.12.0 (2019-08-21)", value="공지사항, 방명록, 출석체크 기능 추가, 프로필 기능 강화", inline=False)
+    embed.add_field(name="1.13.1 (2019-09-03)", value="메시지 삭제 기능 사용 시 로그 파일 첨부하는 기능 추가", inline=False)
+    embed.add_field(name="1.13.0 (2019-09-03)", value="방명록, 관리자 기능 강화", inline=False)
     return embed
 
 def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, servers, users, pid):

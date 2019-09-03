@@ -24,7 +24,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.13.0"
+bot_ver = "1.13.1"
 bot_ver += m_help.patch_ver
 
 try:
@@ -113,6 +113,19 @@ async def server_log(message, colorh, texth, desch = None):
             db.remove_option("server_log", str(message.guild.id))
     except:
         pass
+
+@client.event
+async def server_file(message, fn):
+    try:
+        cid = db.get("server_log", str(message.guild.id))
+        cid = client.get_channel(int(cid))
+        if cid != None:
+            await cid.send(file=discord.File(fn))
+        else:
+            db.remove_option("server_log", str(message.guild.id))
+    except:
+        pass
+
 
 @client.event
 async def news_send(message, title_str, content):
@@ -354,8 +367,15 @@ async def on_message(message):
                 embed=discord.Embed(title="5부터 100까지의 숫자를 입력해주세요!", color=0xff0000)
             else:
                 pl = await message.channel.purge(limit=pu)
+                pf = open("messages.txt", "w")
+                ps = "삭제된 메시지 내역\r\n-----\r\n"
+                for pm in pl:
+                    ps += "채널 : " + pm.channel.name + ", 작성자 : " + pm.author.name + ", " + pm.created_at.isoformat() + "\r\n" + pm.content + "\r\n-----\r\n"
+                pf.write(ps)
+                pf.close()
                 embed=discord.Embed(title=str(len(pl)) + "개의 메시지를 삭제했어요!", color=0xff77ff)
                 await server_log(message, 0xff77ff, str(len(pl)) + "개의 메시지를 삭제함")
+                await server_file(message, "messages.txt")
         except:
             embed=discord.Embed(title="오류가 발생했어요!", description="숫자를 잘못 입력했거나 권한이 없습니다", color=0xff0000)
         await message.channel.send(embed=embed)
