@@ -24,7 +24,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.13.1"
+bot_ver = "1.13.5"
 bot_ver += m_help.patch_ver
 
 try:
@@ -153,6 +153,10 @@ async def on_ready():
     client.loop.create_task(attendance_reset())
 
 @client.event
+async def on_connect():
+    print('Connected to Discord.')
+
+@client.event
 async def on_message(message):
     global test_glyph
     global hash_str
@@ -230,6 +234,14 @@ async def on_message(message):
         await message.channel.send(sans())
     elif message.content == '루냥이 쓰담쓰담':
         await message.channel.send(pat(db, message.author, test_glyph))
+    elif message.content == '루냥아 점프':
+        await message.channel.send("(쫑긋)폴짝! >_<")
+    elif message.content == '루냥아 굴러':
+        await message.channel.send("(쫑긋)데굴데굴~ >_<")
+    elif message.content.startswith('루냥아 섞어줘'):
+        await message.channel.send(say_shuffle(message))
+    elif message.content.startswith('루냥아 행운의숫자'):
+        await message.channel.send(say_rint(message))
     elif message.content.startswith('루냥아 섯다 '):
         await message.channel.send(embed=seotda(message.content, message.author))
     elif message.content.startswith('루냥아 소개말 '):
@@ -348,6 +360,16 @@ async def on_message(message):
         except:
             page = 1
         await message.channel.send(embed=m_help.servers_list(client, page))
+    elif message.content.startswith("루냥아 닉변 "):
+        nc = message.content.replace("루냥아 닉변 ", "")
+        try:
+            np = message.author.display_name
+            await message.author.edit(nick=nc)
+            embed=discord.Embed(title="닉네임을 변경했어요!", description=np + " >> " + nc, color=0xff77ff)
+            await server_log(message, 0xff77ff, message.author.name + "이(가) 닉네임을 변경함", np + " >> " + nc)
+        except:
+            embed=discord.Embed(title="오류가 발생했어요!", description="닉네임이 너무 길거나 권한이 부족합니다", color=0xff0000)
+        await message.channel.send(embed=embed)
     elif message.content == "루냥아 테스트기능" and test_glyph == "_":
         await message.channel.send(embed=m_help.test_features(bot_ver))
     elif message.content.startswith("루냥아 문의 "):

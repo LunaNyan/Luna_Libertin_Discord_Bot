@@ -130,3 +130,15 @@ def l_ticket(message):
 def say_lv():
     say_lv_str = ["(꼬옥", "(껴안"]
     return random.choice(say_lv_str)
+
+def say_shuffle(message):
+    q = message.content.replace("루냥아 섞어줘 ", "")
+    w = q.split(" ")
+    random.shuffle(w)
+    r = ""
+    for m in w:
+        r += m + ", "
+    return r[:-2]
+
+def say_rint(message):
+    return str(random.randint(1, 100))
