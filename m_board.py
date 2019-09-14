@@ -1,4 +1,4 @@
-import configparser, discord, datetime
+import configparser, discord, datetime, m_etc, math
 
 db_path = "board_db.dat"
 
@@ -53,27 +53,58 @@ def clear():
         db.set("article_" + str(i), "datetime", "empty")
         i += 1
 
-def gbook_view():
-    embed = discord.Embed(title="방명록", color=0xffffff)
-    i = 1
-    while i <= 15:
-        content = db.get("gbook_" + str(i), "content")
-        author = db.get("gbook_" + str(i), "author")
-        dtstr = db.get("gbook_" + str(i), "datetime")
-        if dtstr != "empty":
-            embed.add_field(name = content, value = "작성자 : " + author + ", 작성 일자 : " + dtstr, inline=False)
-        i += 1
+def gbook_view(page):
+    try:
+        content = str(db.get("gbook", "content")).split(", ")
+        author = str(db.get("gbook", "author")).split(", ")
+        dtstr = str(db.get("gbook", "datetime")).split(", ")
+    except:
+        l_content = [str(db.get("gbook", "content"))]
+        l_author = [str(db.get("gbook", "author"))]
+        l_dtstr = [str(db.get("gbook", "datetime"))]
+    pages = math.ceil(len(content) / 10)
+    if page > pages or page <= 0:
+        embed=discord.Embed(title="잘못된 페이지 번호입니다")
+    else:
+        embed = discord.Embed(title="방명록", color=0xffffff)
+        c = (page - 1) * 10
+        ct = c + 9
+        while c <= ct:
+            try:
+                embed.add_field(name = "#" + str(c+1) + " : " + m_etc.base64d(content[c]), value = "작성자 : " + m_etc.base64d(author[c]) + ", 작성 일자 : " + m_etc.base64d(dtstr[c]), inline=False)
+                c += 1
+            except:
+                break
+        embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 방명록 (페이지)"')
     return embed
 
 def gbook_write(content, author):
-    shift_i = 14
-    while shift_i >= 1:
-        db.set("gbook_" + str(shift_i + 1), "author", db.get("gbook_" + str(shift_i), "author"))
-        db.set("gbook_" + str(shift_i + 1), "content", db.get("gbook_" + str(shift_i), "content"))
-        db.set("gbook_" + str(shift_i + 1), "datetime", db.get("gbook_" + str(shift_i), "datetime"))
-        shift_i -= 1
-    db.set("gbook_1", "author", author)
-    db.set("gbook_1", "content", content)
-    db.set("gbook_1", "datetime", str(datetime.datetime.now().isoformat()))
+    try:
+        l_content = str(db.get("gbook", "content")).split(", ")
+        l_author = str(db.get("gbook", "author")).split(", ")
+        l_dtstr = str(db.get("gbook", "datetime")).split(", ")
+    except:
+        l_content = [str(db.get("gbook", "content"))]
+        l_author = [str(db.get("gbook", "author"))]
+        l_dtstr = [str(db.get("gbook", "datetime"))]
+    if len(l_content) == 100:
+        del l_content[99]
+        del l_author[99]
+        del l_dtstr[99]
+    l_content.insert(0, m_etc.base64e(content))
+    l_author.insert(0, m_etc.base64e(author))
+    l_dtstr.insert(0, m_etc.base64e(str(datetime.datetime.now().isoformat())))
+    n = 0
+    s_content = ""
+    s_author = ""
+    s_dtstr = ""
+    for c in l_content:
+        s_content += c + ", "
+        s_author += l_author[n] + ", "
+        s_dtstr += l_dtstr[n] + ", "
+        n += 1
+    db.set("gbook", "content", s_content[:-2])
+    db.set("gbook", "author", s_author[:-2])
+    db.set("gbook", "datetime", s_dtstr[:-2])
     with open(db_path, 'w') as configfile:
         db.write(configfile)

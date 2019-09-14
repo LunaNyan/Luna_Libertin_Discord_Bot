@@ -162,3 +162,44 @@ def attendance(conf, user):
             embed=discord.Embed(title="처음으로 출석체크를 했어요!", color=0x00ff00)
         conf.set("attendance", "today", conf.get("attendance", "today") + ", " + str(user.id))
     return embed
+
+def guild_custom_commands(db, message):
+    try:
+        a = db.get("custom_commands", str(message.guild.id) + "_" + message.content.replace("루냥아 ", ""))
+        react = a.split(" | ")[0]
+        react = react.replace("[멘션]", message.author.mention)
+        react = react.replace("[이름]", message.author.display_name)
+        return react
+    except:
+        return None
+
+def make_custom_commands(db, message):
+    m = message.content.replace("루냥아 배워 ", "")
+    try:
+        m = m.split(" | ")
+        db.set("custom_commands", str(message.guild.id) + "_" + m[0], m[1] + " | " + m[2])
+        embed=discord.Embed(title="명령어를 배웠어요!", color=0xff77ff)
+        embed.add_field(name=m[0], value=m[2], inline=False)
+        embed.set_footer(text="주의 : 배운 명령어는 해당 서버에서만 동작합니다")
+    except:
+        embed=discord.Embed(title="오류가 발생했어요!", description="요구 필드가 충족되지 않았습니다", color=0xff0000)
+    return embed
+
+def list_custom_commands(db, message):
+    s = str(message.guild.id)
+    l = dict(db.items("custom_commands"))
+    embed=discord.Embed(title="서버 지정 명령어 목록", color=0xffffff)
+    for a in l:
+        if s in a:
+            embed.add_field(name=a.replace(s + "_", ""), value=l[a].split(' | ')[1])
+    return embed
+
+def remove_custom_commands(db, message):
+    m = message.content.replace("루냥아 잊어 ", "")
+    l = dict(db.items("custom_commands"))
+    if str(message.guild.id) + "_" + m in l:
+        db.remove_option("custom_commands", str(message.guild.id) + "_" + m)
+        embed=discord.Embed(title="명령어를 잊었어요!", color=0xffff00)
+    else:
+        embed=discord.Embed(title="명령어가 존재하지 않아요!", color=0xff0000)
+    return embed
