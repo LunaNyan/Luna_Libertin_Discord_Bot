@@ -6,11 +6,9 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha
+import random, re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands
 from datetime import datetime, timedelta
-from random import randint
 from m_seotda import *
-from m_etc import *
 from m_hash import getHash
 import imp
 
@@ -24,7 +22,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.13.5"
+bot_ver = "1.15.1"
 bot_ver += m_help.patch_ver
 
 try:
@@ -67,6 +65,7 @@ except:
 
 news_str = ""
 news_title_str = "기계식 루냥이 공지"
+news_image = False
 
 article_title = ""
 article_content = ""
@@ -92,10 +91,11 @@ async def bgjob_change_playing():
         if test_glyph == "_":
             presences_list = ["루냥아 테스트기능 : 실험 중인 기능 확인하기", "v" + bot_ver, "이 메시지는 10초 마다 바뀌어요!"]
         else:
-            presences_list = ["루냥아 도와줘 : 도움말" , "루냥아 업데이트내역 : 업데이트 내역 보기", str(len(client.guilds)) + "개의 서버에서 귀여움받는 중", str(members_sum) + "명의 유저들에게 귀여움받는 중", "v" + bot_ver, "이 메시지는 10초 마다 바뀌어요!"]
+            presences_list = ["루냥아 도와줘 : 도움말", str(len(client.guilds)) + "개의 서버에서 귀여움받는 중", str(members_sum) + "명의 유저들에게 귀여움받는 중", "v" + bot_ver, "이 메시지는 10초 마다 바뀌어요!"]
         for v in presences_list:
             await asyncio.sleep(10)
             await client.change_presence(activity=discord.Game(v))
+    client.loop.create_task(bgjob_change_playing())
 
 @client.event
 async def server_log(message, colorh, texth, desch = None):
@@ -130,12 +130,14 @@ async def server_file(message, fn):
 @client.event
 async def news_send(message, title_str, content):
     await message.channel.send("Sending news..")
+    embed = discord.Embed(title=title_str, description=content, color=0xffccff)
+    embed.set_thumbnail(url=client.user.avatar_url)
+    if news_image != False:
+        embed.set_image(url=news_image)
+    embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
     for c in db.get("etc", "news_channel").split(", "):
         try:
             news_channel = client.get_channel(int(c))
-            embed = discord.Embed(title=title_str, description=content, color=0xffccff)
-            embed.set_thumbnail(url=client.user.avatar_url)
-            embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
             await news_channel.send(embed=embed)
             await message.channel.send(str(c) + " : Success")
         except Exception as e:
@@ -165,12 +167,29 @@ async def on_message(message):
     global article_title
     global article_content
     global comm_count
+    global news_image
+    # admin indicator
+    if message.author.id == int(conf.get("config", "bot_owner")) or message.author.guild_permissions.administrator:
+        ifadmin = True
+    else:
+        ifadmin = False
+    # skip for herself, bots, command-denied channel
     if message.author == client.user:
         return
     elif message.author.bot:
         return
+    elif message.content == '루냥아 금지채널 삭제' and ifadmin:
+        dst = db.get("etc", "denied_channel")
+        if str(message.channel.id) in dst:
+            dst = dst.replace(", " + str(message.channel.id), "")
+            db.set("etc", "denied_channel", dst)
+            embed=discord.Embed(title="명령어 사용 금지채널에서 삭제했어요!", color=0xffffff)
+        else:
+            embed=discord.Embed(title="명령어 사용 금지채널이 아니예요!", color=0xff0000)
+        await message.channel.send(embed=embed)
     elif str(message.channel.id) in db.get("etc", "denied_channel"):
         return
+    # delete muted user's message
     try:
         m = db.get("user_mute", str(message.guild.id))
         if str(message.author.id) in m:
@@ -178,11 +197,24 @@ async def on_message(message):
             return
     except:
         pass
+    # ctclink routine
     cr0 = m_ctclink.get_link(message.channel.id, db)
+    try:
+        scnt = int(db.get("server_count", str(message.guild.id)))
+        if scnt != -1:
+            scnt += 1
+            db.set("server_count", str(message.guild.id), str(scnt))
+    except:
+        db.set("server_count", str(message.guild.id), "1")
+        scnt = 1
+    # command count and passive
     if message.content.startswith('루냥아') or message.content.startswith('루냥이') or message.content.startswith('커냥이') or message.content.startswith('귀냥이'):
         m_user.increase(db, message.author)
         comm_count+= 1
         db.set("etc", "comm_count", str(int(db.get("etc", "comm_count")) + 1))
+    elif scnt >= 70 and random.randint(1, 100) == 1:
+        db.set("server_count", str(message.guild.id), "0")
+        await message.channel.send(m_ext_commands.server_burning())
     elif cr0 != False:
         cr = client.get_channel(int(cr0))
         if cr == None:
@@ -190,23 +222,17 @@ async def on_message(message):
         else:
             await cr.send(message.author.name + " : " + message.content)
     m_user.count(db, message.author)
-    if m_user.ret_check(db, message.author, test_glyph) >= 200 and m_user.check_count(db, message.author) >= 30 and randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True:
-        await message.channel.send(message.author.mention + " " + say_lv())
+    if m_user.ret_check(db, message.author, test_glyph) >= 200 and m_user.check_count(db, message.author) >= 30 and random.randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True:
+        await message.channel.send(message.author.mention + " " + m_ext_commands.say_lv())
         if m_user.check_hug_count(db, message.author) <= 3:
             embed = discord.Embed(title="놀라셨나요?", description='기계식 루냥이의 패시브 기능입니다\n"루냥아 도와줘 패시브"를 입력해보세요!')
             await message.channel.send(embed=embed)
         m_user.hug_count(db, message.author)
         m_user.reset_count(db, message.author)
-    if message.author.id == int(conf.get("config", "bot_owner")) or message.author.guild_permissions.administrator:
-        ifadmin = True
-    else:
-        ifadmin = False
     # generic commands
-    if message.content.startswith('루냥아 도와줘'):
+    if message.content.startswith('루냥아 ') and message.content.endswith(' 도와줘'):
         embed = m_help.help(message.author, client, message.content, bot_ver)
         await message.channel.send(embed=embed)
-    elif message.content == '루냥아 업데이트내역':
-        await message.channel.send(embed=m_help.ret_changelog(client, bot_ver))
     elif message.content == '루냥아 공지사항 목록':
         await message.channel.send(embed=m_board.list())
     elif message.content.startswith('루냥아 공지사항'):
@@ -229,19 +255,15 @@ async def on_message(message):
     elif message.content == '루냥아 배고파':
         await message.channel.send(m_food.return_food())
     elif message.content == '루냥이 귀여워' or message.content == '루냥이 커여워' or message.content == '귀냥이 루여워' or message.content == '커냥이 루여워':
-        await message.channel.send(imcute(db, message.author, test_glyph))
+        await message.channel.send(m_ext_commands.imcute(db, message.author, test_glyph))
     elif message.content == '와! 샌즈!':
-        await message.channel.send(sans())
+        await message.channel.send(m_ext_commands.sans())
     elif message.content == '루냥이 쓰담쓰담':
-        await message.channel.send(pat(db, message.author, test_glyph))
-    elif message.content == '루냥아 점프':
-        await message.channel.send("(쫑긋)폴짝! >_<")
-    elif message.content == '루냥아 굴러':
-        await message.channel.send("(쫑긋)데굴데굴~ >_<")
+        await message.channel.send(m_ext_commands.pat(db, message.author, test_glyph))
     elif message.content.startswith('루냥아 섞어줘'):
-        await message.channel.send(say_shuffle(message))
+        await message.channel.send(m_ext_commands.say_shuffle(message))
     elif message.content.startswith('루냥아 행운의숫자'):
-        await message.channel.send(say_rint(message))
+        await message.channel.send(m_ext_commands.say_rint(message))
     elif message.content.startswith('루냥아 섯다 '):
         await message.channel.send(embed=seotda(message.content, message.author))
     elif message.content.startswith('루냥아 소개말 '):
@@ -299,36 +321,39 @@ async def on_message(message):
         except:
             await message.channel.send("연산식을 다시 확인해주세요")
     elif message.content.startswith('루냥아 골라줘 '):
-        await message.channel.send("**" + selectr(message.content) + "**(이)가 선택되었습니다")
+        await message.channel.send("**" + m_ext_commands.selectr(message.content) + "**(이)가 선택되었습니다")
     elif message.content == '루냥아':
-        await message.channel.send(l_ping())
-    elif message.content == '루냥아 짖어봐':
-        await message.channel.send(l_dog())
+        await message.channel.send(m_ext_commands.l_ping())
+    elif message.content == '루냥아 짖어':
+        await message.channel.send(m_ext_commands.l_dog())
     elif message.content == '루냥아 사랑해':
-        await message.channel.send(l_lv(db, message.author, test_glyph))
+        await message.channel.send(m_ext_commands.l_lv(db, message.author, test_glyph))
     elif message.content == '루냥아 출석체크':
         await message.channel.send(embed=m_user.attendance(db, message.author))
-    elif message.content == '루냥아 손':
-        await message.channel.send(':raised_hand:')
     elif message.content.startswith('루냥아 생일'):
         await message.channel.send(embed=m_help.bday())
     elif message.content == '루냥아 주사위':
-        await message.channel.send('(쫑긋) (데구르르) ' + l_dice() + '!')
+        await message.channel.send('(쫑긋) (데구르르) ' + m_ext_commands.l_dice() + '!')
     elif message.content.startswith('루냥아 제비뽑기 '):
-        await message.channel.send(l_ticket(message.content))
+        await message.channel.send(m_ext_commands.l_ticket(message.content))
     elif message.content == '루냥아 나 어때':
         await message.channel.send(embed=m_user.check(db, message.author))
     elif message.content.startswith('루냥아 ') and message.content.endswith(' 어때'):
-        await message.channel.send(embed=m_user.check(db, message.mentions[0]))
-    elif message.content.startswith('루냥아 ') and message.content.endswith(' 먹어'):
-        e = message.content.replace('루냥아 ', '').replace(' 먹어', '')
-        if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
-            embed = discord.Embed(title="그런 물체는 먹을 수 없어요!", color=0xff0000)
+        res2 = m_user.guild_custom_commands(db, message)
+        if res2 == None:
+            await message.channel.send(embed=m_user.check(db, message.mentions[0]))
         else:
-            embed = discord.Embed(title=e + "을(를) 먹었어요!", description="옴뇸뇸뇸뇸", color=0xff77ff)
-        await message.channel.send(embed=embed)
+            await message.channel.send(res2)
+    elif message.content.startswith('루냥아 ') and message.content.endswith(' 먹어'):
+        await message.channel.send(embed=m_ext_commands.eat(message))
+    elif message.content.startswith('루냥아 배워 '):
+        await message.channel.send(embed=m_user.make_custom_commands(db, message))
+    elif message.content.startswith('루냥아 잊어 '):
+        await message.channel.send(embed=m_user.remove_custom_commands(db, message))
+    elif message.content == '루냥아 배운거':
+        await message.channel.send(embed=m_user.list_custom_commands(db, message))
     elif message.content == '루냥아 서버정보':
-        await message.channel.send(embed=m_user.serverinfo(message.guild))
+        await message.channel.send(embed=m_user.serverinfo(db, message))
     elif message.content.startswith('루냥아 거울'):
         if not message.mentions:
             mir_user = message.author
@@ -342,8 +367,9 @@ async def on_message(message):
         embed.set_image(url=mir_user.avatar_url)
         await message.channel.send(embed=embed)
     elif message.content == '루냥아 버전':
-        upt = datetime.now() - startTime
-        await message.channel.send(embed=m_help.get_info_public(client, bot_ver, upt, m_device.SERVER_NAME))
+        await message.channel.send(embed=m_help.get_info_public(client, bot_ver, m_device.SERVER_NAME))
+    elif message.content == '루냥아 졸리니':
+        await message.channel.send("저는 현재 " + str(datetime.now() - startTime) + " 동안 깨어있어요!")
     elif message.content == '루냥아 관심 가져주기':
         await message.channel.send(embed=m_user.toggle_sudden_hugging(db, message.author))
     elif message.content == "루냥아 인기도":
@@ -371,7 +397,7 @@ async def on_message(message):
             embed=discord.Embed(title="오류가 발생했어요!", description="닉네임이 너무 길거나 권한이 부족합니다", color=0xff0000)
         await message.channel.send(embed=embed)
     elif message.content == "루냥아 테스트기능" and test_glyph == "_":
-        await message.channel.send(embed=m_help.test_features(bot_ver))
+        await message.channel.send(embed=m_help.test_features(db, bot_ver))
     elif message.content.startswith("루냥아 문의 "):
         call_s = message.content.replace("루냥아 문의 ", "")
         admin = await client.fetch_user(280306700324700160)
@@ -380,6 +406,14 @@ async def on_message(message):
         else:
             await admin.dm_channel.send(message.author.name + "(" + str(message.author.id) + ")\n" + call_s)
     # commands for server admins
+    elif message.content == '루냥아 불타는 서버' and ifadmin:
+        if scnt != -1:
+            db.set("server_count", str(message.guild.id), "-1")
+            embed=discord.Embed(title="불타는 서버 패시브를 껐어요!", color=0xffffff)
+        else:
+            db.set("server_count", str(message.guild.id), "0")
+            embed=discord.Embed(title="불타는 서버 패시브를 켰어요!", color=0xffffff)
+        await message.channel.send(embed=embed)
     elif message.content == '루냥아 자가진단' and ifadmin:
         await message.channel.send(embed=m_help.permcheck(message.guild.me.guild_permissions))
     elif message.content.startswith("루냥아 지워줘 ") and ifadmin:
@@ -549,6 +583,40 @@ async def on_message(message):
         except:
             embed=discord.Embed(title="오류가 발생했어요!", description="권한이 부족합니다", color=0xff0000)
             await message.channel.send(embed=embed)
+    elif message.content.startswith("루냥아 환영인사 ") and ifadmin:
+        if message.content == "루냥아 환영인사 삭제":
+            try:
+                db.remove_option("welcome_message", str(message.guild.id))
+                embed=discord.Embed(title="환영 메시지를 삭제했어요!", color=0x00ff00)
+            except:
+                embed=discord.Embed(title="환영 메시지가 지정되어 있지 않아요!", color=0xff0000)
+        else:
+            if not " | " in message.content:
+                db.set("welcome_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace("루냥아 환영메시지 ", ""))
+                embed = discord.Embed(title="환영 메시지를 설정했어요!", description="이제 새로운 멤버가 들어오면 여기서 환영할게요!", color=0x00ff00)
+            else:
+                embed = discord.Embed(title="사용할 수 없는 기호가 포함되어 있습니다", description='" | "는 사용할 수 없습니다', color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith("루냥아 작별인사 ") and ifadmin:
+        if message.content == "루냥아 작별인사 삭제":
+            try:
+                db.remove_option("farewell_message", str(message.guild.id))
+                embed=discord.Embed(title="작별 메시지를 삭제했어요!", color=0x00ff00)
+            except:
+                embed=discord.Embed(title="작별 메시지가 지정되어 있지 않아요!", color=0xff0000)
+        else:
+            if not " | " in message.content:
+                db.set("farewell_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace("루냥아 작별메시지 ", ""))
+                embed = discord.Embed(title="작별 메시지를 설정했어요!", description="이제 멤버가 나가면 여기서 작별할게요!", color=0x00ff00)
+            else:
+                embed = discord.Embed(title="사용할 수 없는 기호가 포함되어 있습니다", description='" | "는 사용할 수 없습니다', color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content == '루냥아 금지채널 추가' and ifadmin:
+        dst = db.get("etc", "denied_channel")
+        dst = dst + ", " + str(message.channel.id)
+        db.set("etc", "denied_channel", dst)
+        embed=discord.Embed(title="명령어 사용 금지채널에 추가했어요!", description="이제 여기서 입력되는 명령어는 모두 무시됩니다\n금지 채널에서 삭제하려면 '루냥아 금지채널 삭제'를 입력하세요!", color=0xffffff)
+        await message.channel.send(embed=embed)
     # admin only functions
     elif message.content.startswith('루냥아 shellcmd ') and message.author.id == int(conf.get("config", "bot_owner")):
         shl_str = message.content
@@ -563,6 +631,8 @@ async def on_message(message):
         news_str = news_str.replace("&nbsp", "\n")
         embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
         embed.set_thumbnail(url=client.user.avatar_url)
+        if news_image != False:
+            embed.set_image(url=news_image)
         await message.channel.send(embed=embed)
         if news_title_str != "기계식 루냥이 공지":
             await message.channel.send(":warning: custom embed title was set : " + news_title_str)
@@ -571,8 +641,18 @@ async def on_message(message):
         news_title_str = news_title_str.replace('루냥아 news set_title ', '')
         news_title_str = news_title_str.replace("&nbsp", "\n")
         embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
+        if news_image != False:
+            embed.set_image(url=news_image)
         embed.set_thumbnail(url=client.user.avatar_url)
         await message.channel.send(embed=embed)
+    elif message.content.startswith('루냥아 news set_image ') and message.author.id == int(conf.get("config", "bot_owner")):
+        news_image = message.content.replace("루냥아 news set_image ", "")
+        embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
+        embed.set_image(url=news_image)
+        embed.set_thumbnail(url=client.user.avatar_url)
+        await message.channel.send(embed=embed)
+    elif message.content == '루냥아 news clear_image' and message.author.id == int(conf.get("config", "bot_owner")):
+        news_image = False
     elif message.content == '루냥아 news send' and message.author.id == int(conf.get("config", "bot_owner")):
         await news_send(message, news_title_str, news_str)
     elif message.content.startswith('루냥아 news send_specific ') and message.author.id == int(conf.get("config", "bot_owner")):
@@ -582,6 +662,8 @@ async def on_message(message):
             news_channel = client.get_channel(int(channel_str))
             embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
             embed.set_thumbnail(url=client.user.avatar_url)
+            if news_image != False:
+                embed.set_image(url=news_image)
             embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
             await news_channel.send(embed=embed)
         except Exception as e:
@@ -590,6 +672,8 @@ async def on_message(message):
     elif message.content == '루냥아 news preview' and message.author.id == int(conf.get("config", "bot_owner")):
         embed = discord.Embed(title=news_title_str, description=news_str, color=0xffccff)
         embed.set_thumbnail(url=client.user.avatar_url)
+        if news_image != False:
+            embed.set_image(url=news_image)
         embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
         await message.channel.send(embed=embed)
     elif message.content == '루냥아 getinfo' and message.author.id == int(conf.get("config", "bot_owner")):
@@ -620,14 +704,33 @@ async def on_message(message):
         m_board.clear()
     elif message.content == '루냥아 attendance reset' and message.author.id == int(conf.get("config", "bot_owner")):
         db.set("attendance", "today", "0")
+    elif message.content.startswith('루냥아 attendance set') and message.author.id == int(conf.get("config", "bot_owner")):
+        ats = message.content.replace("루냥아 attendance set ", "")
+        ats = ats.split(" ")
+        db.set("attendance", ats[0], ats[1])
     elif message.content.startswith('루냥아 user_level change ') and message.author.id == int(conf.get("config", "bot_owner")):
         try:
             lc = message.content.replace("루냥아 user_level change ", "")
             lc = lc.split(" ")
             db.set("user_level", lc[0], lc[1])
             await message.channel.send("user level of " + lc[0] + " was changed to " + lc[1])
+            us = await client.fetch_user(int(lc[0]))
+            await message.channel.send(embed=m_user.check(db, us))
         except Exception as e:
             await message.channel.send(str(e))
+    elif message.content.startswith('루냥아 exec ') and message.author.id == int(conf.get("config", "bot_owner")):
+        exec(message.content.replace("루냥아 exec ", ""))
+    elif message.content.startswith('루냥아 awaitexec ') and message.author.id == int(conf.get("config", "bot_owner")):
+        await exec(message.content.replace("루냥아 awaitexec ", ""))
+    else:
+        res = m_ext_commands.ext_talk(message)
+        res2 = m_user.guild_custom_commands(db, message)
+        if res != None and res2 == None:
+            await message.channel.send(res)
+        elif res == None and res2 != None:
+            await message.channel.send(res2)
+        else:
+            pass
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 
@@ -665,6 +768,8 @@ async def on_message_edit(before, after):
         return
     elif before.author.bot:
         return
+    elif before.content == after.content:
+        return
     try:
         cid = db.get("server_log", str(before.guild.id))
         cid = client.get_channel(int(cid))
@@ -687,6 +792,29 @@ async def on_guild_remove(guild):
         db.remove_option("user_mute", str(guild.id))
     except:
         pass
+
+@client.event
+async def on_member_join(member):
+    s = str(member.guild.id)
+    l = dict(db.items("welcome_message"))
+    if s in l:
+        a = db.get("welcome_message", s)
+        a = a.split("|")
+        c = client.get_channel(int(a[0]))
+        c = c.replace("[멘션]", message.author.mention)
+        c = c.replace("[이름]", message.author.name)
+        await c.send(a[1])
+
+@client.event
+async def on_member_remove(member):
+    s = str(member.guild.id)
+    l = dict(db.items("farewell_message"))
+    if s in l:
+        a = db.get("farewell_message", s)
+        a = a.split("|")
+        c = client.get_channel(int(a[0]))
+        c = c.replace("[이름]", message.author.name)
+        await c.send(a[1])
 
 print("connecting to Discord. Please Wait..")
 client.run(conf.get("config", "bot_token"))
