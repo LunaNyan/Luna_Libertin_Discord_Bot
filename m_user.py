@@ -1,4 +1,4 @@
-import discord
+import discord, random
 
 def set_bio(conf, user, text):
     conf.set("bio", str(user.id), text)
@@ -184,6 +184,9 @@ def guild_custom_commands(db, message):
     try:
         a = db.get("custom_commands", str(message.guild.id) + "_" + message.content.replace("루냥아 ", ""))
         react = a.split(" | ")[0]
+        if "&&" in react:
+            react = react.split("&&")
+            react = random.choice(react)
         react = react.replace("[멘션]", message.author.mention)
         react = react.replace("[이름]", message.author.display_name)
         return react
@@ -196,7 +199,11 @@ def make_custom_commands(db, message):
         m = m.split(" | ")
         db.set("custom_commands", str(message.guild.id) + "_" + m[0], m[1] + " | " + str(message.author.id) + " | " + message.author.name)
         embed=discord.Embed(title="명령어를 배웠어요!", color=0xff77ff)
-        embed.add_field(name=m[0], value=m[1], inline=False)
+        if "&&" in m[1]:
+            li = m[1].split("&&")
+            embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
+        else:
+            embed.add_field(name=m[0], value=m[1], inline=False)
         embed.set_footer(text="주의 : 배운 명령어는 해당 서버에서만 동작합니다")
     except:
         embed=discord.Embed(title='사용 방법 : "루냥아 배워 (명령어) | (반응)"', color=0xffffff)

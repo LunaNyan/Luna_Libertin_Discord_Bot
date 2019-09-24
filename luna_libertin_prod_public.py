@@ -22,7 +22,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 # If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.15.1"
+bot_ver = "1.15.3"
 bot_ver += m_help.patch_ver
 
 try:
@@ -189,7 +189,7 @@ async def on_message(message):
         await message.channel.send(embed=embed)
     elif str(message.channel.id) in db.get("etc", "denied_channel"):
         return
-    # delete muted user's message
+    # delete muted user's message, discord link in adblock channel
     try:
         m = db.get("user_mute", str(message.guild.id))
         if str(message.author.id) in m:
@@ -197,6 +197,11 @@ async def on_message(message):
             return
     except:
         pass
+    if str(message.channel.id) in db.get("etc", "adblock_channel") and ifadmin == False:
+        if "discordapp.com/invite" in message.content or "discord.gg" in message.content:
+            await message.delete()
+            await message.channel.send(message.author.mention + ", 여기서의 초대 링크 첨부는 금지되어 있어요!")
+            return
     # ctclink routine
     cr0 = m_ctclink.get_link(message.channel.id, db)
     try:
@@ -256,6 +261,8 @@ async def on_message(message):
         await message.channel.send(m_food.return_food())
     elif message.content == '루냥이 귀여워' or message.content == '루냥이 커여워' or message.content == '귀냥이 루여워' or message.content == '커냥이 루여워':
         await message.channel.send(m_ext_commands.imcute(db, message.author, test_glyph))
+    elif message.content == '루냥아 놀아줘' or message.content == '루냥아 심심해':
+        await message.channel.send(embed=m_help.suggest_game())
     elif message.content == '와! 샌즈!':
         await message.channel.send(m_ext_commands.sans())
     elif message.content == '루냥이 쓰담쓰담':
@@ -501,7 +508,7 @@ async def on_message(message):
             embed=discord.Embed(title="채널 관리 권한이 없어요!", description='서버 설정 -> 역할에서 "기계식 루냥이"를 선택한 뒤 "채널 관리"를 활성화해주세요!', color=0xff0000)
         await message.channel.send(embed=embed)
     elif message.content == '루냥아 공지채널 추가' and ifadmin:
-        if ", " + str(message.channel.id) in db.get("etc", "news_channel"):
+        if str(message.channel.id) in db.get("etc", "news_channel"):
             embed=discord.Embed(title="이미 공지를 받을 채널에 등록되어 있어요!", color=0xffff00)
         else:
             db.set("etc", "news_channel", db.get("etc", "news_channel") + ", " + str(message.channel.id))
@@ -616,6 +623,24 @@ async def on_message(message):
         dst = dst + ", " + str(message.channel.id)
         db.set("etc", "denied_channel", dst)
         embed=discord.Embed(title="명령어 사용 금지채널에 추가했어요!", description="이제 여기서 입력되는 명령어는 모두 무시됩니다\n금지 채널에서 삭제하려면 '루냥아 금지채널 삭제'를 입력하세요!", color=0xffffff)
+        await message.channel.send(embed=embed)
+    elif message.content == '루냥아 애드블락 추가' and ifadmin:
+        ast = db.get("etc", "adblock_channel")
+        if str(message.channel.id) in ast:
+            embed=discord.Embed(title="애드블락이 활성화되어 있는 채널이예요!", color=0xff0000)
+        else:
+            ast = ast + ", " + str(message.channel.id)
+            db.set("etc", "adblock_channel", ast)
+            embed=discord.Embed(title="애드블락이 활성화되었어요!", description="이제 여기서 Discord 서버 초대 코드가 모두 금지됩니다", color=0xffff00)
+        await message.channel.send(embed=embed)
+    elif message.content == '루냥아 애드블락 삭제' and ifadmin:
+        ast = db.get("etc", "adblock_channel")
+        if str(message.channel.id) in ast:
+            ast = ast.replace(", " + str(message.channel.id), "")
+            db.set("etc", "adblock_channel", ast)
+            embed=discord.Embed(title="애드블락이 비활성화되었어요!", color=0xffff00)
+        else:
+            embed=discord.Embed(title="애드블락이 활성화되어 있지 않아요!", color=0xff0000)
         await message.channel.send(embed=embed)
     # admin only functions
     elif message.content.startswith('루냥아 shellcmd ') and message.author.id == int(conf.get("config", "bot_owner")):

@@ -98,9 +98,9 @@ def help(user, client, text, bot_ver):
         embed.add_field(name="루냥아 행운의숫자", value="1부터 100 중의 숫자를 무작위로 선택합니다", inline=False)
     elif a == '서버 지정 명령어':
         embed=discord.Embed(title="서버 지정 명령어", description="서버 지정 명령어는 '루냥아 (명령어)'로 동작시킵니다\n\n루냥이가 배운 명령어는 해당 서버에서만 동작합니다\n이미 존재하는 서버 지정 명령어를 배우도록 시키면 명령어가 수정됩니다\n**봇의 기본 명령어는 배워도 동작하지 않습니다**", color=0x00ff00)
-        embed.add_field(name="루냥아 배워 (명령어) | (반응)", value="서버 지정 명령어를 생성합니다\n[멘션] : 명령어 사용자의 멘션\n[이름] : 명령어 사용자의 닉네임", inline=False)
+        embed.add_field(name="루냥아 배워 (명령어) | (반응)", value="서버 지정 명령어를 생성합니다\n[멘션] : 명령어 사용자의 멘션\n[이름] : 명령어 사용자의 닉네임\n여러개의 반응 중 랜덤으로 반응하기를 원할 때 && 으로 구분할 수 있습니다", inline=False)
         embed.add_field(name="루냥아 잊어 (명령어)", value="서버 지정 명령어를 삭제합니다", inline=False)
-        embed.add_field(name="루냥아 배운것", value="서버 지정 명령어 목록을 확인합니다", inline=False)
+        embed.add_field(name="루냥아 배운거", value="서버 지정 명령어 목록을 확인합니다", inline=False)
     elif a == '패시브':
         embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
         embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
@@ -126,6 +126,8 @@ def help(user, client, text, bot_ver):
             embed.add_field(name="루냥아 작별인사 (메시지)", value="서버에서 유저가 나갔을 때 해당 채널에 표시할 메시지를 지정합니다\n'루냥아 작별인사 삭제'로 메시지를 삭제합니다\n[이름] : 사용자 이름", inline=False)
             embed.add_field(name="루냥아 금지채널 추가", value="해당 채널에서 명령어 사용을 금지합니다", inline=False)
             embed.add_field(name="루냥아 금지채널 삭제", value="해당 채널을 명령어 금지 채널에서 삭제합니다", inline=False)
+            embed.add_field(name="루냥아 애드블락 추가", value="해당 채널에서 초대 링크 첨부를 금지합니다", inline=False)
+            embed.add_field(name="루냥아 애드블락 삭제", value="해당 채널을 코대 링크 첨부 금지 채널에서 삭제합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 생성", value="채널 간 1:1 텍스트 채팅 연결을 준비합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 접속 (코드)", value="부여받은 접속 코드로 채널을 연결합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
@@ -146,7 +148,6 @@ def help(user, client, text, bot_ver):
     return embed
 
 def servers_list(client, page):
-    embed=discord.Embed(title="전체 서버 목록", color=0xff00ff)
     n = 0
     servers = {}
     sorted_servers = {}
@@ -165,11 +166,12 @@ def servers_list(client, page):
     if page > pages or page <= 0:
         embed=discord.Embed(title="잘못된 페이지 번호입니다")
     else:
+        embed=discord.Embed(title="전체 서버 목록 (총 " + str(len(lk)) + "개)", color=0xff00ff)
         c = (page - 1) * 10
         ct = c + 9
         while c <= ct:
             try:
-                embed.add_field(name="#" + str(c+1) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=True)
+                embed.add_field(name="#" + str(c+1) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
                 c += 1
             except:
                 break
@@ -271,4 +273,11 @@ def permcheck(me):
     embed.add_field(name="메시지 기록 보기", value=l_history, inline=True)
     embed.add_field(name="메시지 관리하기", value=l_manm, inline=True)
     embed.add_field(name="즉석 초대 만들기", value=l_inv, inline=True)
+    return embed
+
+def suggest_game():
+    embed=discord.Embed(title="저와 게임을 해보시는건 어때요?", description='저에겐 다양한 게임 기능이 있어요!\n게임 규칙 등의 자세한 정보를 보고 싶다면 "루냥아 게임 (게임이름) 도와줘"를 입력해보세요!', color=0xffff00)
+    embed.add_field(name="섯다", value="CPU와 두장섯다를 진행합니다", inline=False)
+    embed.add_field(name="제비뽑기", value="CPU가 제비뽑기를 실행합니다", inline=False)
+    embed.add_field(name="가위바위보", value="CPU와 가위바위보를 진행합니다", inline=False)
     return embed
