@@ -6,7 +6,7 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import random, re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands
+import time, random, re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_namebase
 from datetime import datetime, timedelta
 from m_seotda import *
 from m_hash import getHash
@@ -21,9 +21,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-# If you want to attach patch version to this, go to m_help.py.
-bot_ver = "1.15.3"
-bot_ver += m_help.patch_ver
+bot_ver = "16.5.0"
 
 try:
     conf_path = "config.ini"
@@ -81,6 +79,13 @@ async def attendance_reset():
         if dt.hour == 0 and dt.minute == 0 and dt.second == 0:
             db.set("attendance", "today", "0")
         await asyncio.sleep(1)
+
+@client.event
+async def user_count_reset():
+    while True:
+        db.remove_section("count")
+        db.add_section("count")
+        await asyncio.sleep(1800)
 
 @client.event
 async def bgjob_change_playing():
@@ -153,6 +158,7 @@ async def on_ready():
     print('MD5 hash: ' + hash_str)
     client.loop.create_task(bgjob_change_playing())
     client.loop.create_task(attendance_reset())
+    client.loop.create_task(user_count_reset())
 
 @client.event
 async def on_connect():
@@ -169,9 +175,12 @@ async def on_message(message):
     global comm_count
     global news_image
     # admin indicator
-    if message.author.id == int(conf.get("config", "bot_owner")) or message.author.guild_permissions.administrator:
-        ifadmin = True
-    else:
+    try:
+        if message.author.id == int(conf.get("config", "bot_owner")) or message.author.guild_permissions.administrator:
+            ifadmin = True
+        else:
+            ifadmin = False
+    except:
         ifadmin = False
     # skip for herself, bots, command-denied channel
     if message.author == client.user:
@@ -187,7 +196,7 @@ async def on_message(message):
         else:
             embed=discord.Embed(title="명령어 사용 금지채널이 아니예요!", color=0xff0000)
         await message.channel.send(embed=embed)
-    elif str(message.channel.id) in db.get("etc", "denied_channel"):
+    elif str(message.channel.id) in db.get("etc", "denied_channel") and ifadmin == False:
         return
     # delete muted user's message, discord link in adblock channel
     try:
@@ -210,8 +219,8 @@ async def on_message(message):
             scnt += 1
             db.set("server_count", str(message.guild.id), str(scnt))
     except:
-        db.set("server_count", str(message.guild.id), "1")
-        scnt = 1
+        db.set("server_count", str(message.guild.id), "-1")
+        scnt = -1
     # command count and passive
     if message.content.startswith('루냥아') or message.content.startswith('루냥이') or message.content.startswith('커냥이') or message.content.startswith('귀냥이'):
         m_user.increase(db, message.author)
@@ -227,13 +236,19 @@ async def on_message(message):
         else:
             await cr.send(message.author.name + " : " + message.content)
     m_user.count(db, message.author)
-    if m_user.ret_check(db, message.author, test_glyph) >= 200 and m_user.check_count(db, message.author) >= 30 and random.randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True:
+    pst = db.get("etc", "passive_denied")
+    if m_user.ret_check(db, message.author, test_glyph) >= 200 and m_user.check_count(db, message.author) >= 30 and random.randint(0, 10) == 1 and m_user.check_allow_sudden_hugging(db, message.author) == True and str(message.guild.id) in pst == False:
         await message.channel.send(message.author.mention + " " + m_ext_commands.say_lv())
         if m_user.check_hug_count(db, message.author) <= 3:
             embed = discord.Embed(title="놀라셨나요?", description='기계식 루냥이의 패시브 기능입니다\n"루냥아 도와줘 패시브"를 입력해보세요!')
             await message.channel.send(embed=embed)
         m_user.hug_count(db, message.author)
         m_user.reset_count(db, message.author)
+    # unsleep routine
+    if m_user.check_sleep(db, message):
+        await message.channel.send(embed=m_user.unsleep(db, message, datetime.now()))
+    # namebase writting routine
+    m_namebase.set_name(message)
     # generic commands
     if message.content.startswith('루냥아 ') and message.content.endswith(' 도와줘'):
         embed = m_help.help(message.author, client, message.content, bot_ver)
@@ -266,7 +281,11 @@ async def on_message(message):
     elif message.content == '와! 샌즈!':
         await message.channel.send(m_ext_commands.sans())
     elif message.content == '루냥이 쓰담쓰담':
-        await message.channel.send(m_ext_commands.pat(db, message.author, test_glyph))
+        await message.channel.send(embed=m_ext_commands.pat(db, message.author, test_glyph))
+    elif message.content == '루냥이 꼬옥':
+        await message.channel.send(embed=m_ext_commands.hug())
+    elif message.content == '루냥이 부비부비':
+        await message.channel.send(embed=m_ext_commands.cuddle())
     elif message.content.startswith('루냥아 섞어줘'):
         await message.channel.send(m_ext_commands.say_shuffle(message))
     elif message.content.startswith('루냥아 행운의숫자'):
@@ -344,15 +363,17 @@ async def on_message(message):
     elif message.content.startswith('루냥아 제비뽑기 '):
         await message.channel.send(m_ext_commands.l_ticket(message.content))
     elif message.content == '루냥아 나 어때':
-        await message.channel.send(embed=m_user.check(db, message.author))
+        await message.channel.send(embed=m_user.check(db, message))
     elif message.content.startswith('루냥아 ') and message.content.endswith(' 어때'):
         res2 = m_user.guild_custom_commands(db, message)
         if res2 == None:
-            await message.channel.send(embed=m_user.check(db, message.mentions[0]))
+            await message.channel.send(embed=m_user.check_another(db, message.mentions[0]))
         else:
             await message.channel.send(res2)
     elif message.content.startswith('루냥아 ') and message.content.endswith(' 먹어'):
         await message.channel.send(embed=m_ext_commands.eat(message))
+    elif message.content.startswith('루냥아 ') and message.content.endswith(' 물어'):
+        await message.channel.send(embed=m_ext_commands.bite(message))
     elif message.content.startswith('루냥아 배워 '):
         await message.channel.send(embed=m_user.make_custom_commands(db, message))
     elif message.content.startswith('루냥아 잊어 '):
@@ -377,6 +398,8 @@ async def on_message(message):
         await message.channel.send(embed=m_help.get_info_public(client, bot_ver, m_device.SERVER_NAME))
     elif message.content == '루냥아 졸리니':
         await message.channel.send("저는 현재 " + str(datetime.now() - startTime) + " 동안 깨어있어요!")
+    elif message.content.startswith('루냥아 잠수'):
+        await message.channel.send(embed=m_user.sleep(db, message, datetime.now()))
     elif message.content == '루냥아 관심 가져주기':
         await message.channel.send(embed=m_user.toggle_sudden_hugging(db, message.author))
     elif message.content == "루냥아 인기도":
@@ -403,6 +426,11 @@ async def on_message(message):
         except:
             embed=discord.Embed(title="오류가 발생했어요!", description="닉네임이 너무 길거나 권한이 부족합니다", color=0xff0000)
         await message.channel.send(embed=embed)
+    elif message.content == "루냥아 핑":
+        pb = time.monotonic()
+        await message.channel.send(":ping_pong: 퐁!")
+        ping = (time.monotonic() - pb) * 1000
+        await message.channel.send("응답 시간 : " + str(int(ping)) + "ms")
     elif message.content == "루냥아 테스트기능" and test_glyph == "_":
         await message.channel.send(embed=m_help.test_features(db, bot_ver))
     elif message.content.startswith("루냥아 문의 "):
@@ -620,9 +648,12 @@ async def on_message(message):
         await message.channel.send(embed=embed)
     elif message.content == '루냥아 금지채널 추가' and ifadmin:
         dst = db.get("etc", "denied_channel")
-        dst = dst + ", " + str(message.channel.id)
-        db.set("etc", "denied_channel", dst)
-        embed=discord.Embed(title="명령어 사용 금지채널에 추가했어요!", description="이제 여기서 입력되는 명령어는 모두 무시됩니다\n금지 채널에서 삭제하려면 '루냥아 금지채널 삭제'를 입력하세요!", color=0xffffff)
+        if str(message.channel.id) in dst:
+            embed=discord.Embed(title="이미 명령어 사용 금지채널이예요!", color=0xff0000)
+        else:
+            dst = dst + ", " + str(message.channel.id)
+            db.set("etc", "denied_channel", dst)
+            embed=discord.Embed(title="명령어 사용 금지채널에 추가했어요!", description="이제 여기서 입력되는 명령어는 모두 무시됩니다\n금지 채널에서 삭제하려면 '루냥아 금지채널 삭제'를 입력하세요!", color=0xffffff)
         await message.channel.send(embed=embed)
     elif message.content == '루냥아 애드블락 추가' and ifadmin:
         ast = db.get("etc", "adblock_channel")
@@ -641,6 +672,17 @@ async def on_message(message):
             embed=discord.Embed(title="애드블락이 비활성화되었어요!", color=0xffff00)
         else:
             embed=discord.Embed(title="애드블락이 활성화되어 있지 않아요!", color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content == '루냥아 유저패시브' and ifadmin:
+        pst = db.get("etc", "passive_denied")
+        if str(message.guild.id) in pst:
+            pst = pst.replace(", " + str(message.guild.id), "")
+            db.set("etc", "passive_denied", pst)
+            embed=discord.Embed(title="사용자 패시브가 허용되었어요!", color=0xffff00)
+        else:
+            pst = pst + ", " + str(message.guild.id)
+            db.set("etc", "passive_denied", pst)
+            embed=discord.Embed(title="현재 서버에서 사용자 패시브가 비허용으로 설정되었어요!", color=0xffff00)
         await message.channel.send(embed=embed)
     # admin only functions
     elif message.content.startswith('루냥아 shellcmd ') and message.author.id == int(conf.get("config", "bot_owner")):
@@ -713,7 +755,8 @@ async def on_message(message):
         a = str(imp.reload(m_food))
         b = str(imp.reload(m_help))
         c = str(imp.reload(m_user))
-        await message.channel.send(a + "\n" + b + "\n" + c + "\nsuccessfully reloaded")
+        d = str(imp.reload(m_ext_commands))
+        await message.channel.send(a + "\n" + b + "\n" + c + "\n" + d + "\nsuccessfully reloaded")
     elif message.content.startswith('루냥아 article set_title ') and message.author.id == int(conf.get("config", "bot_owner")):
         article_title = message.content.replace("루냥아 article set_title ", "")
     elif message.content.startswith('루냥아 article set_content ') and message.author.id == int(conf.get("config", "bot_owner")):
@@ -733,14 +776,24 @@ async def on_message(message):
         ats = message.content.replace("루냥아 attendance set ", "")
         ats = ats.split(" ")
         db.set("attendance", ats[0], ats[1])
-    elif message.content.startswith('루냥아 user_level change ') and message.author.id == int(conf.get("config", "bot_owner")):
+    elif message.content.startswith('루냥아 user level change ') and message.author.id == int(conf.get("config", "bot_owner")):
         try:
-            lc = message.content.replace("루냥아 user_level change ", "")
+            lc = message.content.replace("루냥아 user level change ", "")
             lc = lc.split(" ")
             db.set("user_level", lc[0], lc[1])
             await message.channel.send("user level of " + lc[0] + " was changed to " + lc[1])
             us = await client.fetch_user(int(lc[0]))
-            await message.channel.send(embed=m_user.check(db, us))
+            await message.channel.send(embed=m_user.check_another(db, us))
+        except Exception as e:
+            await message.channel.send(str(e))
+    elif message.content.startswith('루냥아 user tropy set ') and message.author.id == int(conf.get("config", "bot_owner")):
+        try:
+            lc = message.content.replace("루냥아 user tropy set ", "")
+            lc = lc.split(" ")
+            db.set("user_tropy", lc[0], lc[1])
+            await message.channel.send("user level of " + lc[0] + " was changed to " + lc[1])
+            us = await client.fetch_user(int(lc[0]))
+            await message.channel.send(embed=m_user.check_another(db, us))
         except Exception as e:
             await message.channel.send(str(e))
     elif message.content.startswith('루냥아 exec ') and message.author.id == int(conf.get("config", "bot_owner")):

@@ -1,4 +1,4 @@
-import random
+import discord, random, m_etc, nekos
 from m_user import ret_check
 
 comm_d = {'점프':'(쫑긋)폴짝! >_<',
@@ -52,13 +52,28 @@ def pat(conf, user, test_glyph):
         s = random.choice(pat_str_2)
     else:
         s = random.choice(pat_str_3)
-    return s
+    embed=discord.Embed(title=s, color=0xff77ff)
+    embed.set_image(url=nekos.img("pat"))
+    embed.set_footer(text="powered by nekos.life")
+    return embed
+
+def hug():
+    embed=discord.Embed(title="꼬옥~", color=0xff77ff)
+    embed.set_image(url=nekos.img("hug"))
+    embed.set_footer(text="powered by nekos.life")
+    return embed
+
+def cuddle():
+    embed=discord.Embed(title="부비부비~", color=0xff77ff)
+    embed.set_image(url=nekos.img("cuddle"))
+    embed.set_footer(text="powered by nekos.life")
+    return embed
 
 def l_lv(conf, user, test_glyph):
     # int 500 or over
     lv_str_1 = ["저두우~:two_hearts:", "헤헤~(방긋"]
     # int 200 or over
-    lv_str_2 = [">_<~", "헤헤~:two_hearts"]
+    lv_str_2 = [">_<~", "헤헤~:two_hearts:"]
     # else
     lv_str_3 = ["헤헤~", "후히히~"]
     if ret_check(conf, user, test_glyph) >= 500:
@@ -130,11 +145,27 @@ def say_rint(message):
     return str(random.randint(1, 100))
 
 def eat(message):
-    e = message.content.replace('루냥아 ', '').replace(' 먹어', '')
-    if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
-        embed = discord.Embed(title="그런 물체는 먹을 수 없어요!", color=0xff0000)
+    if message.content == "루냥아 먹어":
+        embed=discord.Embed(title="사용 방법 : 루냥아 (물체) 먹어", color=0xff77ff)
     else:
-        embed = discord.Embed(title=e + "을(를) 먹었어요!", description="옴뇸뇸뇸뇸", color=0xff77ff)
+        e = message.content.replace('루냥아 ', '')
+        e = e.replace(' 먹어', '')
+        if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
+            embed = discord.Embed(title="그런 물체는 먹을 수 없어요!", color=0xff0000)
+        else:
+            embed = discord.Embed(title=e + m_etc.checkTrait(e) + " 먹었어요!", description="옴뇸뇸뇸뇸", color=0xff77ff)
+    return embed
+
+def bite(message):
+    if message.content == "루냥아 물어":
+        embed=discord.Embed(title="사용 방법 : 루냥아 (물체) 물어", color=0xff77ff)
+    else:
+        e = message.content.replace('루냥아 ', '')
+        e = e.replace(' 물어', '')
+        if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
+            embed = discord.Embed(title="그런 물체는 물 수 없어요!", color=0xff0000)
+        else:
+            embed = discord.Embed(title=e + m_etc.checkTrait(e) + " 물었어요!", description="앙~", color=0xff77ff)
     return embed
 
 def ext_talk(message):

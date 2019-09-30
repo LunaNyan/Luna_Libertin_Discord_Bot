@@ -1,7 +1,5 @@
 import discord, cpuinfo, psutil, os, math, m_food
 
-patch_ver = ""
-
 def help(user, client, text, bot_ver):
     a = text
     a = a.replace('루냥아 ', '')
@@ -16,20 +14,20 @@ def help(user, client, text, bot_ver):
         embed.add_field(name="대화", value="기계식 루냥이와 대화하기", inline=False)
         embed.add_field(name="유용한 기능", value="유용한 도구 모음", inline=False)
         embed.add_field(name="서버 지정 명령어", value="루냥이에게 명령어를 가르쳐보세요!", inline=False)
-        embed.set_footer(text='Copyright (C) 2017 - 2019 libertin | ver' + bot_ver)
+        embed.set_footer(text='Copyright (C) 2017 - 2019 libertin | ver ' + bot_ver)
     elif a == '전체 명령어':
         embed=discord.Embed(title="도움말", description="전체 명령어 목록", color=0x8080ff)
         embed.add_field(name="도움말", value="루냥아 (항목) 도와줘, 루냥아 누구니, 루냥아 소스코드", inline=False)
         embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
         embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임)", inline=False)
         embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
-        embed.add_field(name="대화", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥아 (물체) 먹어, 와! 샌즈!, 루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
+        embed.add_field(name="대화", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥이 꼬옥, 루냥이 부비부비, 루냥아 (물체) 먹어, 와! 샌즈!, 루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
-        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자", inline=False)
+        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자, 루냥아 핑", inline=False)
         embed.add_field(name="서버 지정 명령어", value="루냥아 배워, 루냥아 잊어, 루냥아 배운거", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기, 불타는 서버", inline=False)
         if user.guild_permissions.administrator:
-            embed.add_field(name="관리자", value='자세한 사항은 "루냥아 도와줘 관리자"를 입력하세요!', inline=False)
+            embed.add_field(name="관리자", value='자세한 사항은 "루냥아 관리자 도와줘"를 입력하세요!', inline=False)
     elif a == '도움말':
         embed=discord.Embed(title="도움말", description="도움말 항목", color=0x8080ff)
         embed.add_field(name="루냥아 (항목) 도와줘", value="각 항목에 대한 도움말을 표시합니다\n항목을 지정하지 않았다면 도움말 홈이 표시됩니다", inline=False)
@@ -63,10 +61,12 @@ def help(user, client, text, bot_ver):
         embed=discord.Embed(title="도움말", description="대화 항목", color=0x8080ff)
         embed.add_field(name="루냥아 배고파", value="랜덤으로 음식을 추천해줍니다 (음식을 사주지는 않습니다!)", inline=False)
         embed.add_field(name="루냥이 귀여워", value="자기 자신을 귀여워합니다 (루냥이 커여워, 귀냥이 루여워, 커냥이 루여워 도 가능합니다)", inline=False)
-        embed.add_field(name="루냥이 쓰담쓰담", value="자기 자신한테 사이버(?) 쓰다듬을 선물해줍니다", inline=False)
+        embed.add_field(name="루냥이 쓰담쓰담", value="쓰다듬는 짤을 가져옵니다", inline=False)
+        embed.add_field(name="루냥이 꼬옥", value="껴안는 짤을 가져옵니다", inline=False)
+        embed.add_field(name="루냥이 부비부비", value="얼굴을 부비는 짤을 가져옵니다", inline=False)
         embed.add_field(name="루냥아 (물체) 먹어", value="물체를 먹습니다(?)", inline=False)
         embed.add_field(name="와! 샌즈!", value="언더테일 아시는구나!", inline=False)
-        embed.add_field(name="기타 대화 명령어", value="루냥아 짖어봐, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
+        embed.add_field(name="기타 대화 명령어", value="루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
     elif a == '게임':
         embed=discord.Embed(title="도움말", description="게임", color=0xffff00)
         embed.set_author(name="게임 사용 방법 보기 : 루냥아 게임 (게임이름) 도와줘")
@@ -96,6 +96,7 @@ def help(user, client, text, bot_ver):
         embed.add_field(name="루냥아 섞어줘 (선택지1) (선택지2) ...", value="선택지들의 순서를 섞어줍니다", inline=False)
         embed.add_field(name="루냥아 주사위", value="1부터 6까지 무작위의 숫자를 출력합니다", inline=False)
         embed.add_field(name="루냥아 행운의숫자", value="1부터 100 중의 숫자를 무작위로 선택합니다", inline=False)
+        embed.add_field(name="루냥아 핑", value="봇의 응답 시간을 조회합니다", inline=False)
     elif a == '서버 지정 명령어':
         embed=discord.Embed(title="서버 지정 명령어", description="서버 지정 명령어는 '루냥아 (명령어)'로 동작시킵니다\n\n루냥이가 배운 명령어는 해당 서버에서만 동작합니다\n이미 존재하는 서버 지정 명령어를 배우도록 시키면 명령어가 수정됩니다\n**봇의 기본 명령어는 배워도 동작하지 않습니다**", color=0x00ff00)
         embed.add_field(name="루냥아 배워 (명령어) | (반응)", value="서버 지정 명령어를 생성합니다\n[멘션] : 명령어 사용자의 멘션\n[이름] : 명령어 사용자의 닉네임\n여러개의 반응 중 랜덤으로 반응하기를 원할 때 && 으로 구분할 수 있습니다", inline=False)
@@ -140,6 +141,7 @@ def help(user, client, text, bot_ver):
             embed.set_footer(text="주의 : 모든 모더레이션 기능은 사전 확인 없이 바로 진행되므로 신중히 사용하시기 바랍니다")
         elif a == '관리자 기타':
             embed=discord.Embed(title="관리자 기능 도움말", description="기타", color=0xff0000)
+            embed.add_field(name="루냥아 유저패시브", value="현재 서버에서 사용자 패시브 허용 여부를 토글합니다", inline=False)
             embed.add_field(name="루냥아 지워줘 (5~100)", value="주어진 개수만큼 메시지를 삭제합니다", inline=False)
             embed.add_field(name="루냥아 초대링크 생성", value="즉석 초대 링크를 생성합니다", inline=False)
             embed.add_field(name="루냥아 자가진단", value="봇이 사용 가능한 권한을 확인합니다", inline=False)

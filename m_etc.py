@@ -17,3 +17,10 @@ def checkIfProcessRunning(processName):
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return False;
+
+def checkTrait(text):
+    c = text[-1:]
+    if int((ord(c) - 0xAC00) % 28) != 0:
+        return "을"
+    else:
+        return "를"

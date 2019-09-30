@@ -1,6 +1,10 @@
 [user_level]
 
+[user_tropy]
+
 [count]
+
+[server_count]
 
 [sudden_hugging]
 
@@ -16,8 +20,15 @@ today = 0,
 
 [server_log]
 
+[custom_commands]
+
 [user_mute]
+
+[sleep]
 
 [etc]
 comm_count = 0
-news_channel =
+news_channel = 
+adblock_channel = 
+denied_channel = 0
+test_features = 

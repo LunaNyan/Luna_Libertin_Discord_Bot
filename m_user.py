@@ -1,4 +1,4 @@
-import discord, random
+import discord, random, datetime, m_namebase
 
 def set_bio(conf, user, text):
     conf.set("bio", str(user.id), text)
@@ -17,6 +17,7 @@ def increase(conf, user):
             conf.set("user_level", str(user.id), str(pt))
             return True
     except:
+        conf.set("user_level", str(user.id), "1")
         return False
 
 def ret_check(conf, user, test_glyph):
@@ -28,7 +29,92 @@ def ret_check(conf, user, test_glyph):
     except:
         return 0
 
-def check(conf, user):
+def check(conf, message):
+    try:
+        pt = int(conf.get("user_level", str(message.author.id)))
+    except:
+        pt = 1
+    if message.author.display_name == message.author.name:
+        usrname = message.author.name
+    else:
+        usrname = message.author.display_name + "(" + message.author.name + ")"
+    embed = discord.Embed(title=usrname + " 님의 프로필", color=0xff0080)
+    embed.set_thumbnail(url=message.author.avatar_url)
+    embed.add_field(name="자기소개", value=get_bio(conf, message.author), inline=False)
+    # point text for current level
+    if pt == 2147483647:
+        ptstr = "개발자"
+    elif pt >= 5000:
+        ptstr = "신의 경지"
+    elif pt >= 3000:
+        ptstr = "팬"
+    elif pt >= 1000:
+        ptstr = "파워유저"
+    elif pt >= 500:
+        ptstr = "애인"
+    elif pt >= 300:
+        ptstr = "친한 친구"
+    elif pt >= 200:
+        ptstr = "친구"
+    elif pt >= 100:
+        ptstr = "더 알아가고 싶은 사람"
+    elif pt >= 60:
+        ptstr = "저에게 관심이 많은 사람"
+    elif pt >= 30:
+        ptstr = "한번씩 놀아주는 사람"
+    else:
+        ptstr = "안녕하세요!"
+    # point text for next level
+    if pt >= 5000:
+        nxtstr = "호감도 최고 레벨이예요!"
+    elif pt < 30:
+        nxtstr = "한번씩 놀아주는 사람까지 " + str(30 - pt) + " 남음"
+    elif pt < 60:
+        nxtstr = "저에게 관심이 많은 사람까지 " + str(60 - pt) + " 남음"
+    elif pt < 100:
+        nxtstr = "더 알아가고 싶은 사람까지 " + str(100 - pt) + " 남음"
+    elif pt < 200:
+        nxtstr = "친구까지 " + str(200 - pt) + " 남음"
+    elif pt < 300:
+        nxtstr = "친한 친구까지 " + str(300 - pt) + " 남음"
+    elif pt < 500:
+        nxtstr = "애인까지 " + str(500 - pt) + " 남음"
+    elif pt < 1000:
+        nxtstr = "파워유저까지 " + str(1000 - pt) + " 남음"
+    elif pt < 3000:
+        nxtstr = "팬까지 " + str(3000 - pt) + " 남음"
+    elif pt < 5000:
+        nxtstr = "신의 경지까지 " + str(5000 - pt) + " 남음"
+    embed.add_field(name="호감도", value=ptstr + "(" + str(pt) + ")", inline=True)
+    embed.add_field(name="호감도 목표치", value=nxtstr, inline=True)
+    try:
+        tr = conf.get("user_tropy", str(message.author.id))
+        embed.add_field(name="칭호", value=tr, inline=True)
+    except:
+        tr = ""
+    embed.add_field(name="Discord 가입 일시", value=message.author.created_at.isoformat(), inline=True)
+    embed.add_field(name="서버 가입 일시", value=message.author.joined_at.isoformat(), inline=True)
+    if message.author.guild_permissions.administrator:
+        usrperm = "서버 관리자"
+    else:
+        usrperm = "일반"
+    embed.add_field(name="서버에서의 권한", value=usrperm, inline=True)
+    if pt >= 200:
+        try:
+            pst = conf.get("etc", "passive_denied")
+            if str(message.guild.id) in pst:
+                embed.add_field(name="관심 가져주기 패시브", value="현재 서버 설정에 의해 비허용됨", inline=False)
+            elif int(conf.get("sudden_hugging", str(message.author.id))) == 1:
+                embed.add_field(name="관심 가져주기 패시브", value="켜짐", inline=False)
+            else:
+                embed.add_field(name="관심 가져주기 패시브", value="꺼짐", inline=False)
+        except:
+            embed.add_field(name="관심 가져주기 패시브", value="켜짐", inline=False)
+    else:
+        embed.add_field(name="관심 가져주기 패시브", value="호감도를 200까지 획득해주세요!", inline=False)
+    return embed
+
+def check_another(conf, user):
     try:
         pt = int(conf.get("user_level", str(user.id)))
     except:
@@ -40,10 +126,15 @@ def check(conf, user):
     embed = discord.Embed(title=usrname + " 님의 프로필", color=0xff0080)
     embed.set_thumbnail(url=user.avatar_url)
     embed.add_field(name="자기소개", value=get_bio(conf, user), inline=False)
+    # point text for current level
     if pt == 2147483647:
         ptstr = "개발자"
-    elif pt == 1000000000:
-        ptstr = "후원자"
+    elif pt >= 5000:
+        ptstr = "신의 경지"
+    elif pt >= 3000:
+        ptstr = "팬"
+    elif pt >= 1000:
+        ptstr = "파워유저"
     elif pt >= 500:
         ptstr = "애인"
     elif pt >= 300:
@@ -59,23 +150,20 @@ def check(conf, user):
     else:
         ptstr = "안녕하세요!"
     embed.add_field(name="호감도", value=ptstr + "(" + str(pt) + ")", inline=True)
+    try:
+        tr = conf.get("user_tropy", str(user.id))
+        embed.add_field(name="칭호", value=tr, inline=True)
+    except:
+        tr = ""
     embed.add_field(name="Discord 가입 일시", value=user.created_at.isoformat(), inline=True)
-    embed.add_field(name="서버 가입 일시", value=user.joined_at.isoformat(), inline=True)
-    if user.guild_permissions.administrator:
-        usrperm = "서버 관리자"
-    else:
-        usrperm = "일반"
-    embed.add_field(name="서버에서의 권한", value=usrperm, inline=True)
-    if pt >= 200:
-        try:
-            if int(conf.get("sudden_hugging", str(user.id))) == 1:
-                embed.add_field(name="관심 가져주기 패시브", value="켜짐", inline=False)
-            else:
-                embed.add_field(name="관심 가져주기 패시브", value="꺼짐", inline=False)
-        except:
-            embed.add_field(name="관심 가져주기 패시브", value="켜짐", inline=False)
-    else:
-        embed.add_field(name="관심 가져주기 패시브", value="호감도를 200까지 획득해주세요!", inline=False)
+    try:
+        embed.add_field(name="서버 가입 일시", value=user.joined_at.isoformat(), inline=True)
+        if user.guild_permissions.administrator:
+            usrperm = "서버 관리자"
+        else:
+            usrperm = "일반"
+    except:
+        pass
     return embed
 
 def check_allow_sudden_hugging(conf, user):
@@ -158,6 +246,11 @@ def serverinfo(conf, message):
             embed.add_field(name="불타는 서버 패시브", value="꺼짐", inline=False)
     except:
         embed.add_field(name="불타는 서버 패시브", value="켜짐", inline=False)
+    pst = conf.get("etc", "passive_denied")
+    if str(message.guild.id) in pst:
+        embed.add_field(name="유저 패시브", value="비허용", inline=False)
+    else:
+        embed.add_field(name="유저 패시브", value="허용", inline=False)
     return embed
 
 def attendance(conf, user):
@@ -216,7 +309,7 @@ def list_custom_commands(db, message):
     for a in l:
         if s in a:
             tit = a.replace(s + "_", "")
-            usr = db.get("custom_commands", a).split(" | ")[2]
+            usr = m_namebase.get_name(db.get("custom_commands", a).split(" | ")[1])
             embed.add_field(name=tit, value="작성자 : " + usr, inline=False)
     return embed
 
@@ -233,4 +326,32 @@ def remove_custom_commands(db, message):
             embed=discord.Embed(title="다른 사람이 가르친 명령어는 잊을 수 없어요!", color=0xff0000)
     else:
         embed=discord.Embed(title="명령어가 존재하지 않아요!", color=0xff0000)
+    return embed
+
+def sleep(db, message, dt):
+    embed=discord.Embed(title=str(message.author.name) + "님의 잠수가 시작되었어요!", description = "현재 서버에 메시지를 남기기 전까지 잠수 시간이 기록됩니다", color=0xffff00)
+    if "루냥아 잠수 " in message.content:
+        reason = message.content.replace("루냥아 잠수 ", "")
+        embed.add_field(name="사유", value=reason, inline=False)
+    else:
+        reason = "empty"
+    db.set("sleep", str(message.author.id) + "&&" + str(message.guild.id), dt.strftime('%s') + "&&" + reason)
+    return embed
+
+def check_sleep(db, message):
+    try:
+        db.get("sleep", str(message.author.id) + "&&" + str(message.guild.id))
+        return True
+    except:
+        return False
+
+def unsleep(db, message, dt):
+    s = db.get("sleep", str(message.author.id) + "&&" + str(message.guild.id))
+    t = datetime.datetime.now() - datetime.datetime.fromtimestamp(int(s.split("&&")[0]))
+    r = s.split("&&")[1]
+    db.remove_option("sleep", str(message.author.id) + "&&" + str(message.guild.id))
+    embed=discord.Embed(title=message.author.name + " 님의 잠수가 끝났어요!", color=0xffff00)
+    if r != "empty":
+        embed.add_field(name="사유", value=r, inline=False)
+    embed.add_field(name="잠수 시간", value=str(t), inline=False)
     return embed
