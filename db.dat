@@ -16,7 +16,8 @@
 today = 0, 
 
 [ctclink]
-0 = pending_0
+
+[ctclink_pending]
 
 [server_log]
 
@@ -29,6 +30,11 @@ today = 0,
 [etc]
 comm_count = 0
 news_channel = 
+ndserver = 0
+createdat_nduser = 0
+createdat_ndserver = 0
+joinedat_nduser = 0
+joinedat_ndserver = 0
 adblock_channel = 
 denied_channel = 0
 test_features = 

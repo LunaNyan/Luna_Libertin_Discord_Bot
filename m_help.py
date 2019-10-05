@@ -1,10 +1,10 @@
 import discord, cpuinfo, psutil, os, math, m_food
 
-def help(user, client, text, bot_ver):
+def help(user, client, text, bot_ver, head):
     a = text
-    a = a.replace('루냥아 ', '')
+    a = a.replace(head, '')
     a = a.replace(' 도와줘', '')
-    if text == '루냥아 도와줘':
+    if text == head + '도와줘':
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description='루냥아 (항목) 도와줘를 입력하세요!\n전체 명령어 목록을 보시려면 "루냥아 전체 명령어 도와줘"를 입력하세요!\n[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190), [공식 트위터](https://twitter.com/luna_libertin)', color=0xff0080)
         embed.add_field(name="도움말", value="기계식 루냥이를 이용하는 방법을 알려줘요!", inline=False)
         embed.add_field(name="커뮤니티", value="다른 서버의 사람들과 소통할 수 있는 광장", inline=False)
@@ -19,7 +19,7 @@ def help(user, client, text, bot_ver):
         embed=discord.Embed(title="도움말", description="전체 명령어 목록", color=0x8080ff)
         embed.add_field(name="도움말", value="루냥아 (항목) 도와줘, 루냥아 누구니, 루냥아 소스코드", inline=False)
         embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
-        embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임)", inline=False)
+        embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임), 루냥아 가입일시공개, 루냥아 생성일시공개", inline=False)
         embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
         embed.add_field(name="대화", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥이 꼬옥, 루냥이 부비부비, 루냥아 (물체) 먹어, 와! 샌즈!, 루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
@@ -48,6 +48,8 @@ def help(user, client, text, bot_ver):
         embed.add_field(name="루냥아 소개말 (자기소개)", value="사용자 정보에 표시되는 소개말을 설정합니다", inline=False)
         embed.add_field(name="루냥아 거울 (멘션)", value="멘션된 유저, 또는 멘션이 없는 경우 자신의 프로필 사진을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 닉변 (닉네임)", value="닉네임을 변경합니다", inline=False)
+        embed.add_field(name="루냥아 생성일시공개", value="계정의 생성 일시 공개 여부를 토글합니다", inline=False)
+        embed.add_field(name="루냥아 가입일시공개", value="서버 가입 일시 표시 여부를 토글합니다", inline=False)
     elif a == '정보':
         embed=discord.Embed(title="도움말", description="정보 항목", color=0x8080ff)
         embed.add_field(name="루냥아 서버정보", value="서버 정보를 불러옵니다", inline=False)
@@ -111,9 +113,9 @@ def help(user, client, text, bot_ver):
             embed=discord.Embed(title="관리자 기능 도움말", description="명령어 목록", color=0xff0000)
             embed.add_field(name="공지", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제", inline=False)
             embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
-            embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제", inline=False)
+            embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보", inline=False)
             embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
-            embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단", inline=False)
+            embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 접두어 설정 (접두어)", inline=False)
         elif a == '관리자 공지':
             embed=discord.Embed(title="관리자 기능 도움말", description="공지", color=0xff0000)
             embed.add_field(name="루냥아 공지채널 추가", value="현재 채널을 알림 채널로 추가합니다", inline=False)
@@ -132,6 +134,7 @@ def help(user, client, text, bot_ver):
             embed.add_field(name="루냥아 채널연결 생성", value="채널 간 1:1 텍스트 채팅 연결을 준비합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 접속 (코드)", value="부여받은 접속 코드로 채널을 연결합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
+            embed.add_field(name="루냥아 채널연결 정보", value="연결된 채널의 정보를 봅니다", inline=False)
         elif a == '관리자 모더레이션':
             embed=discord.Embed(title="관리자 기능 도움말", description="모더레이션", color=0xff0000)
             embed.add_field(name="루냥아 뮤트 (멘션)", value="멘션된 사용자를 뮤트(채팅금지)합니다", inline=False)
@@ -145,25 +148,34 @@ def help(user, client, text, bot_ver):
             embed.add_field(name="루냥아 지워줘 (5~100)", value="주어진 개수만큼 메시지를 삭제합니다", inline=False)
             embed.add_field(name="루냥아 초대링크 생성", value="즉석 초대 링크를 생성합니다", inline=False)
             embed.add_field(name="루냥아 자가진단", value="봇이 사용 가능한 권한을 확인합니다", inline=False)
+            embed.add_field(name="루냥아 서버공개", value="서버 공개 여부를 토글합니다\n서버가 비공개로 전환되는 경우 서버 목록에서 (비공개)로 표시되며 서버 정보 명령어를 입력할 수 없게 됩니다", inline=False)
+            embed.add_field(name="루냥아 가입일시 전체공개", value="모든 사용자의 서버 가입 일시 공개 여부를 토글합니다", inline=False)
+            embed.add_field(name="루냥아 접두어 설정 (접두어)", value="서버 지정 접두어를 설정합니다", inline=False)
     else:
         embed=discord.Embed(title='해당 항목에 대한 도움말을 찾을 수 없어요!', description='전체 도움말을 원하신다면 "루냥아 전체 명령어 도와줘"를 입력해주세요!')
     return embed
 
-def servers_list(client, page):
+def servers_list(client, page, db):
     n = 0
     servers = {}
     sorted_servers = {}
     lk = []
     lu = []
     lo = []
+    nd = []
+    de = 0
     for s in client.guilds:
-        servers[str(s)] = [str(len(s.members)), s.owner.name]
+        if str(s.id) in db.get("etc", "ndserver"):
+            servers[str(s)] = [str(len(s.members)), s.owner.name, "1"]
+        else:
+            servers[str(s)] = [str(len(s.members)), s.owner.name, "0"]
         n += 1
     sorted_servers = sorted(servers)
     for k in sorted_servers:
         lk.append(k)
         lu.append(servers[k][0])
         lo.append(servers[k][1])
+        nd.append(servers[k][2])
     pages = math.ceil(len(lk) / 10)
     if page > pages or page <= 0:
         embed=discord.Embed(title="잘못된 페이지 번호입니다")
@@ -173,9 +185,13 @@ def servers_list(client, page):
         ct = c + 9
         while c <= ct:
             try:
-                embed.add_field(name="#" + str(c+1) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
+                if nd[c] == "1":
+                    de = de + 1
+                else:
+                    embed.add_field(name="#" + str(c+1-de) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
                 c += 1
             except:
+                embed.add_field(name="관리자 설정에 의해 숨겨진 서버", value="개수 : " + str(de), inline=False)
                 break
         embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 서버목록 (페이지)"')
     return embed

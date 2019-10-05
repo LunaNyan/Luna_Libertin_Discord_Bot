@@ -92,13 +92,6 @@ def check(conf, message):
         embed.add_field(name="칭호", value=tr, inline=True)
     except:
         tr = ""
-    embed.add_field(name="Discord 가입 일시", value=message.author.created_at.isoformat(), inline=True)
-    embed.add_field(name="서버 가입 일시", value=message.author.joined_at.isoformat(), inline=True)
-    if message.author.guild_permissions.administrator:
-        usrperm = "서버 관리자"
-    else:
-        usrperm = "일반"
-    embed.add_field(name="서버에서의 권한", value=usrperm, inline=True)
     if pt >= 200:
         try:
             pst = conf.get("etc", "passive_denied")
@@ -114,7 +107,7 @@ def check(conf, message):
         embed.add_field(name="관심 가져주기 패시브", value="호감도를 200까지 획득해주세요!", inline=False)
     return embed
 
-def check_another(conf, user):
+def check_another(conf, user, message):
     try:
         pt = int(conf.get("user_level", str(user.id)))
     except:
@@ -155,15 +148,43 @@ def check_another(conf, user):
         embed.add_field(name="칭호", value=tr, inline=True)
     except:
         tr = ""
-    embed.add_field(name="Discord 가입 일시", value=user.created_at.isoformat(), inline=True)
-    try:
-        embed.add_field(name="서버 가입 일시", value=user.joined_at.isoformat(), inline=True)
-        if user.guild_permissions.administrator:
-            usrperm = "서버 관리자"
-        else:
-            usrperm = "일반"
-    except:
-        pass
+    return embed
+
+def accountinfo(conf, user, message):
+    if user.display_name == user.name:
+        usrname = user.name
+    else:
+        usrname = user.display_name + "(" + user.name + ")"
+    embed = discord.Embed(title=usrname + " 님의 계정 정보", color=0xff0080)
+    embed.set_thumbnail(url=user.avatar_url)
+    embed.add_field(name="유저 ID", value=str(user.id), inline=False)
+    st = str(user.status)
+    if st == "online":
+        sta = "온라인"
+    elif st == "offline":
+        sta = "오프라인"
+    elif st == "idle":
+        sta = "자리 비움"
+    elif st == "dnd" or st == "do_not_disturb":
+        sta = "방해 금지"
+    embed.add_field(name="현재 상태", value=sta, inline=True)
+    if str(user.id) in conf.get("etc", "createdat_nd"):
+        crat = "비공개 설정됨"
+    else:
+        crat = user.created_at.isoformat()
+    embed.add_field(name="Discord 가입 일시", value=crat, inline=True)
+    if str(user.id) in conf.get("etc", "joinedat_nduser"):
+        joat = "사용자에 의해 비공개 설정됨"
+    elif str(message.guild.id) in conf.get("etc", "joinedat_ndserver"):
+        joat = "서버 설정에 의해 비공개 설정됨"
+    else:
+        joat = user.joined_at.isoformat()
+    embed.add_field(name="서버 가입 일시", value=joat, inline=True)
+    if user.guild_permissions.administrator:
+        usrperm = "서버 관리자"
+    else:
+        usrperm = "일반"
+    embed.add_field(name="서버에서의 권한", value=usrperm, inline=True)
     return embed
 
 def check_allow_sudden_hugging(conf, user):
@@ -227,18 +248,9 @@ def reset_count(conf, user):
 def serverinfo(conf, message):
     embed=discord.Embed(title=message.guild.name, color=0xffff00)
     embed.set_thumbnail(url=message.guild.icon_url)
-    embed.add_field(name="서버 생성 일시", value=message.guild.created_at.isoformat(), inline=True)
+    embed.add_field(name="서버 생성 일시", value=message.guild.created_at.isoformat() + "\n지금으로부터 " + str(datetime.datetime.now() - message.guild.created_at) + " 전", inline=True)
     embed.add_field(name="주인", value=message.guild.owner.name, inline=True)
-    embed.add_field(name="서버 지역", value=str(message.guild.region), inline=True)
-    embed.add_field(name="서버 인원 수", value=str(len(message.guild.members)), inline=True)
-    embed.add_field(name="역할 수", value=str(len(message.guild.roles)), inline=True)
-    embed.add_field(name="채널 수", value=str(len(message.guild.channels)), inline=True)
-    embed.add_field(name="커스텀 이모지 수", value=str(len(message.guild.emojis)), inline=True)
-    if message.guild.mfa_level == 1:
-        mfa = "예"
-    else:
-        mfa = "아니오"
-    embed.add_field(name="서버 2차 인증", value=mfa, inline=True)
+    embed.add_field(name="상세 정보", value=str(len(message.guild.members)) + "명의 인원\n" + str(len(message.guild.roles)) + "개의 역할\n" + str(len(message.guild.emojis)) + "개의 서버 커스텀 이모지", inline=True)
     try:
         if int(conf.get("server_count", str(message.guild.id))) >= 0:
             embed.add_field(name="불타는 서버 패시브", value="켜짐", inline=False)
@@ -251,6 +263,8 @@ def serverinfo(conf, message):
         embed.add_field(name="유저 패시브", value="비허용", inline=False)
     else:
         embed.add_field(name="유저 패시브", value="허용", inline=False)
+    if str(message.guild.id) in conf.get("etc", "ndserver"):
+        embed=discord.Embed(title="서버 정보를 볼 수 없습니다", description="서버 설정에 의해 정보를 볼 수 있도록 허용되지 않았습니다", color=0xff0000)
     return embed
 
 def attendance(conf, user):
@@ -275,7 +289,7 @@ def attendance(conf, user):
 
 def guild_custom_commands(db, message):
     try:
-        a = db.get("custom_commands", str(message.guild.id) + "_" + message.content.replace("루냥아 ", ""))
+        a = db.get("custom_commands", str(message.guild.id) + "_" + message.content.replace(head(db, message) + "", ""))
         react = a.split(" | ")[0]
         if "&&" in react:
             react = react.split("&&")
@@ -287,19 +301,29 @@ def guild_custom_commands(db, message):
         return None
 
 def make_custom_commands(db, message):
-    m = message.content.replace("루냥아 배워 ", "")
+    m = message.content.replace(head(db, message) + "배워 ", "")
+    m = m.split(" | ")
+    editing_m = "명령어를 배웠어요!"
     try:
-        m = m.split(" | ")
-        db.set("custom_commands", str(message.guild.id) + "_" + m[0], m[1] + " | " + str(message.author.id) + " | " + message.author.name)
-        embed=discord.Embed(title="명령어를 배웠어요!", color=0xff77ff)
-        if "&&" in m[1]:
-            li = m[1].split("&&")
-            embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
+        i = db.get("custom_commands", str(message.guild.id) + "_" + m[0])
+        i = i.split(" | ")[1]
+        editing_m = "명령어를 수정했어요!"
+        if message.author.guild_permissions.administrator != False and str(message.author.id) != i:
+            embed=discord.Embed(title="다른 사람이 가르친 명령어는 수정할 수 없어요!", color=0xff000)
         else:
-            embed.add_field(name=m[0], value=m[1], inline=False)
-        embed.set_footer(text="주의 : 배운 명령어는 해당 서버에서만 동작합니다")
-    except:
-        embed=discord.Embed(title='사용 방법 : "루냥아 배워 (명령어) | (반응)"', color=0xffffff)
+            raise
+    except Exception as e:
+        try:
+            db.set("custom_commands", str(message.guild.id) + "_" + m[0], m[1] + " | " + str(message.author.id) + " | " + message.author.name)
+            embed=discord.Embed(title=editing_m, color=0xff77ff)
+            if "&&" in m[1]:
+                li = m[1].split("&&")
+                embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
+            else:
+                embed.add_field(name=m[0], value=m[1], inline=False)
+            embed.set_footer(text="주의 : 배운 명령어는 해당 서버에서만 동작합니다")
+        except:
+            embed=discord.Embed(title='사용 방법 : "루냥아 배워 (명령어) | (반응)"', color=0xffffff)
     return embed
 
 def list_custom_commands(db, message):
@@ -313,8 +337,8 @@ def list_custom_commands(db, message):
             embed.add_field(name=tit, value="작성자 : " + usr, inline=False)
     return embed
 
-def remove_custom_commands(db, message):
-    m = message.content.replace("루냥아 잊어 ", "")
+def remove_custom_commands(db, message,):
+    m = message.content.replace(head(db, message) + "잊어 ", "")
     l = dict(db.items("custom_commands"))
     if str(message.guild.id) + "_" + m in l:
         i = db.get("custom_commands", str(message.guild.id) + "_" + m)
@@ -330,8 +354,8 @@ def remove_custom_commands(db, message):
 
 def sleep(db, message, dt):
     embed=discord.Embed(title=str(message.author.name) + "님의 잠수가 시작되었어요!", description = "현재 서버에 메시지를 남기기 전까지 잠수 시간이 기록됩니다", color=0xffff00)
-    if "루냥아 잠수 " in message.content:
-        reason = message.content.replace("루냥아 잠수 ", "")
+    if head(db, message) + "잠수 " in message.content:
+        reason = message.content.replace(head(db, message) + "잠수 ", "")
         embed.add_field(name="사유", value=reason, inline=False)
     else:
         reason = "empty"
@@ -355,3 +379,13 @@ def unsleep(db, message, dt):
         embed.add_field(name="사유", value=r, inline=False)
     embed.add_field(name="잠수 시간", value=str(t), inline=False)
     return embed
+
+def head(db, message):
+    try:
+        hd = db.get("custom_head", str(message.guild.id))
+        if message.content.startswith("루냥아"):
+            raise
+        else:
+            return hd + " "
+    except:
+        return "루냥아 "

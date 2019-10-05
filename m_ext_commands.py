@@ -92,10 +92,9 @@ def l_ping():
               "부르셨어요? 헤헤..(꼬리살랑"]
     return random.choice(lp_str)
 
-def selectr(message):
+def selectr(message, head):
     m = message
-    m = m.replace("_", "")
-    m = m.replace("루냥아 골라줘 ", "")
+    m = m.replace(head + "골라줘 ", "")
     i = m.split(" ")
     return random.choice(i)
 
@@ -107,9 +106,9 @@ def l_dice():
     dice_int = random.randint(1, 6)
     return str(dice_int)
 
-def l_ticket(message):
+def l_ticket(message, head):
     a = message
-    a = a.replace("루냥아 제비뽑기 ", "")
+    a = a.replace(head + "제비뽑기 ", "")
     try:
         b = a.split(',')
         a0 = b[0].split()
@@ -132,8 +131,8 @@ def say_lv():
     say_lv_str = ["(꼬옥", "(껴안", "(쓰다듬"]
     return random.choice(say_lv_str)
 
-def say_shuffle(message):
-    q = message.content.replace("루냥아 섞어줘 ", "")
+def say_shuffle(message, head):
+    q = message.content.replace(head + "섞어줘 ", "")
     w = q.split(" ")
     random.shuffle(w)
     r = ""
@@ -144,11 +143,11 @@ def say_shuffle(message):
 def say_rint(message):
     return str(random.randint(1, 100))
 
-def eat(message):
-    if message.content == "루냥아 먹어":
+def eat(message, head):
+    if message.content == head + "먹어":
         embed=discord.Embed(title="사용 방법 : 루냥아 (물체) 먹어", color=0xff77ff)
     else:
-        e = message.content.replace('루냥아 ', '')
+        e = message.content.replace(head, '')
         e = e.replace(' 먹어', '')
         if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
             embed = discord.Embed(title="그런 물체는 먹을 수 없어요!", color=0xff0000)
@@ -156,11 +155,11 @@ def eat(message):
             embed = discord.Embed(title=e + m_etc.checkTrait(e) + " 먹었어요!", description="옴뇸뇸뇸뇸", color=0xff77ff)
     return embed
 
-def bite(message):
-    if message.content == "루냥아 물어":
+def bite(message, head):
+    if message.content == head + "물어":
         embed=discord.Embed(title="사용 방법 : 루냥아 (물체) 물어", color=0xff77ff)
     else:
-        e = message.content.replace('루냥아 ', '')
+        e = message.content.replace(head, '')
         e = e.replace(' 물어', '')
         if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
             embed = discord.Embed(title="그런 물체는 물 수 없어요!", color=0xff0000)
@@ -168,8 +167,8 @@ def bite(message):
             embed = discord.Embed(title=e + m_etc.checkTrait(e) + " 물었어요!", description="앙~", color=0xff77ff)
     return embed
 
-def ext_talk(message):
-    m = message.content.replace("루냥아 ", "")
+def ext_talk(message, head):
+    m = message.content.replace(head, "")
     if m in comm_d:
         return comm_d[m]
     else:

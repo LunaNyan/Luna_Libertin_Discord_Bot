@@ -6,3 +6,4 @@ requests
 xmltodict
 wolframalpha
 py-cpuinfo
+pillow
