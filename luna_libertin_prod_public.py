@@ -6,10 +6,10 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("This script requires Python version 3.5")
     sys.exit()
 
-import time, random, re, traceback, discord, asyncio, psutil, os, random, configparser, m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_namebase, m_etc
+import time, random, re, traceback, discord, asyncio, psutil, os, random, configparser
+import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_namebase, m_etc
 from datetime import datetime, timedelta
 from m_seotda import *
-from m_hash import getHash
 import imp
 
 startTime = datetime.now()
@@ -21,45 +21,45 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "17.0.1"
+bot_ver = "17.1.0"
 
 try:
     conf_path = "config.ini"
     conf = configparser.ConfigParser()
     conf.read(conf_path)
-    print("Configuration file loaded")
+    print("INFO    : Configuration file loaded")
 except:
-    print("FATAL : Couldn't load configuration file")
+    print("FATAL   : Couldn't load configuration file")
     sys.exit(1)
 
 try:
     db_path = "db.dat"
     db = configparser.ConfigParser()
     db.read(db_path)
-    print("DB file loaded")
+    print("INFO    : DB file loaded")
 except:
-    print("FATAL : Couldn't load DB file")
+    print("FATAL   : Couldn't load DB file")
     sys.exit(1)
 
 test_glyph = ""
 if conf.get("config", "IsThisBotTesting") == "1":
     test_glyph = "_"
-    print("This bot is in test range.")
+    print("WARNING : This bot is in test range.")
 else:
-    print("This bot is not in test range.")
+    print("INFO    : This bot is not in test range.")
 
 try:
-    hash_str = getHash("for_hash.py")
-    print("self MD5 hash get.")
+    hash_str = m_etc.getHash(os.path.split(sys.argv[0])[1])
+    print("INFO    : self MD5 hash get.")
 except:
     hash_str = "disabled"
-    print("couldn't get hard link to get self MD5 hash. type 'ln -f luna_libertin_prod_public.py for_hash.py' to resolve.")
+    print("WARNING : couldn't get hard link to get self MD5 hash. something is wrong.")
 
 try:
     m_wolframalpha.load(conf)
-    print("Wolfram|Alpha module initialized")
+    print("INFO    : Wolfram|Alpha module initialized")
 except:
-    print("WARN : bad Wolfram|Alpha App ID")
+    print("WARNING : bad Wolfram|Alpha App ID")
 
 news_str = ""
 news_title_str = "기계식 루냥이 공지"
@@ -151,7 +151,7 @@ async def news_send(message, title_str, content):
 
 @client.event
 async def on_ready():
-    print('Bot is ready to use.')
+    print('INFO    : Bot is ready to use.')
     print('name    : ' + str(client.user.name))
     print('id      : ' + str(client.user.id))
     print('version : ' + bot_ver)
@@ -162,7 +162,7 @@ async def on_ready():
 
 @client.event
 async def on_connect():
-    print('Connected to Discord.')
+    print('INFO    : Connected to Discord.')
 
 @client.event
 async def on_message(message):
@@ -213,8 +213,7 @@ async def on_message(message):
             await message.delete()
             await message.channel.send(message.author.mention + ", 여기서의 초대 링크 첨부는 금지되어 있어요!")
             return
-    # ctclink routine
-    cr0 = m_ctclink.get_link(message.channel.id, db)
+    # server count, server level passive
     try:
         scnt = int(db.get("server_count", str(message.guild.id)))
         if scnt != -1:
@@ -224,14 +223,16 @@ async def on_message(message):
         db.set("server_count", str(message.guild.id), "-1")
         scnt = -1
     # command count and passive
-    if message.content.startswith('루냥아') or message.content.startswith('루냥이') or message.content.startswith('커냥이') or message.content.startswith('귀냥이'):
+    if message.content.startswith('루냥아') or message.content.startswith('루냥이') or message.content.startswith('커냥이') or message.content.startswith('귀냥이') or message.content.startswith(head_s):
         m_user.increase(db, message.author)
         comm_count+= 1
         db.set("etc", "comm_count", str(int(db.get("etc", "comm_count")) + 1))
     elif scnt >= 70 and random.randint(1, 100) == 1:
         db.set("server_count", str(message.guild.id), "0")
         await message.channel.send(m_ext_commands.server_burning())
-    elif cr0 != False:
+    # ctclink routine
+    cr0 = m_ctclink.get_link(message.channel.id, db)
+    if cr0 != False and message.content.startswith(head_s) == False:
         cr = client.get_channel(int(cr0))
         if cr == None:
             m_ctclink.remove_link(message.channel.id, db)
@@ -251,9 +252,12 @@ async def on_message(message):
         await message.channel.send(embed=m_user.unsleep(db, message, datetime.now()))
     # namebase writting routine
     m_namebase.set_name(message)
-    # generic commands
+    # generic commands starts with head string
     if message.content.startswith(head_s) and message.content.endswith(' 도와줘'):
-        embed = m_help.help(message.author, client, message.content, bot_ver, head_s)
+        embed = m_help.help(message.author, client, message.content, bot_ver, head_s, True)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + '도와줘 '):
+        embed = m_help.help(message.author, client, message.content, bot_ver, head_s, False)
         await message.channel.send(embed=embed)
     elif message.content == head_s + "공지사항 목록":
         await message.channel.send(embed=m_board.list())
@@ -410,6 +414,8 @@ async def on_message(message):
         await message.channel.send(embed=m_user.list_custom_commands(db, message))
     elif message.content == head_s + "서버정보":
         await message.channel.send(embed=m_user.serverinfo(db, message))
+    elif message.content == head_s + "서버설정":
+        await message.channel.send(embed=m_user.serversettings(db, message))
     elif message.content.startswith(head_s + '거울'):
         if not message.mentions:
             mir_user = message.author
@@ -658,9 +664,14 @@ async def on_message(message):
             embed = discord.Embed(title="채널연결 정보", color=0xffffff)
             embed.add_field(name="연결된 서버 이름", value=cr.guild.name, inline=False)
             embed.add_field(name="연결된 채널 이름", value=cr.name, inline=False)
+            embed.add_field(name="연결 코드", value=m_ctclink.get_code(message.channel.id, db))
         else:
             embed = discord.Embed(title="연결되어 있지 않은 채널이예요!", color=0xff0000)
         await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + '채널연결 debug ') and ifadmin:
+        m = message.content.replace(head_s + '채널연결 debug ', '')
+        n = m_ctclink.get_link_by_code(m, db)
+        await message.channel.send(n)
     elif message.content.startswith(head_s + '킥') and ifadmin:
         try:
             if not message.mentions:
@@ -986,5 +997,5 @@ async def on_member_remove(member):
         c = c.replace("[이름]", message.author.name)
         await c.send(a[1])
 
-print("connecting to Discord. Please Wait..")
+print("INFO    : connecting to Discord. Please Wait..")
 client.run(conf.get("config", "bot_token"))

@@ -96,3 +96,54 @@ def remove_pending(channel, conf):
         return True
     else:
         return False
+
+def get_code(channel, conf):
+    a = conf.items("ctclink")
+    b = []
+    c = []
+    for s in a:
+        b.append(s[0])
+        c.append(s[1])
+    d = conf.items("ctclink_pending")
+    e = []
+    for s in d:
+        e.append(s[0])
+    if str(channel) in b:
+        ci = e.index(str(channel))
+        ni = b[ci]
+        return conf.get("ctclink_pending", ni)
+    elif str(channel) in c:
+        bi = c.index(str(channel))
+        ni = b[bi]
+        return conf.get("ctclink_pending", ni)
+    else:
+        return False
+
+def get_link_by_code(text, conf):
+    bi = ""
+    ci = ""
+    ei = ""
+    fi = ""
+    a = conf.items("ctclink")
+    b = []
+    c = []
+    for s in a:
+        b.append(s[0])
+        c.append(s[1])
+    d = conf.items("ctclink_pending")
+    e = []
+    f = []
+    for s in d:
+        e.append(s[0])
+        f.append(s[1])
+    if text in f:
+        fi = f.index(text)
+        ei = e[fi]
+    if ei in b:
+        bi = b.index(ei)
+        return b[bi]
+    elif ei in c:
+        ci = c.index(ei)
+        return c[ci]
+    else:
+        return False

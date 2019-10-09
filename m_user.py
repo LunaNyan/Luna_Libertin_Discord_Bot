@@ -251,6 +251,16 @@ def serverinfo(conf, message):
     embed.add_field(name="서버 생성 일시", value=message.guild.created_at.isoformat() + "\n지금으로부터 " + str(datetime.datetime.now() - message.guild.created_at) + " 전", inline=True)
     embed.add_field(name="주인", value=message.guild.owner.name, inline=True)
     embed.add_field(name="상세 정보", value=str(len(message.guild.members)) + "명의 인원\n" + str(len(message.guild.roles)) + "개의 역할\n" + str(len(message.guild.emojis)) + "개의 서버 커스텀 이모지", inline=True)
+    if str(message.guild.id) in conf.get("etc", "ndserver"):
+        embed=discord.Embed(title="서버 정보를 볼 수 없습니다", description="서버 설정에 의해 정보를 볼 수 있도록 허용되지 않았습니다", color=0xff0000)
+    return embed
+
+def serversettings(conf, message):
+    embed=discord.Embed(title=message.guild.name, color=0xffff00)
+    if str(message.guild.id) in conf.get("etc", "ndserver"):
+        embed.add_field(name="서버 공개 여부", value="비공개", inline=False)
+    else:
+        embed.add_field(name="서버 공개 여부", value="공개", inline=False)
     try:
         if int(conf.get("server_count", str(message.guild.id))) >= 0:
             embed.add_field(name="불타는 서버 패시브", value="켜짐", inline=False)
@@ -258,13 +268,22 @@ def serverinfo(conf, message):
             embed.add_field(name="불타는 서버 패시브", value="꺼짐", inline=False)
     except:
         embed.add_field(name="불타는 서버 패시브", value="켜짐", inline=False)
-    pst = conf.get("etc", "passive_denied")
-    if str(message.guild.id) in pst:
+    if str(message.guild.id) in conf.get("etc", "passive_denied"):
         embed.add_field(name="유저 패시브", value="비허용", inline=False)
     else:
         embed.add_field(name="유저 패시브", value="허용", inline=False)
-    if str(message.guild.id) in conf.get("etc", "ndserver"):
-        embed=discord.Embed(title="서버 정보를 볼 수 없습니다", description="서버 설정에 의해 정보를 볼 수 있도록 허용되지 않았습니다", color=0xff0000)
+    if str(message.guild.id) in conf.get("etc", "joinedat_ndserver"):
+        embed.add_field(name="서버 구성원의 가입 일자 공개", value="비허용", inline=False)
+    else:
+        embed.add_field(name="서버 구성원의 가입 일자 공개", value="허용", inline=False)
+    try:
+        hd = db.get("custom_head", str(message.guild.id))
+        if hd != "루냥아":
+            embed.add_field(name="서버 지정 접두사", value=hd, inline=False)
+        else:
+            embed.add_field(name="서버 지정 접두사", value="없음", inline=False)
+    except:
+        embed.add_field(name="서버 지정 접두사", value="없음", inline=False)
     return embed
 
 def attendance(conf, user):
