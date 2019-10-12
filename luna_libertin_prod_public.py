@@ -3,8 +3,8 @@
 import sys
 
 if sys.version_info[0] != 3 or sys.version_info[1] < 5:
-    print("This script requires Python version 3.5")
-    sys.exit()
+    print("FATAL   : This script requires Python version 3.5")
+    sys.exit(1)
 
 import time, random, re, traceback, discord, asyncio, psutil, os, random, configparser
 import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_namebase, m_etc
@@ -21,7 +21,10 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "17.1.0"
+bot_ver = "17.1.5"
+
+print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
+print("INFO    : Food DB version " + m_food.DB_VERSION)
 
 try:
     conf_path = "config.ini"
@@ -51,6 +54,7 @@ else:
 try:
     hash_str = m_etc.getHash(os.path.split(sys.argv[0])[1])
     print("INFO    : self MD5 hash get.")
+    print("INFO    : MD5 hash : " + hash_str)
 except:
     hash_str = "disabled"
     print("WARNING : couldn't get hard link to get self MD5 hash. something is wrong.")
@@ -152,10 +156,7 @@ async def news_send(message, title_str, content):
 @client.event
 async def on_ready():
     print('INFO    : Bot is ready to use.')
-    print('name    : ' + str(client.user.name))
-    print('id      : ' + str(client.user.id))
-    print('version : ' + bot_ver)
-    print('MD5 hash: ' + hash_str)
+    print("INFO    : Account : " + str(client.user.name) + "(" + str(client.user.id) + ")")
     client.loop.create_task(bgjob_change_playing())
     client.loop.create_task(attendance_reset())
     client.loop.create_task(user_count_reset())
@@ -494,6 +495,8 @@ async def on_message(message):
             await admin.create_dm()
         else:
             await admin.dm_channel.send(message.author.name + "(" + str(message.author.id) + ")\n" + call_s)
+    elif message.content == head_s + "서버아이콘":
+        await message.channel.send(message.guild.icon_url)
     # commands for server admins
     elif message.content == head_s + "서버공개" and ifadmin:
         snd = db.get("etc", "ndserver")
@@ -792,6 +795,49 @@ async def on_message(message):
             await message.channel.send(str(os.popen(shl_str).read()))
         except:
             await message.channel.send(":facepalm:")
+    elif message.content == head_s + "debug message" and message.author.id == int(conf.get("config", "bot_owner")):
+        l = await message.channel.history(limit=2).flatten()
+        l = l[1]
+        embed=discord.Embed(title="debug info of past message", description=str(l.id), color=0xffffff)
+        embed.add_field(name="author", value=l.author.name + "(" + str(l.id) + ")", inline=False)
+        if l.content == "" or l.content == None:
+            lc = "None"
+        else:
+            lc = l.content
+        embed.add_field(name="content", value=lc, inline=False)
+        embed.add_field(name="message channel", value=l.channel.name + "(" + str(l.channel.id) + ")", inline=False)
+        embed.add_field(name="mentions everyone", value=str(l.mention_everyone), inline=False)
+        embed.add_field(name="created at", value=str(l.created_at), inline=False)
+        embed.add_field(name="edited at", value=str(l.edited_at), inline=False)
+        embed.add_field(name="jump url", value="[" + l.jump_url + "](" + l.jump_url + ")", inline=False)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + 'db pick item ') and message.author.id == int(conf.get("config", "bot_owner")):
+        m = message.content.replace(head_s + 'db pick item ', '')
+        m = m.split(' ')
+        embed=discord.Embed(title="Key " + m[1] + " in section " + m[0], color=0xffffff)
+        try:
+            i = db.get(m[0], m[1])
+            embed.add_field(name="value", value=i, inline=False)
+        except Exception as e:
+            embed.add_field(name="error string", value=str(e), inline=False)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + 'db poke item ') and message.author.id == int(conf.get("config", "bot_owner")):
+        m = message.content.replace(head_s + 'db poke item ', '')
+        m = m.split(' ')
+        embed=discord.Embed(title="Key " + m[1] + " in section " + m[0], color=0xffffff)
+        v = message.content.replace(head_s + 'db poke item ' + m[0] + ' ' + m[1] + ' ', '')
+        db.set(m[0], m[1], v)
+        embed.add_field(name="value", value=v, inline=False)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + 'db pick section ') and message.author.id == int(conf.get("config", "bot_owner")):
+        m = message.content.replace(head_s + 'db pick section ', '')
+        v = db.items(m)
+        embed=discord.Embed(title="Section " + m, description=str(v), color=0xffffff)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + 'db pick sections' and message.author.id == int(conf.get("config", "bot_owner")):
+        v = db.sections()
+        embed=discord.Embed(title="DB sections list ", description=str(v), color=0xffffff)
+        await message.channel.send(embed=embed)
     elif message.content.startswith(head_s + 'news set_content ') and message.author.id == int(conf.get("config", "bot_owner")):
         news_str = message.content
         news_str = news_str.replace(head_s + 'news set_content ', '')

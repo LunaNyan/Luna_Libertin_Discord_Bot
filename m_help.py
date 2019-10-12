@@ -15,22 +15,22 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="도움말", value="기계식 루냥이를 이용하는 방법을 알려줘요!", inline=False)
         embed.add_field(name="커뮤니티", value="다른 서버의 사람들과 소통할 수 있는 광장", inline=False)
         embed.add_field(name="프로필", value="자기소개와 계정 정보를 볼 수 있는 곳", inline=False)
+        embed.add_field(name="서버", value="현재 서버에 대한 정보를 볼 수 있는 곳", inline=False)
         embed.add_field(name="정보", value="기계식 루냥이에 대한 여러가지 정보", inline=False)
         embed.add_field(name="게임", value="기계식 루냥이와 놀기", inline=False)
         embed.add_field(name="대화", value="기계식 루냥이와 대화하기", inline=False)
         embed.add_field(name="유용한 기능", value="유용한 도구 모음", inline=False)
-        embed.add_field(name="서버 지정 명령어", value="루냥이에게 명령어를 가르쳐보세요!", inline=False)
         embed.set_footer(text='Copyright (C) 2017 - 2019 libertin | ver ' + bot_ver)
     elif a == '전체 명령어':
         embed=discord.Embed(title="도움말", description="전체 명령어 목록", color=0x8080ff)
         embed.add_field(name="도움말", value="루냥아 (항목) 도와줘, 루냥아 누구니, 루냥아 소스코드", inline=False)
         embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
-        embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임), 루냥아 가입일시공개, 루냥아 생성일시공개", inline=False)
-        embed.add_field(name="정보", value="루냥아 서버정보, 루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
+        embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임), 루냥아 생성일시공개", inline=False)
+        embed.add_field(name="서버", value="루냥아 서버정보, 루냥아 서버설정, 루냥아 서버아이콘, 루냥아 가입일시공개, 루냥아 배워, 루냥아 잊어, 루냥아 배운거", inline=False)
+        embed.add_field(name="정보", value="루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
         embed.add_field(name="대화", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥이 꼬옥, 루냥이 부비부비, 루냥아 (물체) 먹어, 와! 샌즈!, 루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자, 루냥아 핑, 루냥아 색상 (색상코드), 루냥아 받아쓰기 (텍스트)", inline=False)
-        embed.add_field(name="서버 지정 명령어", value="루냥아 배워, 루냥아 잊어, 루냥아 배운거", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기, 불타는 서버", inline=False)
         if user.guild_permissions.administrator:
             embed.add_field(name="관리자", value='자세한 사항은 "루냥아 관리자 도와줘"를 입력하세요!', inline=False)
@@ -55,10 +55,17 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="루냥아 거울 (멘션)", value="멘션된 유저, 또는 멘션이 없는 경우 자신의 프로필 사진을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 닉변 (닉네임)", value="닉네임을 변경합니다", inline=False)
         embed.add_field(name="루냥아 생성일시공개", value="계정의 생성 일시 공개 여부를 토글합니다", inline=False)
+    elif a == '서버':
+        embed=discord.Embed(title="도움말", description="서버 항목", color=0x8080ff)
+        embed.add_field(name="루냥아 서버정보", value="서버 정보를 불러옵니다\n서버가 비공개로 설정되어 있는 경우 사용할 수 없는 명령어입니다", inline=False)
+        embed.add_field(name="루냥아 서버설정", value="서버 설정을 불러옵니다", inline=False)
+        embed.add_field(name="루냥아 서버아이콘", value="서버 아이콘을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 가입일시공개", value="서버 가입 일시 표시 여부를 토글합니다", inline=False)
+        embed.add_field(name="루냥아 배워 (명령어) | (반응)", value="서버 지정 명령어를 생성합니다\n[멘션] : 명령어 사용자의 멘션\n[이름] : 명령어 사용자의 닉네임\n여러개의 반응 중 랜덤으로 반응하기를 원할 때 && 으로 구분할 수 있습니다", inline=False)
+        embed.add_field(name="루냥아 잊어 (명령어)", value="서버 지정 명령어를 삭제합니다", inline=False)
+        embed.add_field(name="루냥아 배운거", value="서버 지정 명령어 목록을 확인합니다", inline=False)
     elif a == '정보':
         embed=discord.Embed(title="도움말", description="정보 항목", color=0x8080ff)
-        embed.add_field(name="루냥아 서버정보", value="서버 정보를 불러옵니다", inline=False)
         embed.add_field(name="루냥아 인기도", value="몇개의 서버에서 몇명의 유저들이 저를 보고 있는지 알려줘요!", inline=False)
         embed.add_field(name="루냥아 자가진단", value="봇이 정상 동작할 수 있는지 점검합니다", inline=False)
         embed.add_field(name="루냥아 서버목록", value="서버 목록을 불러옵니다", inline=False)
@@ -107,11 +114,6 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="루냥아 핑", value="봇의 응답 시간을 조회합니다", inline=False)
         embed.add_field(name="루냥아 색상 (색상코드)", value="색상코드가 배경 색상으로 설정된 이미지를 반환합니다", inline=False)
         embed.add_field(name="루냥아 받아쓰기 (텍스트)", value="받은 텍스트를 이미지로 변환합니다", inline=False)
-    elif a == '서버 지정 명령어':
-        embed=discord.Embed(title="서버 지정 명령어", description="서버 지정 명령어는 '루냥아 (명령어)'로 동작시킵니다\n\n루냥이가 배운 명령어는 해당 서버에서만 동작합니다\n이미 존재하는 서버 지정 명령어를 배우도록 시키면 명령어가 수정됩니다\n**봇의 기본 명령어는 배워도 동작하지 않습니다**", color=0x00ff00)
-        embed.add_field(name="루냥아 배워 (명령어) | (반응)", value="서버 지정 명령어를 생성합니다\n[멘션] : 명령어 사용자의 멘션\n[이름] : 명령어 사용자의 닉네임\n여러개의 반응 중 랜덤으로 반응하기를 원할 때 && 으로 구분할 수 있습니다", inline=False)
-        embed.add_field(name="루냥아 잊어 (명령어)", value="서버 지정 명령어를 삭제합니다", inline=False)
-        embed.add_field(name="루냥아 배운거", value="서버 지정 명령어 목록을 확인합니다", inline=False)
     elif a == '패시브':
         embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
         embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
@@ -252,7 +254,7 @@ def source_code():
 def selfintro(client, bot_ver):
     embed=discord.Embed(title="기계식 루냥이", color=0xffffff)
     embed.add_field(name="제작자", value="[libertin#2340](https://twitter.com/libertin_ko)", inline=True)
-    embed.add_field(name="도와주신 분들", value="[Katinor](https://twitter.com/icoRayner)\nSeia\n[perillamint](https://twitter.com/perillamint)", inline=True)
+    embed.add_field(name="도와주신 분들", value="[Katinor](https://twitter.com/icoRayner)\n[Seia](https://twitter.com/Seia_Soto)\n[perillamint](https://twitter.com/perillamint)", inline=True)
     embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190), [공식 트위터](https://twitter.com/luna_libertin)", inline=False)
     embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
     embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [星海恋詩의 Picrew](https://picrew.me/image_maker/79516/)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
@@ -263,7 +265,7 @@ def selfintro(client, bot_ver):
 def permcheck(me):
     embed=discord.Embed(title="권한 자가진단 결과", color=0xff77ff)
     heart_yes = ":green_heart: 정상"
-    heart_no = ":broken_heart: 오류"
+    heart_no = ":broken_heart: 사용 불가능"
     if me.administrator:
         l_admin = heart_yes
     else:
