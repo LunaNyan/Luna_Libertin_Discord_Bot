@@ -1,5 +1,8 @@
 import configparser, discord, datetime, m_etc, math
 
+memo_temp_title = "66mU66qoIOyCrOyaqSDrsKnrspU="
+memo_temp_content = "IuujqOuDpeyVhCDrqZTrqqggKOuCtOyaqSkiIDog66mU66qoIOyekeyEse2VmOq4sAoi66Oo64Ol7JWEIOuplOuqqCDrqqnroZ0gKO2OmOydtOyngCkiIDog66mU66qoIOuqqeuhnSDrs7TquLAKIuujqOuDpeyVhCDrqZTrqqgg7IKt7KCcICjrsojtmLgpIiA6IOuqqeuhnSDrsojtmLjsl5Ag7ZW064u57ZWY64qUIOuplOuqqCDsgq3soJw="
+
 db_path = "board_db.dat"
 
 db = configparser.ConfigParser()
@@ -108,3 +111,93 @@ def gbook_write(content, author):
     db.set("gbook", "datetime", s_dtstr[:-2])
     with open(db_path, 'w') as configfile:
         db.write(configfile)
+
+def memo_view(message, head):
+    try:
+        content = message.content.replace(head + "메모 목록 ", "")
+        page = int(content)
+    except:
+        page = 1
+    try:
+        content = str(db.get("memo_" + str(message.author.id), "content")).split(", ")
+        dtstr = str(db.get("memo_" + str(message.author.id), "datetime")).split(", ")
+    except:
+        db.add_section("memo_"+ str(message.author.id))
+        l_content = [memo_temp_title]
+        l_dtstr = [memo_temp_content]
+    pages = math.ceil(len(content) / 10)
+    if page > pages or page <= 0:
+        embed=discord.Embed(title="잘못된 페이지 번호입니다")
+    else:
+        embed = discord.Embed(title=message.author.name + " 님의 메모 목록 (총 " + str(len(content)) + "개)", color=0xffffff)
+        c = (page - 1) * 10
+        ct = c + 9
+        while c <= ct:
+            try:
+                embed.add_field(name = "#" + str(c+1) + " : " + m_etc.base64d(content[c]), value ="작성 일자 : " + m_etc.base64d(dtstr[c]), inline=False)
+                c += 1
+            except:
+                break
+        embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 메모 목록 (페이지)"')
+    return embed
+
+def memo_write(message, head):
+    content = message.content.replace(head + "메모 ", "")
+    try:
+        l_content = str(db.get("memo_"+ str(message.author.id), "content")).split(", ")
+        l_dtstr = str(db.get("memo_"+ str(message.author.id), "datetime")).split(", ")
+    except:
+        db.add_section("memo_"+ str(message.author.id))
+        l_content = [memo_temp_title]
+        l_dtstr = [memo_temp_content]
+    if len(l_content) == 30:
+        embed=discord.Embed(title="메모는 30개까지만 저장할 수 있어요!", description="필요없는 메모를 삭제해주세요!", color=0xff0000)
+    else:
+        l_content.insert(0, m_etc.base64e(content))
+        l_dtstr.insert(0, m_etc.base64e(str(datetime.datetime.now().isoformat())))
+        n = 0
+        s_content = ""
+        s_dtstr = ""
+        for c in l_content:
+            s_content += c + ", "
+            s_dtstr += l_dtstr[n] + ", "
+            n += 1
+        db.set("memo_"+ str(message.author.id), "content", s_content[:-2])
+        db.set("memo_"+ str(message.author.id), "datetime", s_dtstr[:-2])
+        embed=discord.Embed(title="메모를 저장했어요!", description='메모 첫번째 항목에 저장되었습니다\n"루냥아 메모 목록"으로 목록을 볼 수 있습니다', color=0xffff00)
+        with open(db_path, 'w') as configfile:
+            db.write(configfile)
+    return embed
+
+def memo_remove(message, head):
+    try:
+        content = message.content.replace(head + "메모 삭제 ", "")
+        num = int(content) - 1
+    except:
+        embed=discord.Embed(title="잘못된 번호입니다", content=0xff0000)
+        return embed
+    try:
+        content = str(db.get("memo_" + str(message.author.id), "content")).split(", ")
+        dtstr = str(db.get("memo_" + str(message.author.id), "datetime")).split(", ")
+    except:
+        embed=discord.Embed(title="메모를 작성하지 않았습니다", description='메모 작성 방법 : "루냥아 메모 (내용)"', content=0xff0000)
+        return embed
+    try:
+        del content[num]
+        del dtstr[num]
+    except:
+        embed=discord.Embed(title="잘못된 번호입니다", content=0xff0000)
+        return embed
+    n = 0
+    s_content = ""
+    s_dtstr = ""
+    for c in content:
+        s_content += c + ", "
+        s_dtstr += dtstr[n] + ", "
+        n += 1
+    db.set("memo_"+ str(message.author.id), "content", s_content[:-2])
+    db.set("memo_"+ str(message.author.id), "datetime", s_dtstr[:-2])
+    embed=discord.Embed(title="메모를 삭제했어요!", color=0xffff00)
+    with open(db_path, 'w') as configfile:
+        db.write(configfile)
+    return embed

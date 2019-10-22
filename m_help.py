@@ -26,11 +26,12 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="도움말", value="루냥아 (항목) 도와줘, 루냥아 누구니, 루냥아 소스코드", inline=False)
         embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
         embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임), 루냥아 생성일시공개", inline=False)
+        embed.add_field(name="메모", value="루냥아 메모 (내용), 루냥아 메모 목록 (페이지), 루냥아 메모 삭제 (번호)", inline=False)
         embed.add_field(name="서버", value="루냥아 서버정보, 루냥아 서버설정, 루냥아 서버아이콘, 루냥아 가입일시공개, 루냥아 배워, 루냥아 잊어, 루냥아 배운거", inline=False)
-        embed.add_field(name="정보", value="루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 버전, 루냥아 후원", inline=False)
+        embed.add_field(name="정보", value="루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 성능, 루냥아 후원", inline=False)
         embed.add_field(name="대화", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥이 꼬옥, 루냥이 부비부비, 루냥아 (물체) 먹어, 와! 샌즈!, 루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
-        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자, 루냥아 핑, 루냥아 색상 (색상코드), 루냥아 받아쓰기 (텍스트)", inline=False)
+        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자, 루냥아 핑, 루냥아 색상 (색상코드), 루냥아 받아쓰기 (텍스트), 루냥아 야짤 (태그)", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기, 불타는 서버", inline=False)
         if user.guild_permissions.administrator:
             embed.add_field(name="관리자", value='자세한 사항은 "루냥아 관리자 도와줘"를 입력하세요!', inline=False)
@@ -55,6 +56,11 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="루냥아 거울 (멘션)", value="멘션된 유저, 또는 멘션이 없는 경우 자신의 프로필 사진을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 닉변 (닉네임)", value="닉네임을 변경합니다", inline=False)
         embed.add_field(name="루냥아 생성일시공개", value="계정의 생성 일시 공개 여부를 토글합니다", inline=False)
+    elif a == '메모':
+        embed=discord.Embed(title="도움말", description="메모 항목", color=0xffff00)
+        embed.add_field(name="루냥아 메모 (내용)", value="최대 30개까지 메모를 작성합니다\n작성된 메모는 목록 첫번째 위치에 기록됩니다", inline=False)
+        embed.add_field(name="루냥아 메모 목록 (페이지)", value="페이지에 해당하는 메모 목록, 또는 페이지가 없는 경우 첫번째 페이지의 메모 목록을 보여줍니다", inline=False)
+        embed.add_field(name="루냥아 메모 삭제 (번호)", value="목록 번호에 해당하는 메모를 삭제합니다", inline=False)
     elif a == '서버':
         embed=discord.Embed(title="도움말", description="서버 항목", color=0x8080ff)
         embed.add_field(name="루냥아 서버정보", value="서버 정보를 불러옵니다\n서버가 비공개로 설정되어 있는 경우 사용할 수 없는 명령어입니다", inline=False)
@@ -70,7 +76,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="루냥아 자가진단", value="봇이 정상 동작할 수 있는지 점검합니다", inline=False)
         embed.add_field(name="루냥아 서버목록", value="서버 목록을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 생일", value="봇이 언제 탄생했는지 알려줍니다", inline=False)
-        embed.add_field(name="루냥아 버전", value="봇의 버전, 서버 상태, 제작진을 보여줍니다", inline=False)
+        embed.add_field(name="루냥아 성능", value="봇의 버전, 서버 성능을 보여줍니다", inline=False)
         embed.add_field(name="루냥아 후원", value="후원 계좌와 리워드를 표시합니다", inline=False)
     elif a == '대화':
         embed=discord.Embed(title="도움말", description="대화 항목", color=0x8080ff)
@@ -114,6 +120,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="루냥아 핑", value="봇의 응답 시간을 조회합니다", inline=False)
         embed.add_field(name="루냥아 색상 (색상코드)", value="색상코드가 배경 색상으로 설정된 이미지를 반환합니다", inline=False)
         embed.add_field(name="루냥아 받아쓰기 (텍스트)", value="받은 텍스트를 이미지로 변환합니다", inline=False)
+        embed.add_field(name="루냥아 야짤 (태그)", value="태그에 해당하는 야짤을 보여줍니다\n서버 관리자가 허용한 채널에 한해서만 동작합니다", inline=False)
     elif a == '패시브':
         embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
         embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
@@ -145,6 +152,7 @@ def help(user, client, text, bot_ver, head, mode):
             embed.add_field(name="루냥아 채널연결 접속 (코드)", value="부여받은 접속 코드로 채널을 연결합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 정보", value="연결된 채널의 정보를 봅니다", inline=False)
+            embed.add_field(name="루냥아 야짤채널", value="현재 채널의 야짤기능 허용 여부를 결정합니다", inline=False)
         elif a == '관리자 모더레이션':
             embed=discord.Embed(title="관리자 기능 도움말", description="모더레이션", color=0xff0000)
             embed.add_field(name="루냥아 뮤트 (멘션)", value="멘션된 사용자를 뮤트(채팅금지)합니다", inline=False)
@@ -234,16 +242,20 @@ def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, se
     embed.set_footer(text="ver " + bot_ver + ", food database ver " + m_food.DB_VERSION)
     return embed
 
+def get_info_public(uptime, servername, bot_ver):
+    embed=discord.Embed(title="기계식 루냥이의 시스템 성능")
+    embed.add_field(name="서버 이름", value=servername, inline=False)
+    embed.add_field(name="CPU", value=cpuinfo.get_cpu_info()["brand"], inline=False)
+    embed.add_field(name="RAM 용량", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB")
+    embed.add_field(name="Python 버전", value=cpuinfo.get_cpu_info()["python_version"].replace(".final.0", ""), inline=False)
+    embed.add_field(name="Discord.py 버전", value=discord.__version__, inline=False)
+    embed.add_field(name="동작 시간", value=uptime, inline=False)
+    embed.add_field(name="버전", value="봇 시스템 버전 " + bot_ver + "\n음식 추천 데이터베이스 버전 " + m_food.DB_VERSION + " (항목 " + m_food.ELEMENT_COUNT + "개)", inline=True)
+    return embed
+
 def bday():
     embed=discord.Embed(title="저는 2017년 5월 9일에 태어났어요!", color=0xffff00)
     embed.set_footer(text="Copyright (C) 2017 - 2019 libertin")
-    return embed
-
-def get_info_public(client, bot_ver, servername):
-    embed=discord.Embed(title="시스템 정보", color=0xffffff)
-    embed.set_author(name="기계식 루냥이",icon_url=client.user.avatar_url)
-    embed.add_field(name="버전", value="봇 시스템 버전 " + bot_ver + "\n음식 추천 데이터베이스 버전 " + m_food.DB_VERSION + " (항목 " + m_food.ELEMENT_COUNT + "개)", inline=True)
-    embed.add_field(name="컨테이너", value=servername, inline=True)
     return embed
 
 def source_code():

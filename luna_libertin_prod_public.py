@@ -21,7 +21,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "17.1.5"
+bot_ver = "18.0.0"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -429,10 +429,8 @@ async def on_message(message):
         embed=discord.Embed(title=usrname + " 님의 프로필 사진", color=0xff77ff)
         embed.set_image(url=mir_user.avatar_url)
         await message.channel.send(embed=embed)
-    elif message.content == head_s + "버전":
-        await message.channel.send(embed=m_help.get_info_public(client, bot_ver, m_device.SERVER_NAME))
-    elif message.content == head_s + "졸리니":
-        await message.channel.send("저는 현재 " + str(datetime.now() - startTime) + " 동안 깨어있어요!")
+    elif message.content == head_s + "성능":
+        await message.channel.send(embed=m_help.get_info_public(str(datetime.now() - startTime), m_device.SERVER_NAME, bot_ver))
     elif message.content.startswith(head_s + '잠수'):
         await message.channel.send(embed=m_user.sleep(db, message, datetime.now()))
     elif message.content == head_s + "관심 가져주기":
@@ -488,15 +486,25 @@ async def on_message(message):
         await message.channel.send(embed=embed)
     elif message.content == head_s + "테스트기능" and test_glyph == "_":
         await message.channel.send(embed=m_help.test_features(db, bot_ver))
-    elif message.content.startswith("루냥아 문의 "):
+    elif message.content.startswith(head_s + "문의 "):
         call_s = message.content.replace(head_s + "문의 ", "")
-        admin = await client.fetch_user(280306700324700160)
-        if admin.dm_channel == None:
-            await admin.create_dm()
-        else:
-            await admin.dm_channel.send(message.author.name + "(" + str(message.author.id) + ")\n" + call_s)
+        s = message.author.name + "(" + str(message.author.id) + ")\n" + call_s
+        u = await client.fetch_user(int(conf.get("config", "bot_owner")))
+        await u.send(s)
     elif message.content == head_s + "서버아이콘":
         await message.channel.send(message.guild.icon_url)
+    elif message.content.startswith(head_s + "메모 목록"):
+        await message.channel.send(embed=m_board.memo_view(message, head_s))
+    elif message.content.startswith(head_s + "메모 삭제 "):
+        await message.channel.send(embed=m_board.memo_remove(message, head_s))
+    elif message.content.startswith(head_s + "메모 "):
+        await message.channel.send(embed=m_board.memo_write(message, head_s))
+    elif message.content.startswith(head_s + "야짤") and message.content != head_s + "야짤채널":
+        if str(message.channel.id) in db.get("etc", "nsfw_channel"):
+            await message.channel.send(embed=m_ext_commands.nsfw_neko(message, head_s))
+        else:
+            embed=discord.Embed(title="해당 채널에서의 명령어 사용이 허가되지 않았습니다", description="서버 관리자에게 문의 바랍니다", color=0xff0000)
+            await message.channel.send(embed=embed)
     # commands for server admins
     elif message.content == head_s + "서버공개" and ifadmin:
         snd = db.get("etc", "ndserver")
@@ -787,6 +795,15 @@ async def on_message(message):
             db.set("etc", "passive_denied", pst)
             embed=discord.Embed(title="현재 서버에서 사용자 패시브가 비허용으로 설정되었어요!", color=0xffff00)
         await message.channel.send(embed=embed)
+    elif message.content == head_s + "야짤채널" and ifadmin:
+        if str(message.channel.id) in db.get("etc", "nsfw_channel"):
+            db.set("etc", "nsfw_channel", db.get("etc", "nsfw_channel").replace(", " + str(message.channel.id), ""))
+            embed=discord.Embed(title="야짤 비허용 채널로 지정되었습니다", color=0xffff00)
+            await message.channel.send(embed=embed)
+        else:
+            db.set("etc", "nsfw_channel", db.get("etc", "nsfw_channel") + ", " + str(message.channel.id))
+            embed=discord.Embed(title="야짤 허용 채널로 지정되었습니다", color=0xffff00)
+            await message.channel.send(embed=embed)
     # admin only functions
     elif message.content.startswith(head_s + 'shellcmd ') and message.author.id == int(conf.get("config", "bot_owner")):
         shl_str = message.content

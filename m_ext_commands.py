@@ -5,6 +5,18 @@ comm_d = {'점프':'(쫑긋)폴짝! >_<',
           '굴러':'(쫑긋)데굴데굴~ >_<',
           '손':':raised_hand:'}
 
+possible = [
+    'feet', 'yuri', 'trap', 'futanari', 'hololewd', 'lewdkemo',
+    'solog', 'feetg', 'cum', 'erokemo', 'les', 'wallpaper', 'lewdk',
+    'ngif', 'tickle', 'lewd', 'feed', 'gecg', 'eroyuri', 'eron',
+    'cum_jpg', 'bj', 'nsfw_neko_gif', 'solo', 'kemonomimi', 'nsfw_avatar',
+    'gasm', 'poke', 'anal', 'slap', 'hentai', 'avatar', 'erofeet', 'holo',
+    'keta', 'blowjob', 'pussy', 'tits', 'holoero', 'lizard', 'pussy_jpg',
+    'pwankg', 'classic', 'kuni', 'waifu', 'pat', '8ball', 'kiss', 'femdom',
+    'neko', 'spank', 'cuddle', 'erok', 'fox_girl', 'boobs', 'random_hentai_gif',
+    'smallboobs', 'hug', 'ero', 'smug', 'goose', 'baka'
+]
+
 def sans():
     sans_str = ["언더테일 아시는구나! 혹시 모르시는분들에 대해 설명해드립니다 샌즈랑 언더테일의 세가지 엔딩루트중 몰살엔딩의 최종보스로 진.짜.겁.나.어.렵.습.니.다 공격은 전부다 회피하고 만피가 92인데 샌즈의 공격은 1초당 60이 다는데다가 독뎀까지 추가로 붙어있습니다.. 하지만 이러면 전대로 게임을 깰 수 가없으니 제작진이 치명적인 약점을 만들었죠. 샌즈의 치명적인 약점이 바로 지친다는것입니다. 패턴들을 다 견디고나면 지쳐서 자신의 턴을 유지한채로 잠에듭니다. 하지만 잠이들었을때 창을옮겨서 공격을 시도하고 샌즈는 1차공격은 피하지만 그 후에 바로날아오는 2차 공격을 맞고 죽습니다.",
                 "와!",
@@ -176,3 +188,21 @@ def ext_talk(message, head):
 
 def server_burning():
     return "저하고도 놀아줘요!"
+
+def nsfw_neko(message, head):
+    if message.content == head + "야짤":
+        li = ""
+        for le in possible:
+            li += le + ", "
+        li = li[:-2]
+        embed=discord.Embed(title="사용 가능한 야짤 태그", description=li)
+        embed.add_field(name="주의사항", value="야짤 기능을 사용함으로써 발생하는 모든 피해는 전적으로 명령어 사용자에게 있음을 숙지해 주시기 바랍니다\n야짤 기능을 사용한다고 해서 호감도가 깎이지는 않습니다")
+    else:
+        s = message.content.replace(head + "야짤 ", "")
+        if s not in possible:
+            embed=discord.Embed(title="사용할 수 없는 야짤 태그입니다", description='도움말 : "루냥아 야짤"')
+        else:
+            embed=discord.Embed(title="야짤 태그 : " + s, color=0xff77ff)
+            embed.set_image(url=nekos.img(s))
+            embed.set_footer(text="powered by nekos.life")
+    return embed

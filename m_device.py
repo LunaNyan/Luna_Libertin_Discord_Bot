@@ -1,2 +1,2 @@
-SERVER_NAME = "2호기"
+SERVER_NAME = "메인"
 

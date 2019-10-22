@@ -37,4 +37,5 @@ joinedat_nduser = 0
 joinedat_ndserver = 0
 adblock_channel = 
 denied_channel = 0
+nsfw_channel = 0
 test_features = 
