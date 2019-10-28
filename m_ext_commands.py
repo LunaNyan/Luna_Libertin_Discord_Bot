@@ -8,13 +8,19 @@ comm_d = {'점프':'(쫑긋)폴짝! >_<',
 possible = [
     'feet', 'yuri', 'trap', 'futanari', 'hololewd', 'lewdkemo',
     'solog', 'feetg', 'cum', 'erokemo', 'les', 'wallpaper', 'lewdk',
-    'ngif', 'tickle', 'lewd', 'feed', 'gecg', 'eroyuri', 'eron',
-    'cum_jpg', 'bj', 'nsfw_neko_gif', 'solo', 'kemonomimi', 'nsfw_avatar',
-    'gasm', 'poke', 'anal', 'slap', 'hentai', 'avatar', 'erofeet', 'holo',
-    'keta', 'blowjob', 'pussy', 'tits', 'holoero', 'lizard', 'pussy_jpg',
-    'pwankg', 'classic', 'kuni', 'waifu', 'pat', '8ball', 'kiss', 'femdom',
-    'neko', 'spank', 'cuddle', 'erok', 'fox_girl', 'boobs', 'random_hentai_gif',
-    'smallboobs', 'hug', 'ero', 'smug', 'goose', 'baka'
+    'ngif', 'tickle', 'lewd', 'gecg', 'eroyuri', 'eron',
+    'cum_jpg', 'bj', 'nsfw_neko_gif', 'solo', 'nsfw_avatar',
+    'poke', 'anal', 'slap', 'hentai', 'erofeet',
+    'keta', 'blowjob', 'pussy', 'tits', 'holoero', 'pussy_jpg',
+    'pwankg', 'classic', 'kuni', 'femdom',
+    'spank', 'cuddle', 'erok', 'boobs', 'random_hentai_gif',
+    'smallboobs', 'ero', 'baka'
+]
+
+possible_pub = [
+               'feed', 'kemonomimi', 'gasm', 'avatar', 'holo', 'lizard',
+               'waifu', 'pat', '8ball', 'kiss', 'neko', 'fox_girl'
+               'hug', 'smug', 'goose'
 ]
 
 def sans():
@@ -203,6 +209,23 @@ def nsfw_neko(message, head):
             embed=discord.Embed(title="사용할 수 없는 야짤 태그입니다", description='도움말 : "루냥아 야짤"')
         else:
             embed=discord.Embed(title="야짤 태그 : " + s, color=0xff77ff)
+            embed.set_image(url=nekos.img(s))
+            embed.set_footer(text="powered by nekos.life")
+    return embed
+
+def neko(message, head):
+    if message.content == head + "짤":
+        li = ""
+        for le in possible_pub:
+            li += le + ", "
+        li = li[:-2]
+        embed=discord.Embed(title="사용 가능한 짤 태그", description=li)
+    else:
+        s = message.content.replace(head + "짤 ", "")
+        if s not in possible_pub:
+            embed=discord.Embed(title="사용할 수 없는 짤 태그입니다", description='도움말 : "루냥아 야짤"')
+        else:
+            embed=discord.Embed(title="짤 태그 : " + s, color=0xff77ff)
             embed.set_image(url=nekos.img(s))
             embed.set_footer(text="powered by nekos.life")
     return embed

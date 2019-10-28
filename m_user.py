@@ -1,4 +1,4 @@
-import discord, random, datetime, m_namebase
+import discord, random, datetime, m_etc
 
 def set_bio(conf, user, text):
     conf.set("bio", str(user.id), text)
@@ -349,11 +349,15 @@ def list_custom_commands(db, message):
     s = str(message.guild.id)
     l = dict(db.items("custom_commands"))
     embed=discord.Embed(title="서버 지정 명령어 목록", color=0xffffff)
+    n = 0
     for a in l:
         if s in a:
             tit = a.replace(s + "_", "")
-            usr = m_namebase.get_name(db.get("custom_commands", a).split(" | ")[1])
+            usn = db.get("custom_commands", a).split(" | ")[1]
+            usr = m_etc.get_name(str(usn))
             embed.add_field(name=tit, value="작성자 : " + usr, inline=False)
+            n + 1
+    embed.set_footer(text="총 " + str(n) + " 개")
     return embed
 
 def remove_custom_commands(db, message,):

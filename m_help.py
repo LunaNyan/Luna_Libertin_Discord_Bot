@@ -204,12 +204,12 @@ def servers_list(client, page, db):
         while c <= ct:
             try:
                 if nd[c] == "1":
+                    embed.add_field(name="#" + str(c+1) + " : (숨겨짐)", inline=False)
                     de += 1
                 else:
-                    embed.add_field(name="#" + str(c+1-de) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
+                    embed.add_field(name="#" + str(c+1) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
                 c += 1
             except:
-                embed.add_field(name="관리자 설정에 의해 숨겨진 서버", value="개수 : " + str(de), inline=False)
                 break
         embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 서버목록 (페이지)"')
     return embed

@@ -74,7 +74,13 @@ def gbook_view(page):
         ct = c + 9
         while c <= ct:
             try:
-                embed.add_field(name = "#" + str(c+1) + " : " + m_etc.base64d(content[c]), value = "작성자 : " + m_etc.base64d(author[c]) + ", 작성 일자 : " + m_etc.base64d(dtstr[c]), inline=False)
+                try:
+                    nn = m_etc.base64d(author[c])
+                    nm = int(nn)
+                    nm = m_etc.get_name(nm)
+                except:
+                    nm = nn
+                embed.add_field(name = "#" + str(c+1) + " : " + m_etc.base64d(content[c]), value = "작성자 : " + nm + ", 작성 일자 : " + m_etc.base64d(dtstr[c]), inline=False)
                 c += 1
             except:
                 break

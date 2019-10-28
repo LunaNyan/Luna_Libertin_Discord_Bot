@@ -7,7 +7,7 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     sys.exit(1)
 
 import time, random, re, traceback, discord, asyncio, psutil, os, random, configparser
-import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_namebase, m_etc
+import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc
 from datetime import datetime, timedelta
 from m_seotda import *
 import imp
@@ -21,7 +21,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "18.0.0"
+bot_ver = "18.1.0"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -144,13 +144,16 @@ async def news_send(message, title_str, content):
     if news_image != False:
         embed.set_image(url=news_image)
     embed.set_footer(text="작성자 : " + message.author.name, icon_url=message.author.avatar_url)
+    cs = db.get("etc", "news_channel")
     for c in db.get("etc", "news_channel").split(", "):
         try:
             news_channel = client.get_channel(int(c))
             await news_channel.send(embed=embed)
             await message.channel.send(str(c) + " : Success")
         except Exception as e:
-            await message.channel.send(str(c) + " : Failed (" + str(e) + ")")
+            cs = cs.replace(c + ", ", "")
+            await message.channel.send(str(c) + " : Failed (" + str(e) + "), channel destroyed")
+    db.set("etc", "news_channel", cs)
     await message.channel.send("Complete")
 
 @client.event
@@ -252,7 +255,7 @@ async def on_message(message):
     if m_user.check_sleep(db, message):
         await message.channel.send(embed=m_user.unsleep(db, message, datetime.now()))
     # namebase writting routine
-    m_namebase.set_name(message)
+    m_etc.set_name(message)
     # generic commands starts with head string
     if message.content.startswith(head_s) and message.content.endswith(' 도와줘'):
         embed = m_help.help(message.author, client, message.content, bot_ver, head_s, True)
@@ -280,7 +283,10 @@ async def on_message(message):
     elif message.content == head_s + "누구니":
         await message.channel.send(embed=m_help.selfintro(client, bot_ver))
     elif message.content == head_s + "배고파":
-        await message.channel.send(m_food.return_food())
+        s = m_food.return_food()
+        embed=discord.Embed(title=s, color=0xff7fff)
+        embed.set_footer(text="개발자의 취향을 따라 작성되었으며 사람마다 호불호가 갈릴 수 있습니다")
+        await message.channel.send(embed=embed)
     elif message.content == '루냥이 귀여워' or message.content == '루냥이 커여워' or message.content == '귀냥이 루여워' or message.content == '커냥이 루여워':
         await message.channel.send(m_ext_commands.imcute(db, message.author, test_glyph))
     elif message.content == head_s + "놀아줘" or message.content == head_s + "심심해":
@@ -499,6 +505,8 @@ async def on_message(message):
         await message.channel.send(embed=m_board.memo_remove(message, head_s))
     elif message.content.startswith(head_s + "메모 "):
         await message.channel.send(embed=m_board.memo_write(message, head_s))
+    elif message.content.startswith(head_s + "짤"):
+        await message.channel.send(embed=m_ext_commands.neko(message, head_s))
     elif message.content.startswith(head_s + "야짤") and message.content != head_s + "야짤채널":
         if str(message.channel.id) in db.get("etc", "nsfw_channel"):
             await message.channel.send(embed=m_ext_commands.nsfw_neko(message, head_s))
@@ -809,9 +817,19 @@ async def on_message(message):
         shl_str = message.content
         shl_str = shl_str.replace(head_s + 'shellcmd ','')
         try:
-            await message.channel.send(str(os.popen(shl_str).read()))
-        except:
-            await message.channel.send(":facepalm:")
+            shl_res = str(os.popen(shl_str).read())
+            if len(shl_res) >= 1000:
+                pf = open("command_result.txt", "w")
+                ps = "bash command : " + shl_str + "\r\n-----\r\n" + shl_res
+                pf.write(ps)
+                pf.close()
+                await message.channel.send("length of result is over 1000. here is text file of result", file=discord.File("command_result.txt"))
+            else:
+                if shl_res == "":
+                    shl_res = "no stdout or stderr."
+                await message.channel.send("```" + shl_res + "```")
+        except Exception as e:
+            await message.channel.send(":facepalm:" + str(e))
     elif message.content == head_s + "debug message" and message.author.id == int(conf.get("config", "bot_owner")):
         l = await message.channel.history(limit=2).flatten()
         l = l[1]
