@@ -37,6 +37,13 @@ def write(title, content):
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 
+def amend(no, title, content):
+    db.set("article_" + no, "title", title)
+    db.set("article_" + no, "content", content)
+    db.set("article_" + no, "datetime", str(datetime.datetime.now().isoformat()))
+    with open(db_path, 'w') as configfile:
+        db.write(configfile)
+
 def list():
     embed = discord.Embed(title="공지사항 목록", color=0xffffff)
     i = 1
@@ -101,7 +108,7 @@ def gbook_write(content, author):
         del l_author[99]
         del l_dtstr[99]
     l_content.insert(0, m_etc.base64e(content))
-    l_author.insert(0, m_etc.base64e(author))
+    l_author.insert(0, m_etc.base64e(str(author)))
     l_dtstr.insert(0, m_etc.base64e(str(datetime.datetime.now().isoformat())))
     n = 0
     s_content = ""

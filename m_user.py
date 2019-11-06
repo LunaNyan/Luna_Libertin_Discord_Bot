@@ -1,4 +1,4 @@
-import discord, random, datetime, m_etc
+import math, discord, random, datetime, m_etc
 
 def set_bio(conf, user, text):
     conf.set("bio", str(user.id), text)
@@ -284,6 +284,11 @@ def serversettings(conf, message):
             embed.add_field(name="서버 지정 접두사", value="없음", inline=False)
     except:
         embed.add_field(name="서버 지정 접두사", value="없음", inline=False)
+    try:
+        bu = db.get("server_burning", str(message.guild.id))
+        embed.add_field(name="불타는 서버 지정 문구", value=bu, inline=False)
+    except:
+        embed.add_field(name="불타는 서버 지정 문구", value="없음", inline=False)
     return embed
 
 def attendance(conf, user):
@@ -345,19 +350,37 @@ def make_custom_commands(db, message):
             embed=discord.Embed(title='사용 방법 : "루냥아 배워 (명령어) | (반응)"', color=0xffffff)
     return embed
 
-def list_custom_commands(db, message):
+def list_custom_commands(db, message, head):
+    try:
+        content = message.content.replace(head + "배운거 ", "")
+        page = int(content)
+    except:
+        page = 1
     s = str(message.guild.id)
     l = dict(db.items("custom_commands"))
-    embed=discord.Embed(title="서버 지정 명령어 목록", color=0xffffff)
     n = 0
+    t = []
+    u = []
     for a in l:
         if s in a:
-            tit = a.replace(s + "_", "")
+            t.append(a.replace(s + "_", ""))
             usn = db.get("custom_commands", a).split(" | ")[1]
-            usr = m_etc.get_name(str(usn))
-            embed.add_field(name=tit, value="작성자 : " + usr, inline=False)
-            n + 1
-    embed.set_footer(text="총 " + str(n) + " 개")
+            u.append(str(usn))
+            n += 1
+    pages = math.ceil(n / 10)
+    if page > pages or page <= 0:
+        embed=discord.Embed(title="잘못된 페이지 번호입니다")
+    else:
+        c = (page - 1) * 10
+        ct = c + 9
+        embed=discord.Embed(title="서버 지정 명령어 목록 (총 " + str(n) + "개)", color=0xffffff)
+        while c <= ct:
+            try:
+                embed.add_field(name="#" + str(c+1) + " : " + t[c], value="작성자 : " + u[c], inline=False)
+                c += 1
+            except:
+                break
+        embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 배운거 (페이지)"')
     return embed
 
 def remove_custom_commands(db, message,):

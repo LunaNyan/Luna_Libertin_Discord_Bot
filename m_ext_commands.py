@@ -19,7 +19,7 @@ possible = [
 
 possible_pub = [
                'feed', 'kemonomimi', 'gasm', 'avatar', 'holo', 'lizard',
-               'waifu', 'pat', '8ball', 'kiss', 'neko', 'fox_girl'
+               'waifu', 'pat', '8ball', 'kiss', 'neko', 'fox_girl',
                'hug', 'smug', 'goose'
 ]
 
@@ -192,8 +192,12 @@ def ext_talk(message, head):
     else:
         return None
 
-def server_burning():
-    return "저하고도 놀아줘요!"
+def server_burning(db, id):
+    try:
+        b = db.get("server_burning", str(id))
+    except:
+        b = "저하고도 놀아줘요!"
+    return b
 
 def nsfw_neko(message, head):
     if message.content == head + "야짤":

@@ -21,7 +21,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "18.1.0"
+bot_ver = "18.2.5"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -107,7 +107,7 @@ async def bgjob_change_playing():
     client.loop.create_task(bgjob_change_playing())
 
 @client.event
-async def server_log(message, colorh, texth, desch = None):
+async def server_log(message, colorh, texth, desch = None, footh = None):
     try:
         cid = db.get("server_log", str(message.guild.id))
         cid = client.get_channel(int(cid))
@@ -116,7 +116,10 @@ async def server_log(message, colorh, texth, desch = None):
                 embed=discord.Embed(title=texth, color=colorh)
             else:
                 embed=discord.Embed(title=texth, description=desch, color=colorh)
-            embed.set_footer(text=message.author.name)
+            if footh == None:
+                embed.set_footer(text=message.author.name)
+            else:
+                embed.set_footer(text=footh)
             await cid.send(embed=embed)
         else:
             db.remove_option("server_log", str(message.guild.id))
@@ -233,7 +236,7 @@ async def on_message(message):
         db.set("etc", "comm_count", str(int(db.get("etc", "comm_count")) + 1))
     elif scnt >= 70 and random.randint(1, 100) == 1:
         db.set("server_count", str(message.guild.id), "0")
-        await message.channel.send(m_ext_commands.server_burning())
+        await message.channel.send(m_ext_commands.server_burning(db, message.guild.id))
     # ctclink routine
     cr0 = m_ctclink.get_link(message.channel.id, db)
     if cr0 != False and message.content.startswith(head_s) == False:
@@ -317,7 +320,7 @@ async def on_message(message):
             m_user.set_bio(db, message.author, bio_str)
             await message.channel.send("소개말을 설정했어요!")
     elif message.content.startswith(head_s + '방명록 쓰기 '):
-        m_board.gbook_write(message.content.replace(head_s + "방명록 쓰기 ", ""), message.author.name)
+        m_board.gbook_write(message.content.replace(head_s + "방명록 쓰기 ", ""), message.author.id)
         embed=discord.Embed(title="방명록에 글을 썼어요!", description='"루냥아 방명록"으로 목록을 볼 수 있어요!', color=0xffffff)
         await message.channel.send(embed=embed)
     elif message.content.startswith(head_s + '방명록'):
@@ -350,7 +353,7 @@ async def on_message(message):
             say_str = say_str.replace(head_s + '확성기 ','')
             await message.delete()
             await message.channel.send(say_str)
-            await server_log(message, 0xffff00, "확성기 기능을 사용함", message.author.name + " : " + say_str)
+            await server_log(message, 0xffff00, "확성기 기능을 사용함", message.author.name + " : " + say_str, "채널 : " + message.channel.name)
     elif message.content.startswith(head_s + "계산해줘 이미지 "):
         message_temp = await message.channel.send("잠시만 기다려주세요!")
         bci_str = message.content
@@ -382,6 +385,8 @@ async def on_message(message):
             await message.channel.send("연산식을 다시 확인해주세요")
     elif message.content.startswith(head_s + '골라줘 '):
         await message.channel.send("**" + m_ext_commands.selectr(message.content, head_s) + "**(이)가 선택되었습니다")
+    elif message.content == head_s + "이용약관":
+        await message.channel.send(embed=m_help.tos())
     elif message.content == "루냥아":
         await message.channel.send(m_ext_commands.l_ping())
     elif message.content == head_s + "짖어":
@@ -418,7 +423,7 @@ async def on_message(message):
     elif message.content.startswith(head_s + '잊어 '):
         await message.channel.send(embed=m_user.remove_custom_commands(db, message))
     elif message.content == head_s + "배운거":
-        await message.channel.send(embed=m_user.list_custom_commands(db, message))
+        await message.channel.send(embed=m_user.list_custom_commands(db, message, head_s))
     elif message.content == head_s + "서버정보":
         await message.channel.send(embed=m_user.serverinfo(db, message))
     elif message.content == head_s + "서버설정":
@@ -534,7 +539,11 @@ async def on_message(message):
             embed=discord.Embed(title="모든 사용자의 가입 일시를 비공개로 설정했어요!", color=0xffffff)
         db.set("etc", "joinedat_ndserver", jnd)
         await message.channel.send(embed=embed)
-    elif message.content == head_s + "불타는 서버" and ifadmin:
+    elif message.content.startswith(head_s + "불타는 서버 문구 ") and ifadmin:
+        m = message.content.replace(head_s + "불타는 서버 문구 ", "")
+        db.set("server_burning", str(message.guild.id), m)
+        await message.channel.send("정상적으로 설정되었어요!")
+    elif message.content == head_s + "불타는 서버 토글" and ifadmin:
         if scnt != -1:
             db.set("server_count", str(message.guild.id), "-1")
             embed=discord.Embed(title="불타는 서버 패시브를 껐어요!", color=0xffffff)
@@ -948,6 +957,11 @@ async def on_message(message):
         await message.channel.send(embed=embed)
     elif message.content == head_s + "article write" and message.author.id == int(conf.get("config", "bot_owner")):
         m_board.write(article_title, article_content)
+        await message.channel.send(":ok_hand:")
+    elif message.content.startswith(head_s + "article amend") and message.author.id == int(conf.get("config", "bot_owner")):
+        no = message.content.replace(head_s + "article amend ", "")
+        m_board.amend(no, article_title, article_content)
+        await message.channel.send(":ok_hand:")
     elif message.content == head_s + "article notify" and message.author.id == int(conf.get("config", "bot_owner")):
         await news_send(message, "새 공지사항 : " + article_title, '"루냥아 공지사항"으로 볼 수 있습니다')
     elif message.content == head_s + "article clear" and message.author.id == int(conf.get("config", "bot_owner")):
@@ -1077,6 +1091,33 @@ async def on_member_remove(member):
         c = client.get_channel(int(a[0]))
         c = c.replace("[이름]", message.author.name)
         await c.send(a[1])
+
+@client.event
+async def on_member_update(before, after):
+    s = before.guild
+    nb = before.nick
+    na = after.nick
+    nn = after.name
+    if nb != na and nb != None and na != None:
+        try:
+            cid = db.get("server_log", str(before.guild.id))
+            cid = client.get_channel(int(cid))
+            if cid != None:
+                embed=discord.Embed(title=nn + " 님이 서버 닉네임을 변경함", color=0xffff00)
+                embed.add_field(name="이전", value=nb, inline=False)
+                embed.add_field(name="이후", value=na, inline=False)
+                await cid.send(embed=embed)
+            else:
+                db.remove_option("server_log", str(before.guild.id))
+        except:
+            pass
+    else:
+        pass
+
+@client.event
+async def on_guild_join(guild):
+    if guild.system_channel != None:
+        await guild.system_channel.send(guild.owner.mention, embed=m_help.bot_welcome_message(client, bot_ver))
 
 print("INFO    : connecting to Discord. Please Wait..")
 client.run(conf.get("config", "bot_token"))
