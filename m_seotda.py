@@ -135,7 +135,7 @@ def seotda_ready():
     shuffle(deck)
     deck = deck[:10]
 
-def seotda(message_content, user):
+def seotda(message_content, user, head):
     global result_str_player
     global result_str_cpu
     global winning_percentage
@@ -145,7 +145,7 @@ def seotda(message_content, user):
         usrname = user.display_name + "(" + user.name + ")"
     try:
         message_content = message_content.replace("_", "")
-        message_content = message_content.replace("루냥아 섯다 ", "")
+        message_content = message_content.replace(head + "섯다 ", "")
         x, y = message_content.split(" ")
         x = int(x)
         y = int(y)

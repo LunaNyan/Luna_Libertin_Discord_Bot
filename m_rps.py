@@ -1,4 +1,4 @@
-import discord
+import discord, m_lang
 from random import randint, choice
 
 def rps_arg(text):
@@ -23,7 +23,7 @@ def rps_judge(player, cpu):
     else:
         return "패배!"
 
-def rps(message, user):
+def rps(message, user, db):
     if user.display_name == user.name:
         usrname = user.name
     else:
@@ -41,7 +41,7 @@ def rps(message, user):
             elif c == 3:
                 cm = "보"
             r = rps_judge(p, c)
-            if r == "패배!" and randint(1, 10) >= 5:
+            if r == "패배!" and randint(1, 10) >= 3:
                 continue
             else:
                 break
@@ -50,5 +50,5 @@ def rps(message, user):
         embed.add_field(name="루냥이의 선택", value=cm, inline=True)
         embed.add_field(name="결과", value=r, inline=False)
     else:
-        embed=discord.Embed(title="선택지로 가위, 바위, 보 중 하나를 골라주세요!", description="예시 : 루냥아 가위바위보 " + choice(["가위", "바위", "보"]))
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "rps_help"), description="예시 : 루냥아 가위바위보 " + choice(["가위", "바위", "보"]))
     return embed
