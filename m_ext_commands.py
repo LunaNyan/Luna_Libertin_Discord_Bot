@@ -1,4 +1,4 @@
-import discord, random, m_etc, nekos
+import discord, random, m_etc, m_pingpong, m_lang, nekos
 from m_user import ret_check
 
 comm_d = {'점프':'(쫑긋)폴짝! >_<',
@@ -124,15 +124,15 @@ def l_dice():
     dice_int = random.randint(1, 6)
     return str(dice_int)
 
-def l_ticket(message, head):
-    a = message
+def l_ticket(message, head, db):
+    a = message.content
     a = a.replace(head + "제비뽑기 ", "")
     try:
         b = a.split(',')
         a0 = b[0].split()
         b0 = b[1].split()
         if len(a0) != len(b0):
-            return "선택지와 결과의 개수가 맞지 않습니다 (각 항목은 띄어쓰기로 구분합니다)"
+            return m_lang.string(db, message.author.id, "ticket_no_balance")
         else:
             random.shuffle(b0)
             c = 0
@@ -143,7 +143,7 @@ def l_ticket(message, head):
             ret+= "```"
             return ret
     except:
-        return "선택지와 결과를 구분할 때는 쉼표(,)를 입력해주세요"
+        return m_lang.string(db, message.author.id, "ticket_wrong_indent")
 
 def say_lv():
     say_lv_str = ["(꼬옥", "(껴안", "(쓰다듬"]
@@ -161,34 +161,45 @@ def say_shuffle(message, head):
 def say_rint(message):
     return str(random.randint(1, 100))
 
-def eat(message, head):
+def eat(message, head, db):
     if message.content == head + "먹어":
         embed=discord.Embed(title="사용 방법 : 루냥아 (물체) 먹어", color=0xff77ff)
     else:
         e = message.content.replace(head, '')
         e = e.replace(' 먹어', '')
         if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
-            embed = discord.Embed(title="그런 물체는 먹을 수 없어요!", color=0xff0000)
+            embed = discord.Embed(title=m_lang.string(db, message.author.id, "swearing_in_eat"), color=0xff0000)
         else:
-            embed = discord.Embed(title=e + m_etc.checkTrait(e) + " 먹었어요!", description="옴뇸뇸뇸뇸", color=0xff77ff)
+            embed = discord.Embed(title=e + m_etc.checkTrait(e) + m_lang.string(db, message.author.id, "eat"), description="옴뇸뇸뇸뇸", color=0xff77ff)
     return embed
 
-def bite(message, head):
+def bite(message, head, db):
     if message.content == head + "물어":
         embed=discord.Embed(title="사용 방법 : 루냥아 (물체) 물어", color=0xff77ff)
     else:
         e = message.content.replace(head, '')
         e = e.replace(' 물어', '')
         if e in ["엿", "똥", "뻐큐", "빠큐", "훠뀨", "퍼큐", "퍽유"]:
-            embed = discord.Embed(title="그런 물체는 물 수 없어요!", color=0xff0000)
+            embed = discord.Embed(title=m_lang.string(db, message.author.id, "swearing_in_bite"), color=0xff0000)
         else:
-            embed = discord.Embed(title=e + m_etc.checkTrait(e) + " 물었어요!", description="앙~", color=0xff77ff)
+            embed = discord.Embed(title=e + m_etc.checkTrait(e) + m_lang.string(db, message.author.id, "bite"), description="앙~", color=0xff77ff)
     return embed
 
-def ext_talk(message, head):
+def ext_talk(client, message, head):
     m = message.content.replace(head, "")
+    r = m_pingpong.react(m)
     if m in comm_d:
-        return comm_d[m]
+        embed=discord.Embed(title=comm_d[m], color=0xff7fff)
+        return embed
+    elif r != None:
+        if not r:
+            return False
+        else:
+            rr = random.choice(r)
+            rr = rr.decode("utf-8")
+            embed=discord.Embed(title=rr, color=0xff7fff)
+            embed.set_footer(text="powered by PINGPONG Builder")
+            return embed
     else:
         return None
 

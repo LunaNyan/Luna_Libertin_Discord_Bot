@@ -1,4 +1,4 @@
-import discord, cpuinfo, psutil, os, math, m_food
+import discord, cpuinfo, psutil, os, math, m_food, m_lang
 
 def help(user, client, text, bot_ver, head, mode):
     # mode interpretation
@@ -11,7 +11,7 @@ def help(user, client, text, bot_ver, head, mode):
     else:
         a = a.replace(head + '도와줘 ', '')
     if text == head + '도와줘':
-        embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description='루냥아 (항목) 도와줘를 입력하세요!\n전체 명령어 목록을 보시려면 "루냥아 전체 명령어 도와줘"를 입력하세요!\n[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190), [공식 트위터](https://twitter.com/luna_libertin)', color=0xff0080)
+        embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description='루냥아 (항목) 도와줘를 입력하세요!\n전체 명령어 목록을 보시려면 "루냥아 전체 명령어 도와줘"를 입력하세요!\n[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)', color=0xff0080)
         embed.add_field(name="도움말", value="기계식 루냥이를 이용하는 방법을 알려줘요!", inline=False)
         embed.add_field(name="커뮤니티", value="다른 서버의 사람들과 소통할 수 있는 광장", inline=False)
         embed.add_field(name="프로필", value="자기소개와 계정 정보를 볼 수 있는 곳", inline=False)
@@ -175,7 +175,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed=discord.Embed(title='해당 항목에 대한 도움말을 찾을 수 없어요!', description='전체 도움말을 원하신다면 "루냥아 전체 명령어 도와줘"를 입력해주세요!')
     return embed
 
-def servers_list(client, page, db):
+def servers_list(client, page, db, id):
     n = 0
     servers = {}
     sorted_servers = {}
@@ -198,7 +198,7 @@ def servers_list(client, page, db):
         nd.append(servers[k][2])
     pages = math.ceil(len(lk) / 10)
     if page > pages or page <= 0:
-        embed=discord.Embed(title="잘못된 페이지 번호입니다")
+        embed=discord.Embed(title=m_lang.string(db, id, "wrong_page_idx"))
     else:
         embed=discord.Embed(title="전체 서버 목록 (총 " + str(len(lk)) + "개)", color=0xff00ff)
         c = (page - 1) * 10
@@ -224,7 +224,7 @@ def test_features(db, bot_ver):
 def donation():
     embed=discord.Embed(title="기계식 루냥이를 지원해주세요!", color=0xffccff)
     embed.add_field(name="후원 계좌", value="하나은행 538-910289-86107", inline=False)
-    embed.add_field(name="후원 리워드", value="- 후원자 칭호\n- (10,000원 이상 후원 시) Nitro Classic 1개월, 컬쳐랜드 문화상품권 5,000원권 중 택1\n\n후원 리워드를 받으려면 [공식 트위터](https://twitter.com/luna_libertin) 또는 libertin#2340에 DM을 남겨주세요!)", inline=False)
+    embed.add_field(name="후원 리워드", value="- 후원자 칭호\n- (10,000원 이상 후원 시) Nitro Classic 1개월, 컬쳐랜드 문화상품권 5,000원권 중 택1\n\n후원 리워드를 받으려면 libertin#2340에 DM을 남겨주세요!)", inline=False)
     return embed
 
 def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, servers, users, pid):
@@ -249,6 +249,7 @@ def get_info_public(uptime, servername, bot_ver):
     embed.add_field(name="서버 이름", value=servername, inline=False)
     embed.add_field(name="CPU", value=cpuinfo.get_cpu_info()["brand"], inline=False)
     embed.add_field(name="RAM 용량", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB")
+    embed.add_field(name="운영체제 버전", value="VxWorks 7 SMP 64-bit", inline=False)
     embed.add_field(name="Python 버전", value=cpuinfo.get_cpu_info()["python_version"].replace(".final.0", ""), inline=False)
     embed.add_field(name="Discord.py 버전", value=discord.__version__, inline=False)
     embed.add_field(name="동작 시간", value=uptime, inline=False)
@@ -267,9 +268,9 @@ def source_code():
 
 def selfintro(client, bot_ver):
     embed=discord.Embed(title="기계식 루냥이", color=0xffffff)
-    embed.add_field(name="제작자", value="[libertin#2340](https://twitter.com/libertin_ko)", inline=True)
+    embed.add_field(name="제작자", value="libertin#2340", inline=True)
     embed.add_field(name="도와주신 분들", value="[Katinor](https://twitter.com/icoRayner)\n[Seia](https://twitter.com/Seia_Soto)\n[perillamint](https://twitter.com/perillamint)", inline=True)
-    embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190), [공식 트위터](https://twitter.com/luna_libertin)", inline=False)
+    embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)", inline=False)
     embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
     embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [星海恋詩의 Picrew](https://picrew.me/image_maker/79516/)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
     embed.set_thumbnail(url=client.user.avatar_url)
@@ -317,11 +318,9 @@ def permcheck(me):
     embed.add_field(name="즉석 초대 만들기", value=l_inv, inline=True)
     return embed
 
-def suggest_game():
-    embed=discord.Embed(title="저와 게임을 해보시는건 어때요?", description='저에겐 다양한 게임 기능이 있어요!\n게임 규칙 등의 자세한 정보를 보고 싶다면 "루냥아 게임 (게임이름) 도와줘"를 입력해보세요!', color=0xffff00)
-    embed.add_field(name="섯다", value="CPU와 두장섯다를 진행합니다", inline=False)
-    embed.add_field(name="제비뽑기", value="CPU가 제비뽑기를 실행합니다", inline=False)
-    embed.add_field(name="가위바위보", value="CPU와 가위바위보를 진행합니다", inline=False)
+def suggest_game(db, id):
+    embed=discord.Embed(title=m_lang.string(db, id, "suggest_game"), description=m_lang.string(db, id, "suggest_game_desc"), color=0xffff00)
+    embed.add_field(name="사용 가능한 게임 종류", value="섯다, 가위바위보, 주사위", inline=False)
     return embed
 
 def bot_welcome_message(client, bot_ver):

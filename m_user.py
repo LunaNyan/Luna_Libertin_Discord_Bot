@@ -1,4 +1,4 @@
-import math, discord, random, datetime, m_etc
+import math, discord, random, datetime, m_etc, m_lang
 
 def set_bio(conf, user, text):
     conf.set("bio", str(user.id), text)
@@ -7,7 +7,7 @@ def get_bio(conf, user):
     try:
         s = conf.get("bio", str(user.id))
     except:
-        s = '자기소개가 설정되지 않았어요!\n"루냥아 소개말 (자기소개)"로 등록할 수 있어요!'
+        s = m_lang.string(conf, user.id, "bio_not_set")
     return s
 
 def increase(conf, user):
@@ -104,7 +104,8 @@ def check(conf, message):
         except:
             embed.add_field(name="관심 가져주기 패시브", value="켜짐", inline=False)
     else:
-        embed.add_field(name="관심 가져주기 패시브", value="호감도를 200까지 획득해주세요!", inline=False)
+        embed.add_field(name="관심 가져주기 패시브", value=m_lang.string(conf, message.author.id, "insufficient_level"), inline=False)
+    embed.add_field(name="언어", value=m_lang.check_lang(conf, message.author.id))
     return embed
 
 def check_another(conf, user, message):
@@ -205,14 +206,14 @@ def toggle_sudden_hugging(conf, user):
     try:
         if int(conf.get("sudden_hugging", str(user.id))) == 1:
             conf.set("sudden_hugging", str(user.id), "0")
-            embed = discord.Embed(title=usrname + " 님에게 관심 가져주기를 껐어요!")
+            res = False
         elif int(conf.get("sudden_hugging", str(user.id))) == 0:
             conf.set("sudden_hugging", str(user.id), "1")
-            embed = discord.Embed(title=usrname + " 님에게 관심 가져주기를 켰어요!")
+            res = True
     except:
         conf.set("sudden_hugging", str(user.id), "0")
-        embed = discord.Embed(title=usrname + " 님에게 관심 가져주기를 껐어요!")
-    return embed
+        res = False
+    return res
 
 def hug_count(conf, user):
     try:
@@ -296,7 +297,7 @@ def attendance(conf, user):
     try:
         a = conf.get("attendance", "today").split(", ")
         if str(user.id) in a:
-            embed=discord.Embed(title="오늘 이미 출석을 했어요!", description="누적 출석 횟수 : " + str(conf.get("attendance", str(user.id))), color=0xffff00)
+            embed=discord.Embed(title=m_lang.string(conf, user.id, "attendance_already"), description="누적 출석 횟수 : " + str(conf.get("attendance", str(user.id))), color=0xffff00)
         else:
             raise
     except:
@@ -304,10 +305,10 @@ def attendance(conf, user):
             c = int(conf.get("attendance", str(user.id)))
             c += 1
             conf.set("attendance", str(user.id), str(c))
-            embed=discord.Embed(title="출석 체크를 했어요!", description="누적 출석 횟수 : " + str(conf.get("attendance", str(user.id))), color=0x00ff00)
+            embed=discord.Embed(title=m_lang.string(conf, user.id, "attendance_check"), description="누적 출석 횟수 : " + str(conf.get("attendance", str(user.id))), color=0x00ff00)
         except:
             conf.set("attendance", str(user.id), "1")
-            embed=discord.Embed(title="처음으로 출석체크를 했어요!", color=0x00ff00)
+            embed=discord.Embed(title=m_lang.string(conf, user.id, "attendance_first"), color=0x00ff00)
         conf.set("attendance", "today", conf.get("attendance", "today") + ", " + str(user.id))
     return embed
 
@@ -327,13 +328,13 @@ def guild_custom_commands(db, message):
 def make_custom_commands(db, message):
     m = message.content.replace(head(db, message) + "배워 ", "")
     m = m.split(" | ")
-    editing_m = "명령어를 배웠어요!"
+    editing_m = m_lang.string(db, message.author.id, "custom_command_added")
     try:
         i = db.get("custom_commands", str(message.guild.id) + "_" + m[0])
         i = i.split(" | ")[1]
-        editing_m = "명령어를 수정했어요!"
+        editing_m = m_lang.string(db, message.author.id, "custom_command_edit")
         if message.author.guild_permissions.administrator != False and str(message.author.id) != i:
-            embed=discord.Embed(title="다른 사람이 가르친 명령어는 수정할 수 없어요!", color=0xff000)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_edit"), color=0xff000)
         else:
             raise
     except Exception as e:
@@ -369,21 +370,21 @@ def list_custom_commands(db, message, head):
             n += 1
     pages = math.ceil(n / 10)
     if page > pages or page <= 0:
-        embed=discord.Embed(title="잘못된 페이지 번호입니다")
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "wrong_page_idx"))
     else:
         c = (page - 1) * 10
         ct = c + 9
         embed=discord.Embed(title="서버 지정 명령어 목록 (총 " + str(n) + "개)", color=0xffffff)
         while c <= ct:
             try:
-                embed.add_field(name="#" + str(c+1) + " : " + t[c], value="작성자 : " + u[c], inline=False)
+                embed.add_field(name="#" + str(c+1) + " : " + t[c], value="작성자 : " + m_etc.get_name(u[c]), inline=False)
                 c += 1
             except:
                 break
         embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 배운거 (페이지)"')
     return embed
 
-def remove_custom_commands(db, message,):
+def remove_custom_commands(db, message):
     m = message.content.replace(head(db, message) + "잊어 ", "")
     l = dict(db.items("custom_commands"))
     if str(message.guild.id) + "_" + m in l:
@@ -391,15 +392,15 @@ def remove_custom_commands(db, message,):
         i = i.split(" | ")[1]
         if message.author.guild_permissions.administrator or str(message.author.id) == i:
             db.remove_option("custom_commands", str(message.guild.id) + "_" + m)
-            embed=discord.Embed(title="명령어를 잊었어요!", color=0xffff00)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_deleted"), color=0xffff00)
         else:
-            embed=discord.Embed(title="다른 사람이 가르친 명령어는 잊을 수 없어요!", color=0xff0000)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_deleted"), color=0xff0000)
     else:
-        embed=discord.Embed(title="명령어가 존재하지 않아요!", color=0xff0000)
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_found"), color=0xff0000)
     return embed
 
 def sleep(db, message, dt):
-    embed=discord.Embed(title=str(message.author.name) + "님의 잠수가 시작되었어요!", description = "현재 서버에 메시지를 남기기 전까지 잠수 시간이 기록됩니다", color=0xffff00)
+    embed=discord.Embed(title=str(message.author.name) + m_lang.string(db, message.author.id, "sleep_start"), description = m_lang.string(db, message.author.id, "sleep_start_desc"), color=0xffff00)
     if head(db, message) + "잠수 " in message.content:
         reason = message.content.replace(head(db, message) + "잠수 ", "")
         embed.add_field(name="사유", value=reason, inline=False)
@@ -420,18 +421,21 @@ def unsleep(db, message, dt):
     t = datetime.datetime.now() - datetime.datetime.fromtimestamp(int(s.split("&&")[0]))
     r = s.split("&&")[1]
     db.remove_option("sleep", str(message.author.id) + "&&" + str(message.guild.id))
-    embed=discord.Embed(title=message.author.name + " 님의 잠수가 끝났어요!", color=0xffff00)
+    embed=discord.Embed(title=message.author.name + m_lang.string(db, message.author.id, "sleep_end"), color=0xffff00)
     if r != "empty":
         embed.add_field(name="사유", value=r, inline=False)
     embed.add_field(name="잠수 시간", value=str(t), inline=False)
     return embed
 
-def head(db, message):
-    try:
-        hd = db.get("custom_head", str(message.guild.id))
-        if message.content.startswith("루냥아"):
-            raise
-        else:
-            return hd + " "
-    except:
-        return "루냥아 "
+def head(db, message, test_glyph=""):
+    if test_glyph != "_":
+        try:
+            hd = db.get("custom_head", str(message.guild.id))
+            if message.content.startswith("루냥아"):
+                raise
+            else:
+                return hd + " "
+        except:
+            return "루냥아 "
+    else:
+        return "루우냥아 "
