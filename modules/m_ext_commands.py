@@ -192,15 +192,14 @@ def ext_talk(client, message, head):
         embed=discord.Embed(title=comm_d[m], color=0xff7fff)
         return embed
     elif r != None:
-#        if message.content.startswith(head) or str(client.user.id) in message.content:
-        if True:
+        if not r:
+            return False
+        else:
             rr = random.choice(r)
             rr = rr.decode("utf-8")
             embed=discord.Embed(title=rr, color=0xff7fff)
             embed.set_footer(text="powered by PINGPONG Builder")
             return embed
-        else:
-            return None
     else:
         return None
 

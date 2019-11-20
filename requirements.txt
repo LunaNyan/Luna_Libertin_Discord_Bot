@@ -1,7 +1,9 @@
 asyncio
-discord==0.16.12
+discord.py>=1.2.5
 psutil
 configparser
 requests
 xmltodict
 wolframalpha
+py-cpuinfo
+pillow

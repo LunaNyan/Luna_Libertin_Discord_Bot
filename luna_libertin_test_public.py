@@ -6,22 +6,18 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("FATAL   : This script requires Python version 3.5")
     sys.exit(1)
 
-import time, random, re, traceback, discord, asyncio, psutil, os, random, configparser
-import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc, m_lang
+import time, random, re, traceback, discord, asyncio, psutil, os, sys, random, configparser
 from datetime import datetime, timedelta
-from m_seotda import *
+from modules.m_seotda import *
 import imp
+
+sys.path.append('./modules/')
+import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc, m_lang
+sys.path.append('../')
 
 startTime = datetime.now()
 
-import logging
-logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
-
-bot_ver = "19.0.0-rtm-19111701"
+bot_ver = "19.0.5-test-19112001"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -36,7 +32,7 @@ except:
     sys.exit(1)
 
 try:
-    db_path = "db.dat"
+    db_path = "db/db.dat"
     db = configparser.ConfigParser()
     db.read(db_path)
     print("INFO    : DB file loaded")
@@ -271,7 +267,7 @@ async def on_message(message):
     elif message.content.startswith(head_s + '공지사항'):
         i = message.content.replace(head_s + '공지사항', '')
         if i == "":
-            embed = m_board.read(1)
+            embed = m_board.read(1, db, message.author.id)
         else:
             try:
                 ix = int(i.replace(' ', ''))
@@ -337,6 +333,7 @@ async def on_message(message):
         else:
             fn = m_etc.make_color(message.content, head_s)
             await message.channel.send(file=discord.File(fn))
+            os.remove(fn)
     elif message.content.startswith(head_s + '받아쓰기'):
         if message.content == head_s + '받아쓰기':
             embed=discord.Embed(title='사용 방법 : 루냥아 받아쓰기 (텍스트)', color=0xffffff)
@@ -360,6 +357,7 @@ async def on_message(message):
         bci_str = bci_str.replace(head_s + "계산해줘 이미지 ", "")
         await message.channel.send(file=discord.File(m_wolframalpha.wa_img(conf, bci_str)))
         await message_temp.delete()
+        os.remove("wa_temp_img.gif")
     elif message.content.startswith(head_s + "캡챠 "):
         try:
             bc_str = message.content
@@ -367,6 +365,7 @@ async def on_message(message):
             bc_tmp = await message.channel.send(m_lang.string(db, message.author.id, "plz_wait"))
             await message.channel.send(file=discord.File(m_wolframalpha.wa_img(conf, "captcha " + bc_str)))
             await bc_tmp.delete()
+            os.remove("wa_temp_img.gif")
         except:
             await message.channel.send(m_lang.string(db, message.author.id, "generic_error"))
     elif message.content.startswith(head_s + "계산해줘 "):
@@ -384,7 +383,7 @@ async def on_message(message):
         except:
             await message.channel.send(m_lang.string(db, message.author.id, "recheck_algebra"))
     elif message.content.startswith(head_s + '골라줘 '):
-        await message.channel.send("**" + m_ext_commands.selectr(message.content, head_s) + m_lang.string(db, message.author.id, "selectr_tail"))
+        await message.channel.send(message.author.mention + ", **" + m_ext_commands.selectr(message.content, head_s) + m_lang.string(db, message.author.id, "selectr_tail"))
     elif message.content == head_s + "이용약관":
         await message.channel.send(embed=m_help.tos())
     elif message.content == "루냥아":
@@ -547,6 +546,8 @@ async def on_message(message):
                 await message.channel.send("```" + shl_res + "```")
         except Exception as e:
             await message.channel.send(":facepalm:" + str(e))
+    elif message.content == head_s + "stringtest"  and message.author.id == int(conf.get("config", "bot_owner")):
+        await message.channel.send(m_lang.string(db, message.author.id, "foo"))
     elif message.content == head_s + "debug message" and message.author.id == int(conf.get("config", "bot_owner")):
         l = await message.channel.history(limit=2).flatten()
         l = l[1]
@@ -704,320 +705,344 @@ async def on_message(message):
         exec(message.content.replace(head_s + "exec ", ""))
     elif message.content.startswith(head_s + 'awaitexec ') and message.author.id == int(conf.get("config", "bot_owner")):
         await exec(message.content.replace(head_s + "awaitexec ", ""))
+    elif message.content.startswith(head_s + 'say ') and message.author.id == int(conf.get("config", "bot_owner")):
+        m = message.content.replace(head_s + 'say ', '')
+        mc = m.split(" ")[0]
+        mx = m.split(" ")[1:]
+        mm = ""
+        for mxi in mx:
+            mm = mm + mxi + " "
+        c = client.get_channel(int(mc))
+        await c.send(mm)
+        await message.channel.send(c.name + "(" + str(c.id) + ") in " + c.guild.name + "(" + str(c.guild.id) + ")\n" + mm)
+    # commands for guild admins
+    # these commands will be disabled when bot is in test mode
+    elif message.content == head_s + "서버공개" and ifadmin:
+        snd = db.get("etc", "ndserver")
+        if str(message.guild.id) in snd:
+            snd = snd.replace(", " + str(message.guild.id), "")
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndserver_activated"), color=0xffffff)
+        else:
+            snd = snd + ", " + str(message.guild.id)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndserver_deactivated"), color=0xffffff)
+        db.set("etc", "ndserver", snd)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "가입일시 전체공개" and ifadmin:
+        jnd = db.get("etc", "joinedat_ndserver")
+        if str(message.guild.id) in jnd:
+            jnd = jnd.replace(", " + str(message.guild.id), "")
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndjoined_server_deactivated"), color=0xffffff)
+        else:
+            jnd = jnd + ", " + str(message.guild.id)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndjoined_server_activated"), color=0xffffff)
+        db.set("etc", "joinedat_ndserver", jnd)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + "불타는 서버 문구 ") and ifadmin:
+        m = message.content.replace(head_s + "불타는 서버 문구 ", "")
+        db.set("server_burning", str(message.guild.id), m)
+        await message.channel.send(m_lang.string(db, message.author.id, "successfully_set"))
+    elif message.content == head_s + "불타는 서버 토글" and ifadmin:
+        if scnt != -1:
+            db.set("server_count", str(message.guild.id), "-1")
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "server_burning_deactivated"), color=0xffffff)
+        else:
+            db.set("server_count", str(message.guild.id), "0")
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "server_burning_activated"), color=0xffffff)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "자가진단" and ifadmin:
+        await message.channel.send(embed=m_help.permcheck(message.guild.me.guild_permissions))
+    elif message.content.startswith(head_s + "지워줘 ") and ifadmin:
+        try:
+            pu = int(message.content.replace(head_s + "지워줘 ", ""))
+            if pu > 100 or pu < 5:
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "purge_int_error"), color=0xff0000)
+            else:
+                pl = await message.channel.purge(limit=pu)
+                pf = open("messages.txt", "w")
+                ps = "삭제된 메시지 내역\r\n-----\r\n"
+                for pm in pl:
+                    ps += "채널 : " + pm.channel.name + ", 작성자 : " + pm.author.name + ", " + pm.created_at.isoformat() + "\r\n" + pm.content + "\r\n-----\r\n"
+                pf.write(ps)
+                pf.close()
+                embed=discord.Embed(title=str(len(pl)) + m_lang.string(db, message.author.id, "purged_n"), color=0xff77ff)
+                await server_log(message, 0xff77ff, str(len(pl)) + "개의 메시지를 삭제함")
+                await server_file(message, "messages.txt")
+                os.remove("messages.txt")
+        except:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "generic_error"), description=m_lang.string(db, message.author.id, "purge_error_desc"), color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + '뮤트 ') and ifadmin:
+        ife = False
+        try:
+            m = db.get("user_mute", str(message.guild.id))
+        except:
+            m = "0"
+        if str(message.mentions[0].id) in m:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "already_muted"), color=0xff0000)
+            ife = True
+        else:
+            db.set("user_mute", str(message.guild.id), m + ", " + str(message.mentions[0].id))
+            embed=discord.Embed(title=message.mentions[0].name + m_lang.string(db, message.author.id, "muted_desc"), color=0xff0000)
+        await message.channel.send(embed=embed)
+        if ife == False:
+            try:
+                cid = db.get("server_log", str(message.guild.id))
+                cid = client.get_channel(int(cid))
+                if cid != None:
+                    embed=discord.Embed(title=message.mentions[0].name + "을(를) 뮤트함", color=0xffff00)
+                    embed.set_footer(text=message.author.name)
+                    await cid.send(embed=embed)
+                else:
+                    db.remove_option("server_log", str(message.guild.id))
+            except:
+                pass
+    elif message.content.startswith(head_s + '언뮤트 ') and ifadmin:
+        ife = False
+        try:
+            m = db.get("user_mute", str(message.guild.id))
+            if str(message.mentions[0].id) in m:
+                m = m.replace(", " + str(message.mentions[0].id), "")
+                db.set("user_mute", str(message.guild.id), m)
+                embed=discord.Embed(title=message.mentions[0].name + m_lang.string(db, message.author.id, "unmuted_desc"), color=0x00ff00)
+            else:
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "not_muted"), color=0xffff00)
+                ife = True
+        except:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "not_muting_anyone"), color=0x00ff00)
+            ife = True
+        await message.channel.send(embed=embed)
+        if ife == False:
+            try:
+                cid = db.get("server_log", str(message.guild.id))
+                cid = client.get_channel(int(cid))
+                if cid != None:
+                    embed=discord.Embed(title=message.mentions[0].name + "을(를) 언뮤트함", color=0xffff00)
+                    embed.set_footer(text=message.author.name)
+                    await cid.send(embed=embed)
+                else:
+                    db.remove_option("server_log", str(message.guild.id))
+            except:
+                pass
+    elif message.content == head_s + "로그채널 생성" and ifadmin:
+        try:
+            try:
+                cid = db.get("server_log", str(message.guild.id))
+                cid = client.get_channel(int(cid))
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "log_channel_already_exists_title"), description=cid.mention + m_lang.string(db, message.author.id, "log_channel_already_exists_desc"), color=0x00ff00)
+            except:
+                cid = await message.guild.create_text_channel("message_log", reason="메시지 삭제, 수정 시 여기에 기록됩니다")
+                db.set("server_log", str(message.guild.id), str(cid.id))
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "log_channel_created_title"), description="메시지 수정, 삭제는 " + cid.mention + m_lang.string(db, message.author.id, "log_channel_created_desc"), color=0x00ff00)
+        except:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_channel_management_title"), description=m_lang.string(db, message.author.id, "no_channel_management_desc"), color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "공지채널 추가" and ifadmin:
+        if str(message.channel.id) in db.get("etc", "news_channel"):
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "notice_channel_already"), color=0xffff00)
+        else:
+            db.set("etc", "news_channel", db.get("etc", "news_channel") + ", " + str(message.channel.id))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "notice_channel_set_title"), description=m_lang.string(db, message.author.id, "notice_channel_set_desc"), color=0x00ff00)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "공지채널 삭제" and ifadmin:
+        if ", " + str(message.channel.id) in db.get("etc", "news_channel"):
+            db.set("etc", "news_channel", db.get("etc", "news_channel").replace(", " + str(message.channel.id), ""))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "notice_channel_unset"), color=0x00ff00)
+        else:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "not_notice_channel"), color=0xffff00)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "채널연결 생성" and ifadmin:
+        i = m_ctclink.generate_code(message.channel.id, db)
+        if i != False:
+            embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_code_created"), description=m_lang.string(db, message.author.id, "ctc_code_desc") + i, color=0x00ff00)
+        else:
+            if m_ctclink.get_link(message.channel.id, db) != False:
+                embed = discord.Embed(title=m_lang.string(db, message.author.id, "already_ctc"), color=0xff0000)
+            else:
+                i = m_ctclink.get_link(message.channel.id, db)
+                embed = discord.Embed(title=m_lang.string(db, message.author.id, "no_ctc_connected_title"), description=m_lang.string(db, message.author.id, "ctc_code_desc") + m_ctclink.prev_code)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + '채널연결 접속 ') and ifadmin:
+        i = message.content.replace(head_s + "채널연결 접속 ", "")
+        c = m_ctclink.get_channel_code(message.channel.id, i, db)
+        if c == False:
+            embed = discord.Embed(title=m_lang.string(db, message.author.id, "invalid_ctc_code"), color=0xff0000)
+        else:
+            ch = client.get_channel(int(c))
+            embed = discord.Embed(title="채널 연결 완료!", description=ch.guild.name + "의 " + ch.name + m_lang.string(db, message.author.id, "ctc_created"), color=0x00ff00)
+            embed2 = discord.Embed(title="채널 연결 완료!", description=message.guild.name + "의 " + message.channel.name + m_lang.string(db, message.author.id, "ctc_created"), color=0x00ff00)
+            await ch.send(embed=embed2)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "채널연결 삭제" and ifadmin:
+        if cr0 == False:
+            if m_ctclink.remove_pending(message.channel.id, db) == True:
+                embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_canceled"), color=0xffff00)
+            else:
+                embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_not_connected"), color=0xff0000)
+        else:
+            m_ctclink.remove_link(message.channel.id, db)
+            cr = client.get_channel(int(cr0))
+            embed2 = discord.Embed(title=message.guild.name + "의 " + message.channel.name + " 채널과의 연결이 " + message.author.name + m_lang.string(db, message.author.id, "ctc_deleted_another"), color=0xff0000)
+            await cr.send(embed=embed2)
+            embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_deleted"), color=0x00ff00)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "채널연결 정보" and ifadmin:
+        if cr0 != False:
+            cr = client.get_channel(int(cr0))
+            embed = discord.Embed(title="채널연결 정보", color=0xffffff)
+            embed.add_field(name="연결된 서버 이름", value=cr.guild.name, inline=False)
+            embed.add_field(name="연결된 채널 이름", value=cr.name, inline=False)
+            embed.add_field(name="연결 코드", value=m_ctclink.get_code(message.channel.id, db))
+        else:
+            embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_not_connected"), color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + '채널연결 debug ') and ifadmin:
+        m = message.content.replace(head_s + '채널연결 debug ', '')
+        n = m_ctclink.get_link_by_code(m, db)
+        await message.channel.send(n)
+    elif message.content.startswith(head_s + '킥') and ifadmin:
+        try:
+            if not message.mentions:
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "define_user_to_kick"), color=0xffff00)
+            else:
+                await message.mentions[0].kick()
+                embed=discord.Embed(title=message.mentions[0].name + m_lang.string(db, message.author.id, "kicked"), color=0xffff00)
+                await server_log(message, 0xffff00, message.mentions[0].name + "을(를) 킥함")
+        except Exception as e:
+            print(str(e))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_user_management_title"), description=m_lang.string(db, message.author.id, "no_user_management_desc"), color=0xffff00)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + '밴') and ifadmin:
+        try:
+            if message.content == head_s + "밴":
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "define_user_to_ban"), color=0xff0000)
+            else:
+                b = message.content.replace(head_s + '밴 ', '')
+                if not message.mentions:
+                    b = int(b)
+                    busr = await client.fetch_user(b)
+                    if b == None:
+                        embed=discord.Embed(title=m_lang.string(db, message.author.id, "user_not_found"), color=0xff0000)
+                    else:
+                        await message.guild.ban(user=busr)
+                else:
+                    busr = message.mentions[0]
+                    await message.guild.ban(user=busr)
+                embed=discord.Embed(title=busr.name + m_lang.string(db, message.author.id, "banned"), color=0xff0000)
+                await server_log(message, 0xffff00, busr.name + "을(를) 밴함")
+        except:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_user_management_title"), description=m_lang.string(db, message.author.id, "no_user_management_desc"), color=0xffff00)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "초대링크 생성" and ifadmin:
+        try:
+            inv = await message.channel.create_invite()
+            await message.channel.send(inv.url)
+            await server_log(message, 0xffff00, "즉석 초대를 생성함", inv.url)
+        except:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "generic_error"), description=m_lang.string(db, message.author.id, "lack_permissions"), color=0xff0000)
+            await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + "환영인사 ") and ifadmin:
+        if message.content == head_s + "환영인사 삭제":
+            try:
+                db.remove_option("welcome_message", str(message.guild.id))
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "welcome_message_deleted"), color=0x00ff00)
+            except:
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "welcome_message_not_set"), color=0xff0000)
+        else:
+            if not " | " in message.content:
+                db.set("welcome_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace(head_s + "환영메시지 ", ""))
+                embed = discord.Embed(title=m_lang.string(db, message.author.id, "welcome_message_set_title"), description=m_lang.string(db, message.author.id, "welcome_message_set_desc"), color=0x00ff00)
+            else:
+                embed = discord.Embed(title=m_lang.string(db, message.author.id, "unallowed_glyph"), description=m_lang.string(db, message.author.id, "unallowed_glyph_desc_1"), color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + "작별인사 ") and ifadmin:
+        if message.content == head_s + "작별인사 삭제":
+            try:
+                db.remove_option("farewell_message", str(message.guild.id))
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "farewell_message_deleted"), color=0x00ff00)
+            except:
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "farewell_message_not_set"), color=0xff0000)
+        else:
+            if not " | " in message.content:
+                db.set("farewell_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace(head_s + "작별메시지 ", ""))
+                embed = discord.Embed(title=m_lang.string(db, message.author.id, "farewell_message_set_title"), description=m_lang.string(db, message.author.id, "farewell_message_set_desc"), color=0x00ff00)
+            else:
+                embed = discord.Embed(title=m_lang.string(db, message.author.id, "unallowed_glyph"), description=m_lang.string(db, message.author.id, "unallowed_glyph_desc_1"), color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content.startswith(head_s + "접두어 설정 ") and ifadmin:
+        hst = message.content.replace(head_s + "접두어 설정 ", "")
+        db.set("custom_head", str(message.guild.id), hst)
+        embed=discord.Embed(title='서버의 지정 접두어가 "' + hst + m_lang.string(db, message.author.id, "custom_head_set_title"), description=m_lang.string(db, message.author.id, "custom_head_set_desc"), color=0xffffff)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "금지채널 추가" and ifadmin:
+        dst = db.get("etc", "denied_channel")
+        if str(message.channel.id) in dst:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "already_muted_channel"), color=0xff0000)
+        else:
+            dst = dst + ", " + str(message.channel.id)
+            db.set("etc", "denied_channel", dst)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "muted_channel_title"), description=m_lang.string(db, message.author.id, "muted_channel_desc"), color=0xffffff)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "애드블락 추가" and ifadmin:
+        ast = db.get("etc", "adblock_channel")
+        if str(message.channel.id) in ast:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "already_adblock"), color=0xff0000)
+        else:
+            ast = ast + ", " + str(message.channel.id)
+            db.set("etc", "adblock_channel", ast)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "adblock_added_title"), description=m_lang.string(db, message.author.id, "adblock_added_desc"), color=0xffff00)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "애드블락 삭제" and ifadmin:
+        ast = db.get("etc", "adblock_channel")
+        if str(message.channel.id) in ast:
+            ast = ast.replace(", " + str(message.channel.id), "")
+            db.set("etc", "adblock_channel", ast)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "adblock_deleted"), color=0xffff00)
+        else:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_adblock"), color=0xff0000)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "유저패시브" and ifadmin:
+        pst = db.get("etc", "passive_denied")
+        if str(message.guild.id) in pst:
+            pst = pst.replace(", " + str(message.guild.id), "")
+            db.set("etc", "passive_denied", pst)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "user_passive_allowed"), color=0xffff00)
+        else:
+            pst = pst + ", " + str(message.guild.id)
+            db.set("etc", "passive_denied", pst)
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "user_passive_denied"), color=0xffff00)
+        await message.channel.send(embed=embed)
+    elif message.content == head_s + "야짤채널" and ifadmin:
+        if str(message.channel.id) in db.get("etc", "nsfw_channel"):
+            db.set("etc", "nsfw_channel", db.get("etc", "nsfw_channel").replace(", " + str(message.channel.id), ""))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "nsfw_neko_denied"), color=0xffff00)
+            await message.channel.send(embed=embed)
+        else:
+            db.set("etc", "nsfw_channel", db.get("etc", "nsfw_channel") + ", " + str(message.channel.id))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "nsfw_neko_allowed"), color=0xffff00)
+            await message.channel.send(embed=embed)
+    elif message.content == head_s + "일상대화 접두어" and ifadmin:
+        if str(message.guild.id) in db.get("etc", "pingpong_headless"):
+            db.set("etc", "pingpong_headless", db.get("etc", "pingpong_headless").replace(", " + str(message.guild.id), ""))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "pingpong_headless_denied"), color=0xffff00)
+            await message.channel.send(embed=embed)
+        else:
+            db.set("etc", "pingpong_headless", db.get("etc", "pingpong_headless") + ", " + str(message.guild.id))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "pingpong_headless_allowed"), color=0xffff00)
+            await message.channel.send(embed=embed)
     else:
         res = m_ext_commands.ext_talk(client, message, head_s)
         res2 = m_user.guild_custom_commands(db, message)
-        if res != None and res2 == None:
-            await message.channel.send(embed=res)
-        elif res == None and res2 != None:
+        if res != None:
+            if str(message.guild.id) in db.get("etc", "pingpong_headless"):
+                await message.channel.send(embed=res)
+            elif message.content.startswith(head_s):
+                await message.channel.send(embed=res)
+            else:
+                pass
+        elif res2 != None:
             await message.channel.send(res2)
         else:
             pass
-    # commands for guild admins
-    # these commands will be disabled when bot is in test mode
-    if test_glyph != "_":
-        if message.content == head_s + "서버공개" and ifadmin:
-            snd = db.get("etc", "ndserver")
-            if str(message.guild.id) in snd:
-                snd = snd.replace(", " + str(message.guild.id), "")
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndserver_activated"), color=0xffffff)
-            else:
-                snd = snd + ", " + str(message.guild.id)
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndserver_deactivated"), color=0xffffff)
-            db.set("etc", "ndserver", snd)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "가입일시 전체공개" and ifadmin:
-            jnd = db.get("etc", "joinedat_ndserver")
-            if str(message.guild.id) in jnd:
-                jnd = jnd.replace(", " + str(message.guild.id), "")
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndjoined_server_deactivated"), color=0xffffff)
-            else:
-                jnd = jnd + ", " + str(message.guild.id)
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndjoined_server_activated"), color=0xffffff)
-            db.set("etc", "joinedat_ndserver", jnd)
-            await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + "불타는 서버 문구 ") and ifadmin:
-            m = message.content.replace(head_s + "불타는 서버 문구 ", "")
-            db.set("server_burning", str(message.guild.id), m)
-            await message.channel.send(m_lang.string(db, message.author.id, "successfully_set"))
-        elif message.content == head_s + "불타는 서버 토글" and ifadmin:
-            if scnt != -1:
-                db.set("server_count", str(message.guild.id), "-1")
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "server_burning_deactivated"), color=0xffffff)
-            else:
-                db.set("server_count", str(message.guild.id), "0")
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "server_burning_activated"), color=0xffffff)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "자가진단" and ifadmin:
-            await message.channel.send(embed=m_help.permcheck(message.guild.me.guild_permissions))
-        elif message.content.startswith(head_s + "지워줘 ") and ifadmin:
-            try:
-                pu = int(message.content.replace(head_s + "지워줘 ", ""))
-                if pu > 100 or pu < 5:
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "purge_int_error"), color=0xff0000)
-                else:
-                    pl = await message.channel.purge(limit=pu)
-                    pf = open("messages.txt", "w")
-                    ps = "삭제된 메시지 내역\r\n-----\r\n"
-                    for pm in pl:
-                        ps += "채널 : " + pm.channel.name + ", 작성자 : " + pm.author.name + ", " + pm.created_at.isoformat() + "\r\n" + pm.content + "\r\n-----\r\n"
-                    pf.write(ps)
-                    pf.close()
-                    embed=discord.Embed(title=str(len(pl)) + m_lang.string(db, message.author.id, "purged_n"), color=0xff77ff)
-                    await server_log(message, 0xff77ff, str(len(pl)) + "개의 메시지를 삭제함")
-                    await server_file(message, "messages.txt")
-            except:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "generic_error"), description=m_lang.string(db, message.author.id, "purge_error_desc"), color=0xff0000)
-            await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + '뮤트 ') and ifadmin:
-            ife = False
-            try:
-                m = db.get("user_mute", str(message.guild.id))
-            except:
-                m = "0"
-            if str(message.mentions[0].id) in m:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "already_muted"), color=0xff0000)
-                ife = True
-            else:
-                db.set("user_mute", str(message.guild.id), m + ", " + str(message.mentions[0].id))
-                embed=discord.Embed(title=message.mentions[0].name + m_lang.string(db, message.author.id, "muted_desc"), color=0xff0000)
-            await message.channel.send(embed=embed)
-            if ife == False:
-                try:
-                    cid = db.get("server_log", str(message.guild.id))
-                    cid = client.get_channel(int(cid))
-                    if cid != None:
-                        embed=discord.Embed(title=message.mentions[0].name + "을(를) 뮤트함", color=0xffff00)
-                        embed.set_footer(text=message.author.name)
-                        await cid.send(embed=embed)
-                    else:
-                        db.remove_option("server_log", str(message.guild.id))
-                except:
-                    pass
-        elif message.content.startswith(head_s + '언뮤트 ') and ifadmin:
-            ife = False
-            try:
-                m = db.get("user_mute", str(message.guild.id))
-                if str(message.mentions[0].id) in m:
-                    m = m.replace(", " + str(message.mentions[0].id), "")
-                    db.set("user_mute", str(message.guild.id), m)
-                    embed=discord.Embed(title=message.mentions[0].name + m_lang.string(db, message.author.id, "unmuted_desc"), color=0x00ff00)
-                else:
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "not_muted"), color=0xffff00)
-                    ife = True
-            except:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "not_muting_anyone"), color=0x00ff00)
-                ife = True
-            await message.channel.send(embed=embed)
-            if ife == False:
-                try:
-                    cid = db.get("server_log", str(message.guild.id))
-                    cid = client.get_channel(int(cid))
-                    if cid != None:
-                        embed=discord.Embed(title=message.mentions[0].name + "을(를) 언뮤트함", color=0xffff00)
-                        embed.set_footer(text=message.author.name)
-                        await cid.send(embed=embed)
-                    else:
-                        db.remove_option("server_log", str(message.guild.id))
-                except:
-                    pass
-        elif message.content == head_s + "로그채널 생성" and ifadmin:
-            try:
-                try:
-                    cid = db.get("server_log", str(message.guild.id))
-                    cid = client.get_channel(int(cid))
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "log_channel_already_exists_title"), description=cid.mention + m_lang.string(db, message.author.id, "log_channel_already_exists_desc"), color=0x00ff00)
-                except:
-                    cid = await message.guild.create_text_channel("message_log", reason="메시지 삭제, 수정 시 여기에 기록됩니다")
-                    db.set("server_log", str(message.guild.id), str(cid.id))
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "log_channel_created_title"), description="메시지 수정, 삭제는 " + cid.mention + m_lang.string(db, message.author.id, "log_channel_created_desc"), color=0x00ff00)
-            except:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_channel_management_title"), description=m_lang.string(db, message.author.id, "no_channel_management_desc"), color=0xff0000)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "공지채널 추가" and ifadmin:
-            if str(message.channel.id) in db.get("etc", "news_channel"):
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "notice_channel_already"), color=0xffff00)
-            else:
-                db.set("etc", "news_channel", db.get("etc", "news_channel") + ", " + str(message.channel.id))
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "notice_channel_set_title"), description=m_lang.string(db, message.author.id, "notice_channel_set_desc"), color=0x00ff00)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "공지채널 삭제" and ifadmin:
-            if ", " + str(message.channel.id) in db.get("etc", "news_channel"):
-                db.set("etc", "news_channel", db.get("etc", "news_channel").replace(", " + str(message.channel.id), ""))
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "notice_channel_unset"), color=0x00ff00)
-            else:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "not_notice_channel"), color=0xffff00)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "채널연결 생성" and ifadmin:
-            i = m_ctclink.generate_code(message.channel.id, db)
-            if i != False:
-                embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_code_created"), description=m_lang.string(db, message.author.id, "ctc_code_desc") + i, color=0x00ff00)
-            else:
-                if m_ctclink.get_link(message.channel.id, db) != False:
-                    embed = discord.Embed(title=m_lang.string(db, message.author.id, "already_ctc"), color=0xff0000)
-                else:
-                    i = m_ctclink.get_link(message.channel.id, db)
-                    embed = discord.Embed(title=m_lang.string(db, message.author.id, "no_ctc_connected_title"), description=m_lang.string(db, message.author.id, "ctc_code_desc") + m_ctclink.prev_code)
-            await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + '채널연결 접속 ') and ifadmin:
-            i = message.content.replace(head_s + "채널연결 접속 ", "")
-            c = m_ctclink.get_channel_code(message.channel.id, i, db)
-            if c == False:
-                embed = discord.Embed(title=m_lang.string(db, message.author.id, "invalid_ctc_code"), color=0xff0000)
-            else:
-                ch = client.get_channel(int(c))
-                embed = discord.Embed(title="채널 연결 완료!", description=ch.guild.name + "의 " + ch.name + m_lang.string(db, message.author.id, "ctc_created"), color=0x00ff00)
-                embed2 = discord.Embed(title="채널 연결 완료!", description=message.guild.name + "의 " + message.channel.name + m_lang.string(db, message.author.id, "ctc_created"), color=0x00ff00)
-                await ch.send(embed=embed2)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "채널연결 삭제" and ifadmin:
-            if cr0 == False:
-                if m_ctclink.remove_pending(message.channel.id, db) == True:
-                    embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_canceled"), color=0xffff00)
-                else:
-                    embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_not_connected"), color=0xff0000)
-            else:
-                m_ctclink.remove_link(message.channel.id, db)
-                cr = client.get_channel(int(cr0))
-                embed2 = discord.Embed(title=message.guild.name + "의 " + message.channel.name + " 채널과의 연결이 " + message.author.name + m_lang.string(db, message.author.id, "ctc_deleted_another"), color=0xff0000)
-                await cr.send(embed=embed2)
-                embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_deleted"), color=0x00ff00)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "채널연결 정보" and ifadmin:
-            if cr0 != False:
-                cr = client.get_channel(int(cr0))
-                embed = discord.Embed(title="채널연결 정보", color=0xffffff)
-                embed.add_field(name="연결된 서버 이름", value=cr.guild.name, inline=False)
-                embed.add_field(name="연결된 채널 이름", value=cr.name, inline=False)
-                embed.add_field(name="연결 코드", value=m_ctclink.get_code(message.channel.id, db))
-            else:
-                embed = discord.Embed(title=m_lang.string(db, message.author.id, "ctc_not_connected"), color=0xff0000)
-            await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + '채널연결 debug ') and ifadmin:
-            m = message.content.replace(head_s + '채널연결 debug ', '')
-            n = m_ctclink.get_link_by_code(m, db)
-            await message.channel.send(n)
-        elif message.content.startswith(head_s + '킥') and ifadmin:
-            try:
-                if not message.mentions:
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "define_user_to_kick"), color=0xffff00)
-                else:
-                    await message.mentions[0].kick()
-                    embed=discord.Embed(title=message.mentions[0].name + m_lang.string(db, message.author.id, "kicked"), color=0xffff00)
-                    await server_log(message, 0xffff00, message.mentions[0].name + "을(를) 킥함")
-            except Exception as e:
-                print(str(e))
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_user_management_title"), description=m_lang.string(db, message.author.id, "no_user_management_desc"), color=0xffff00)
-            await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + '밴') and ifadmin:
-            try:
-                if message.content == head_s + "밴":
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "define_user_to_ban"), color=0xff0000)
-                else:
-                    b = message.content.replace(head_s + '밴 ', '')
-                    if not message.mentions:
-                        b = int(b)
-                        busr = await client.fetch_user(b)
-                        if b == None:
-                            embed=discord.Embed(title=m_lang.string(db, message.author.id, "user_not_found"), color=0xff0000)
-                        else:
-                            await message.guild.ban(user=busr)
-                    else:
-                        busr = message.mentions[0]
-                        await message.guild.ban(user=busr)
-                    embed=discord.Embed(title=busr.name + m_lang.string(db, message.author.id, "banned"), color=0xff0000)
-                    await server_log(message, 0xffff00, busr.name + "을(를) 밴함")
-            except:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_user_management_title"), description=m_lang.string(db, message.author.id, "no_user_management_desc"), color=0xffff00)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "초대링크 생성" and ifadmin:
-            try:
-                inv = await message.channel.create_invite()
-                await message.channel.send(inv.url)
-                await server_log(message, 0xffff00, "즉석 초대를 생성함", inv.url)
-            except:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "generic_error"), description=m_lang.string(db, message.author.id, "lack_permissions"), color=0xff0000)
-                await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + "환영인사 ") and ifadmin:
-            if message.content == head_s + "환영인사 삭제":
-                try:
-                    db.remove_option("welcome_message", str(message.guild.id))
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "welcome_message_deleted"), color=0x00ff00)
-                except:
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "welcome_message_not_set"), color=0xff0000)
-            else:
-                if not " | " in message.content:
-                    db.set("welcome_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace(head_s + "환영메시지 ", ""))
-                    embed = discord.Embed(title=m_lang.string(db, message.author.id, "welcome_message_set_title"), description=m_lang.string(db, message.author.id, "welcome_message_set_desc"), color=0x00ff00)
-                else:
-                    embed = discord.Embed(title=m_lang.string(db, message.author.id, "unallowed_glyph"), description=m_lang.string(db, message.author.id, "unallowed_glyph_desc_1"), color=0xff0000)
-            await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + "작별인사 ") and ifadmin:
-            if message.content == head_s + "작별인사 삭제":
-                try:
-                    db.remove_option("farewell_message", str(message.guild.id))
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "farewell_message_deleted"), color=0x00ff00)
-                except:
-                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "farewell_message_not_set"), color=0xff0000)
-            else:
-                if not " | " in message.content:
-                    db.set("farewell_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace(head_s + "작별메시지 ", ""))
-                    embed = discord.Embed(title=m_lang.string(db, message.author.id, "farewell_message_set_title"), description=m_lang.string(db, message.author.id, "farewell_message_set_desc"), color=0x00ff00)
-                else:
-                    embed = discord.Embed(title=m_lang.string(db, message.author.id, "unallowed_glyph"), description=m_lang.string(db, message.author.id, "unallowed_glyph_desc_1"), color=0xff0000)
-            await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + "접두어 설정 ") and ifadmin:
-            hst = message.content.replace(head_s + "접두어 설정 ", "")
-            db.set("custom_head", str(message.guild.id), hst)
-            embed=discord.Embed(title='서버의 지정 접두어가 "' + hst + m_lang.string(db, message.author.id, "custom_head_set_title"), description=m_lang.string(db, message.author.id, "custom_head_set_desc"), color=0xffffff)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "금지채널 추가" and ifadmin:
-            dst = db.get("etc", "denied_channel")
-            if str(message.channel.id) in dst:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "already_muted_channel"), color=0xff0000)
-            else:
-                dst = dst + ", " + str(message.channel.id)
-                db.set("etc", "denied_channel", dst)
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "muted_channel_title"), description=m_lang.string(db, message.author.id, "muted_channel_desc"), color=0xffffff)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "애드블락 추가" and ifadmin:
-            ast = db.get("etc", "adblock_channel")
-            if str(message.channel.id) in ast:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "already_adblock"), color=0xff0000)
-            else:
-                ast = ast + ", " + str(message.channel.id)
-                db.set("etc", "adblock_channel", ast)
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "adblock_added_title"), description=m_lang.string(db, message.author.id, "adblock_added_desc"), color=0xffff00)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "애드블락 삭제" and ifadmin:
-            ast = db.get("etc", "adblock_channel")
-            if str(message.channel.id) in ast:
-                ast = ast.replace(", " + str(message.channel.id), "")
-                db.set("etc", "adblock_channel", ast)
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "adblock_deleted"), color=0xffff00)
-            else:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_adblock"), color=0xff0000)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "유저패시브" and ifadmin:
-            pst = db.get("etc", "passive_denied")
-            if str(message.guild.id) in pst:
-                pst = pst.replace(", " + str(message.guild.id), "")
-                db.set("etc", "passive_denied", pst)
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "user_passive_allowed"), color=0xffff00)
-            else:
-                pst = pst + ", " + str(message.guild.id)
-                db.set("etc", "passive_denied", pst)
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "user_passive_denied"), color=0xffff00)
-            await message.channel.send(embed=embed)
-        elif message.content == head_s + "야짤채널" and ifadmin:
-            if str(message.channel.id) in db.get("etc", "nsfw_channel"):
-                db.set("etc", "nsfw_channel", db.get("etc", "nsfw_channel").replace(", " + str(message.channel.id), ""))
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "nsfw_neko_denied"), color=0xffff00)
-                await message.channel.send(embed=embed)
-            else:
-                db.set("etc", "nsfw_channel", db.get("etc", "nsfw_channel") + ", " + str(message.channel.id))
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "nsfw_neko_allowed"), color=0xffff00)
-                await message.channel.send(embed=embed)
     with open(db_path, 'w') as configfile:
         db.write(configfile)
 
@@ -1090,9 +1115,10 @@ async def on_member_join(member):
         a = db.get("welcome_message", s)
         a = a.split("|")
         c = client.get_channel(int(a[0]))
-        c = c.replace("[멘션]", message.author.mention)
-        c = c.replace("[이름]", message.author.name)
-        await c.send(a[1])
+        m = a[1]
+        m = m.replace("[멘션]", member.mention)
+        m = m.replace("[이름]", member.name)
+        await ch.send(m)
 
 @client.event
 async def on_member_remove(member):
@@ -1102,8 +1128,9 @@ async def on_member_remove(member):
         a = db.get("farewell_message", s)
         a = a.split("|")
         c = client.get_channel(int(a[0]))
-        c = c.replace("[이름]", message.author.name)
-        await c.send(a[1])
+        m = a[1]
+        m = m.replace("[이름]", member.name)
+        await c.send(m)
 
 @client.event
 async def on_member_update(before, after):

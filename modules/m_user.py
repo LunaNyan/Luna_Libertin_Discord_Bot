@@ -321,7 +321,8 @@ def guild_custom_commands(db, message):
             react = random.choice(react)
         react = react.replace("[멘션]", message.author.mention)
         react = react.replace("[이름]", message.author.display_name)
-        return react
+        n = m_etc.get_name(a.split(" | ")[1])
+        return react + "\n`작성자 : " + n + "`"
     except:
         return None
 
@@ -333,7 +334,7 @@ def make_custom_commands(db, message):
         i = db.get("custom_commands", str(message.guild.id) + "_" + m[0])
         i = i.split(" | ")[1]
         editing_m = m_lang.string(db, message.author.id, "custom_command_edit")
-        if message.author.guild_permissions.administrator != False and str(message.author.id) != i:
+        if message.author.guild_permissions.administrator == False and str(message.author.id) != i:
             embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_edit"), color=0xff000)
         else:
             raise
@@ -427,7 +428,7 @@ def unsleep(db, message, dt):
     embed.add_field(name="잠수 시간", value=str(t), inline=False)
     return embed
 
-def head(db, message, test_glyph):
+def head(db, message, test_glyph=""):
     if test_glyph != "_":
         try:
             hd = db.get("custom_head", str(message.guild.id))

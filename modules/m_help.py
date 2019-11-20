@@ -249,6 +249,7 @@ def get_info_public(uptime, servername, bot_ver):
     embed.add_field(name="서버 이름", value=servername, inline=False)
     embed.add_field(name="CPU", value=cpuinfo.get_cpu_info()["brand"], inline=False)
     embed.add_field(name="RAM 용량", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB")
+    embed.add_field(name="운영체제 버전", value="VxWorks 7 SMP 64-bit", inline=False)
     embed.add_field(name="Python 버전", value=cpuinfo.get_cpu_info()["python_version"].replace(".final.0", ""), inline=False)
     embed.add_field(name="Discord.py 버전", value=discord.__version__, inline=False)
     embed.add_field(name="동작 시간", value=uptime, inline=False)

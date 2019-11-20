@@ -16,12 +16,12 @@ def string(db, id, call):
         try:
             s = kr_def.get("string", call)
         except:
-            s = "내부 시스템 오류 : 스트링 " + call + "에 대한 언어 데이터를 찾을 수 없습니다"
+            s = "내부 시스템 오류 : 언어 " + l + "에서 스트링 " + call + "을 찾을 수 없습니다"
     elif l == "ban":
         try:
             s = kr_ban.get("string", call)
         except:
-            s = "내부 시스템 오류 : 스트링 " + call + "에 대한 언어 데이터를 찾을 수 없습니다"
+            s = "내부 시스템 오류 : 언어 " + l + "에서 스트링 " + call + "을 찾을 수 없습니다"
     return s
 
 def check_lang(db, id):
