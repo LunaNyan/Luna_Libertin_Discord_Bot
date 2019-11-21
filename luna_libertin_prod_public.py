@@ -21,7 +21,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "19.0.4"
+bot_ver = "19.0.5"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -949,7 +949,7 @@ async def on_message(message):
                 embed=discord.Embed(title=m_lang.string(db, message.author.id, "welcome_message_not_set"), color=0xff0000)
         else:
             if not " | " in message.content:
-                db.set("welcome_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace(head_s + "환영메시지 ", ""))
+                db.set("welcome_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace(head_s + "환영인사 ", ""))
                 embed = discord.Embed(title=m_lang.string(db, message.author.id, "welcome_message_set_title"), description=m_lang.string(db, message.author.id, "welcome_message_set_desc"), color=0x00ff00)
             else:
                 embed = discord.Embed(title=m_lang.string(db, message.author.id, "unallowed_glyph"), description=m_lang.string(db, message.author.id, "unallowed_glyph_desc_1"), color=0xff0000)
@@ -963,7 +963,7 @@ async def on_message(message):
                 embed=discord.Embed(title=m_lang.string(db, message.author.id, "farewell_message_not_set"), color=0xff0000)
         else:
             if not " | " in message.content:
-                db.set("farewell_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace(head_s + "작별메시지 ", ""))
+                db.set("farewell_message", str(message.guild.id), str(message.channel.id) + " | " + message.content.replace(head_s + "작별인사 ", ""))
                 embed = discord.Embed(title=m_lang.string(db, message.author.id, "farewell_message_set_title"), description=m_lang.string(db, message.author.id, "farewell_message_set_desc"), color=0x00ff00)
             else:
                 embed = discord.Embed(title=m_lang.string(db, message.author.id, "unallowed_glyph"), description=m_lang.string(db, message.author.id, "unallowed_glyph_desc_1"), color=0xff0000)
@@ -1118,7 +1118,7 @@ async def on_member_join(member):
         m = a[1]
         m = m.replace("[멘션]", member.mention)
         m = m.replace("[이름]", member.name)
-        await ch.send(m)
+        await c.send(m)
 
 @client.event
 async def on_member_remove(member):
