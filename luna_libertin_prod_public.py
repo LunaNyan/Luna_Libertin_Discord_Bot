@@ -21,7 +21,7 @@ handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-bot_ver = "19.0.3"
+bot_ver = "19.0.4"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -384,7 +384,7 @@ async def on_message(message):
         except:
             await message.channel.send(m_lang.string(db, message.author.id, "recheck_algebra"))
     elif message.content.startswith(head_s + '골라줘 '):
-        await message.channel.send("**" + m_ext_commands.selectr(message.content, head_s) + m_lang.string(db, message.author.id, "selectr_tail"))
+        await message.channel.send(message.author.mention + ", **" + m_ext_commands.selectr(message.content, head_s) + m_lang.string(db, message.author.id, "selectr_tail"))
     elif message.content == head_s + "이용약관":
         await message.channel.send(embed=m_help.tos())
     elif message.content == "루냥아":
@@ -422,7 +422,7 @@ async def on_message(message):
         await message.channel.send(embed=m_user.make_custom_commands(db, message))
     elif message.content.startswith(head_s + '잊어 '):
         await message.channel.send(embed=m_user.remove_custom_commands(db, message))
-    elif message.content == head_s + "배운거":
+    elif message.content.startswith(head_s + "배운거"):
         await message.channel.send(embed=m_user.list_custom_commands(db, message, head_s))
     elif message.content == head_s + "서버정보":
         await message.channel.send(embed=m_user.serverinfo(db, message))
@@ -1115,9 +1115,10 @@ async def on_member_join(member):
         a = db.get("welcome_message", s)
         a = a.split("|")
         c = client.get_channel(int(a[0]))
-        c = c.replace("[멘션]", message.author.mention)
-        c = c.replace("[이름]", message.author.name)
-        await c.send(a[1])
+        m = a[1]
+        m = m.replace("[멘션]", member.mention)
+        m = m.replace("[이름]", member.name)
+        await ch.send(m)
 
 @client.event
 async def on_member_remove(member):
@@ -1127,8 +1128,9 @@ async def on_member_remove(member):
         a = db.get("farewell_message", s)
         a = a.split("|")
         c = client.get_channel(int(a[0]))
-        c = c.replace("[이름]", message.author.name)
-        await c.send(a[1])
+        m = a[1]
+        m = m.replace("[이름]", member.name)
+        await c.send(m)
 
 @client.event
 async def on_member_update(before, after):
