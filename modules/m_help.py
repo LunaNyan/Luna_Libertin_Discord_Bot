@@ -25,7 +25,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed=discord.Embed(title="도움말", description="전체 명령어 목록", color=0x8080ff)
         embed.add_field(name="도움말", value="루냥아 (항목) 도와줘, 루냥아 누구니, 루냥아 소스코드", inline=False)
         embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말)", inline=False)
-        embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임), 루냥아 생성일시공개", inline=False)
+        embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임), 루냥아 생성일시공개, 루냥아 반모", inline=False)
         embed.add_field(name="메모", value="루냥아 메모 (내용), 루냥아 메모 목록 (페이지), 루냥아 메모 삭제 (번호)", inline=False)
         embed.add_field(name="서버", value="루냥아 서버정보, 루냥아 서버설정, 루냥아 서버아이콘, 루냥아 가입일시공개, 루냥아 배워, 루냥아 잊어, 루냥아 배운거", inline=False)
         embed.add_field(name="정보", value="루냥아 이용약관, 루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 성능, 루냥아 후원", inline=False)
@@ -56,6 +56,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="루냥아 거울 (멘션)", value="멘션된 유저, 또는 멘션이 없는 경우 자신의 프로필 사진을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 닉변 (닉네임)", value="닉네임을 변경합니다", inline=False)
         embed.add_field(name="루냥아 생성일시공개", value="계정의 생성 일시 공개 여부를 토글합니다", inline=False)
+        embed.add_field(name="루냥아 반모", value="반말모드 사용 여부를 토글합니다", inline=False)
     elif a == '메모':
         embed=discord.Embed(title="도움말", description="메모 항목", color=0xffff00)
         embed.add_field(name="루냥아 메모 (내용)", value="최대 30개까지 메모를 작성합니다\n작성된 메모는 목록 첫번째 위치에 기록됩니다", inline=False)
@@ -133,7 +134,7 @@ def help(user, client, text, bot_ver, head, mode):
             embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
             embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보", inline=False)
             embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
-            embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 접두어 설정 (접두어), 루냥아 불타는 서버 문구", inline=False)
+            embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 접두어 설정 (접두어), 루냥아 불타는 서버 문구, 루냥아 일상대화 접두어, 루냥아 서버 지정 명령어 접두어", inline=False)
         elif a == '관리자 공지':
             embed=discord.Embed(title="관리자 기능 도움말", description="공지", color=0xff0000)
             embed.add_field(name="루냥아 공지채널 추가", value="현재 채널을 알림 채널로 추가합니다", inline=False)
@@ -171,6 +172,8 @@ def help(user, client, text, bot_ver, head, mode):
             embed.add_field(name="루냥아 가입일시 전체공개", value="모든 사용자의 서버 가입 일시 공개 여부를 토글합니다", inline=False)
             embed.add_field(name="루냥아 접두어 설정 (접두어)", value="서버 지정 접두어를 설정합니다", inline=False)
             embed.add_field(name="루냥아 불타는 서버 문구", value="불타는 서버 패시브의 문구를 지정합니다", inline=False)
+            embed.add_field(name="루냥아 일상대화 접두어", value="일상대화에 접두어를 필수로 요구할지 결정합니다", inline=False)
+            embed.add_field(name="루냥아 서버 지정 명령어 접두어", value="서버 지정 명령어에 접두어를 필수로 요구할지 결정합니다", inline=False)
     else:
         embed=discord.Embed(title='해당 항목에 대한 도움말을 찾을 수 없어요!', description='전체 도움말을 원하신다면 "루냥아 전체 명령어 도와줘"를 입력해주세요!')
     return embed
@@ -270,6 +273,7 @@ def selfintro(client, bot_ver):
     embed=discord.Embed(title="기계식 루냥이", color=0xffffff)
     embed.add_field(name="제작자", value="libertin#2340", inline=True)
     embed.add_field(name="도와주신 분들", value="[Katinor](https://twitter.com/icoRayner)\n[Seia](https://twitter.com/Seia_Soto)\n[perillamint](https://twitter.com/perillamint)", inline=True)
+    embed.add_field(name="특별 감사", value="Team Dexter\nSQUARE PIXELS & EZ2AC Team\n[메밀](https://www.facebook.com/memil.lee)", inline=True)
     embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)", inline=False)
     embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
     embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [星海恋詩의 Picrew](https://picrew.me/image_maker/79516/)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)

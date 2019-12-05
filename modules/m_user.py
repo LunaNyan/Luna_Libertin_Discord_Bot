@@ -290,6 +290,14 @@ def serversettings(conf, message):
         embed.add_field(name="불타는 서버 지정 문구", value=bu, inline=False)
     except:
         embed.add_field(name="불타는 서버 지정 문구", value="없음", inline=False)
+    if str(message.guild.id) in conf.get("etc", "pingpong_headless"):
+        embed.add_field(name="일상대화 접두어", value="불필요", inline=False)
+    else:
+        embed.add_field(name="일상대화 접두어", value="필수", inline=False)
+    if str(message.guild.id) in conf.get("etc", "guild_custom_headless"):
+        embed.add_field(name="서버 지정 명령어 접두어", value="불필요", inline=False)
+    else:
+        embed.add_field(name="서버 지정 명령어 접두어", value="필수", inline=False)
     return embed
 
 def attendance(conf, user):

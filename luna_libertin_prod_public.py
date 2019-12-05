@@ -6,22 +6,18 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("FATAL   : This script requires Python version 3.5")
     sys.exit(1)
 
-import time, random, re, traceback, discord, asyncio, psutil, os, random, configparser
-import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc, m_lang
+import time, random, re, traceback, discord, asyncio, psutil, os, sys, random, configparser
 from datetime import datetime, timedelta
-from m_seotda import *
+from modules.m_seotda import *
 import imp
+
+sys.path.append('./modules/')
+import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc, m_lang
+sys.path.append('../')
 
 startTime = datetime.now()
 
-import logging
-logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='log.txt', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
-
-bot_ver = "19.0.5"
+bot_ver = "20.0.1"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -36,7 +32,7 @@ except:
     sys.exit(1)
 
 try:
-    db_path = "db.dat"
+    db_path = "db/db.dat"
     db = configparser.ConfigParser()
     db.read(db_path)
     print("INFO    : DB file loaded")
@@ -308,7 +304,7 @@ async def on_message(message):
         await message.channel.send(m_ext_commands.say_rint(message))
     elif message.content.startswith(head_s + '섯다'):
         if message.content == head_s + '섯다':
-            embed=discord.Emebd(title="사용 방법 : 루냥아 섯다 (0부터 9까지의 숫자) (0부터 9까지의 숫자)", color=0xff77ff)
+            embed=discord.Embed(title="사용 방법 : 루냥아 섯다 (0부터 9까지의 숫자) (0부터 9까지의 숫자)", color=0xff77ff)
         else:
             embed=seotda(message.content, message.author, head_s)
         await message.channel.send(embed=embed)
@@ -317,8 +313,11 @@ async def on_message(message):
             embed=discord.Embed(title="사용 방법 : 루냥아 소개말 (소개문장)", color=0xffffff)
         else:
             bio_str = message.content.replace(head_s + "소개말 ", "")
-            m_user.set_bio(db, message.author, bio_str)
-            await message.channel.send(m_lang.string(db, message.author.id, "bio_set"))
+            if len(bio_str) > 300:
+                await message.channel.send(m_lang.string(db, message.author.id, "bio_too_long"))
+            else:
+                m_user.set_bio(db, message.author, bio_str)
+                await message.channel.send(m_lang.string(db, message.author.id, "bio_set"))
     elif message.content.startswith(head_s + '방명록 쓰기 '):
         m_board.gbook_write(message.content.replace(head_s + "방명록 쓰기 ", ""), message.author.id)
         embed=discord.Embed(title=m_lang.string(db, message.author.id, "board_writed_title"), description=m_lang.string(db, message.author.id, "board_writed_desc"), color=0xffffff)
@@ -337,6 +336,7 @@ async def on_message(message):
         else:
             fn = m_etc.make_color(message.content, head_s)
             await message.channel.send(file=discord.File(fn))
+            os.remove(fn)
     elif message.content.startswith(head_s + '받아쓰기'):
         if message.content == head_s + '받아쓰기':
             embed=discord.Embed(title='사용 방법 : 루냥아 받아쓰기 (텍스트)', color=0xffffff)
@@ -360,6 +360,7 @@ async def on_message(message):
         bci_str = bci_str.replace(head_s + "계산해줘 이미지 ", "")
         await message.channel.send(file=discord.File(m_wolframalpha.wa_img(conf, bci_str)))
         await message_temp.delete()
+        os.remove("wa_temp_img.gif")
     elif message.content.startswith(head_s + "캡챠 "):
         try:
             bc_str = message.content
@@ -367,6 +368,7 @@ async def on_message(message):
             bc_tmp = await message.channel.send(m_lang.string(db, message.author.id, "plz_wait"))
             await message.channel.send(file=discord.File(m_wolframalpha.wa_img(conf, "captcha " + bc_str)))
             await bc_tmp.delete()
+            os.remove("wa_temp_img.gif")
         except:
             await message.channel.send(m_lang.string(db, message.author.id, "generic_error"))
     elif message.content.startswith(head_s + "계산해줘 "):
@@ -529,6 +531,24 @@ async def on_message(message):
         elif m_lang.check_lang(db, message.author.id) == "한국어(반말모드)":
             db.set("lang", str(message.author.id), "default")
             await message.channel.send("이제 존댓말로 대화할게요!")
+    # command for christmas event
+    # delete when event is over
+    elif message.content == head_s + "메리 크리스마스":
+        tropy = ""
+        try:
+            tropy = db.get("user_tropy", str(message.author.id))
+        except:
+            pass
+        if "메리 크리스마스 2019!" in tropy:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "event_christmas_already"), color=0xf58442)
+        else:
+            if tropy != "":
+                tropy += ", 메리 크리스마스 2019!"
+            else:
+                tropy = "메리 크리스마스 2019!"
+            db.set("user_tropy", str(message.author.id), tropy)
+            embed=discord.Embed(title="즐거운 크리스마스!", description=m_lang.string(db, message.author.id, "event_christmas_desc"), color=0xf58442)
+        await message.channel.send(embed=embed)
     # admin only functions
     elif message.content.startswith(head_s + 'shellcmd ') and message.author.id == int(conf.get("config", "bot_owner")):
         shl_str = message.content
@@ -696,8 +716,12 @@ async def on_message(message):
         try:
             lc = message.content.replace(head_s + "user tropy set ", "")
             lc = lc.split(" ")
-            db.set("user_tropy", lc[0], lc[1])
-            await message.channel.send("user level of " + lc[0] + " was changed to " + lc[1])
+            lc2 = lc[1:]
+            lc3 = ""
+            for i in lc2:
+                lc3 += i + " "
+            db.set("user_tropy", lc[0], lc3)
+            await message.channel.send("user level of " + lc[0] + " was changed to " + lc3)
             us = await client.fetch_user(int(lc[0]))
             await message.channel.send(embed=m_user.check_another(db, us, message))
         except Exception as e:
@@ -768,6 +792,7 @@ async def on_message(message):
                 embed=discord.Embed(title=str(len(pl)) + m_lang.string(db, message.author.id, "purged_n"), color=0xff77ff)
                 await server_log(message, 0xff77ff, str(len(pl)) + "개의 메시지를 삭제함")
                 await server_file(message, "messages.txt")
+                os.remove("messages.txt")
         except:
             embed=discord.Embed(title=m_lang.string(db, message.author.id, "generic_error"), description=m_lang.string(db, message.author.id, "purge_error_desc"), color=0xff0000)
         await message.channel.send(embed=embed)
@@ -1029,6 +1054,15 @@ async def on_message(message):
             db.set("etc", "pingpong_headless", db.get("etc", "pingpong_headless") + ", " + str(message.guild.id))
             embed=discord.Embed(title=m_lang.string(db, message.author.id, "pingpong_headless_allowed"), color=0xffff00)
             await message.channel.send(embed=embed)
+    elif message.content == head_s + "서버 지정 명령어 접두어" and ifadmin:
+        if str(message.guild.id) in db.get("etc", "guild_custom_headless"):
+            db.set("etc", "guild_custom_headless", db.get("etc", "guild_custom_headless").replace(", " + str(message.guild.id), ""))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "guild_custom_headless_denied"), color=0xffff00)
+            await message.channel.send(embed=embed)
+        else:
+            db.set("etc", "guild_custom_headless", db.get("etc", "guild_custom_headless") + ", " + str(message.guild.id))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "guild_custom_headless_allowed"), color=0xffff00)
+            await message.channel.send(embed=embed)
     else:
         res = m_ext_commands.ext_talk(client, message, head_s)
         res2 = m_user.guild_custom_commands(db, message)
@@ -1040,7 +1074,12 @@ async def on_message(message):
             else:
                 pass
         elif res2 != None:
-            await message.channel.send(res2)
+            if str(message.guild.id) in db.get("etc", "guild_custom_headless"):
+                await message.channel.send(res2)
+            elif message.content.startswith(head_s):
+                await message.channel.send(res2)
+            else:
+                pass
         else:
             pass
     with open(db_path, 'w') as configfile:
@@ -1118,7 +1157,7 @@ async def on_member_join(member):
         m = a[1]
         m = m.replace("[멘션]", member.mention)
         m = m.replace("[이름]", member.name)
-        await c.send(m)
+        await ch.send(m)
 
 @client.event
 async def on_member_remove(member):

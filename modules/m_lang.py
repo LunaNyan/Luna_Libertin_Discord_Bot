@@ -15,11 +15,13 @@ def string(db, id, call):
     if l == "default":
         try:
             s = kr_def.get("string", call)
+            s = s.replace("&nbsp", "\n")
         except:
             s = "내부 시스템 오류 : 언어 " + l + "에서 스트링 " + call + "을 찾을 수 없습니다"
     elif l == "ban":
         try:
             s = kr_ban.get("string", call)
+            s = s.replace("&nbsp", "\n")
         except:
             s = "내부 시스템 오류 : 언어 " + l + "에서 스트링 " + call + "을 찾을 수 없습니다"
     return s
