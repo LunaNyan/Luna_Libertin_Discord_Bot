@@ -1,5 +1,5 @@
 asyncio
-discord>=1.2.5
+discord.py>=1.2.5
 psutil
 configparser
 requests
