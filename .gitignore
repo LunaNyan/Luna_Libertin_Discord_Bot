@@ -4,3 +4,5 @@ __pycache__/
 log.txt
 for_hash.py
 m_device.py
+db/*
+config.ini
