@@ -131,5 +131,7 @@ custom_command_no_emoji_in_invoker = 명령어에 서버 이모지는 삽입할 
 guild_custom_headless_allowed = 이제 서버 지정 명령어에 접두어를 쓰지 않아도 발동해요!
 guild_custom_headless_denied = 이제 서버 지정 명령어에 접두어를 써야 발동해요!
 bio_too_long = 소개말은 300글자를 초과할 수 없어요!
+custom_command_no_blank = 명령어 또는 반응은 비울 수 없어요!
 event_christmas_desc = 칭호를 얻었어요!&nbsp"루냥아 나 어때"에서 칭호를 확인해보세요!
 event_christmas_already = 칭호를 이미 얻었어요!
+is_sleeping = 님은 현재 잠수중이예요!

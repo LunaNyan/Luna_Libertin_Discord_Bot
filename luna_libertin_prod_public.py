@@ -17,7 +17,7 @@ sys.path.append('../')
 
 startTime = datetime.now()
 
-bot_ver = "20.0.1"
+bot_ver = "21.0.0"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -27,8 +27,8 @@ try:
     conf = configparser.ConfigParser()
     conf.read(conf_path)
     print("INFO    : Configuration file loaded")
-except:
-    print("FATAL   : Couldn't load configuration file")
+except Exception as e:
+    print("FATAL   : Couldn't load configuration file : " + str(e))
     sys.exit(1)
 
 try:
@@ -36,8 +36,8 @@ try:
     db = configparser.ConfigParser()
     db.read(db_path)
     print("INFO    : DB file loaded")
-except:
-    print("FATAL   : Couldn't load DB file")
+except Exception as e:
+    print("FATAL   : Couldn't load DB file" + str(e))
     sys.exit(1)
 
 test_glyph = ""
@@ -46,6 +46,8 @@ if conf.get("config", "IsThisBotTesting") == "1":
     print("WARNING : This bot is in test range.")
 else:
     print("INFO    : This bot is not in test range.")
+
+m_user.test_glyph_2 = test_glyph
 
 try:
     hash_str = m_etc.getHash(os.path.split(sys.argv[0])[1])
@@ -151,7 +153,7 @@ async def news_send(message, title_str, content):
             await message.channel.send(str(c) + " : Success")
         except Exception as e:
             cs = cs.replace(c + ", ", "")
-            await message.channel.send(str(c) + " : Failed (" + str(e) + "), channel destroyed")
+            await message.channel.send(str(c) + " : Failed (" + str(e) + ")")
     db.set("etc", "news_channel", cs)
     await message.channel.send("Complete")
 
@@ -178,7 +180,7 @@ async def on_message(message):
     global comm_count
     global news_image
     # head pointer
-    head_s = m_user.head(db, message, test_glyph)
+    head_s = m_user.head(db, message)
     # admin indicator
     try:
         if message.author.id == int(conf.get("config", "bot_owner")) or message.author.guild_permissions.administrator:
@@ -251,8 +253,17 @@ async def on_message(message):
         m_user.hug_count(db, message.author)
         m_user.reset_count(db, message.author)
     # unsleep routine
-    if m_user.check_sleep(db, message):
+    if m_user.check_sleep(db, message.author, message.guild) != None:
         await message.channel.send(embed=m_user.unsleep(db, message, datetime.now()))
+    # notify mentioning user that sleeping
+    if len(message.mentions) >= 1:
+        for mn in message.mentions:
+            mb = m_user.check_sleep(db, mn, message.guild)
+            if mb != None:
+                embed=discord.Embed(title=mn.name + m_lang.string(db, message.author.id, "is_sleeping"))
+                embed.add_field(name="잠수 시간", value=mb[1])
+                embed.add_field(name="사유", value=mb[0])
+                await message.channel.send(embed=embed)
     # namebase writting routine
     m_etc.set_name(message)
     # generic commands starts with head string
@@ -280,7 +291,7 @@ async def on_message(message):
     elif message.content == head_s + "소스코드":
         await message.channel.send(embed=m_help.source_code())
     elif message.content == head_s + "누구니":
-        await message.channel.send(embed=m_help.selfintro(client, bot_ver))
+        await message.channel.send(embed=m_help.selfintro(client, bot_ver, message))
     elif message.content == head_s + "배고파":
         s = m_food.return_food()
         embed=discord.Embed(title=s, color=0xff7fff)
@@ -353,7 +364,7 @@ async def on_message(message):
             say_str = say_str.replace(head_s + '확성기 ','')
             await message.delete()
             await message.channel.send(say_str)
-            await server_log(message, 0xffff00, "확성기 기능을 사용함", message.author.name + " : " + say_str, "채널 : " + message.channel.name)
+            await server_log(message, 0x00ffff, "확성기 기능을 사용함", message.author.name + " : " + say_str, "채널 : " + message.channel.name)
     elif message.content.startswith(head_s + "계산해줘 이미지 "):
         message_temp = await message.channel.send(m_lang.string(db, message.author.id, "plz_wait"))
         bci_str = message.content
@@ -420,12 +431,19 @@ async def on_message(message):
         await message.channel.send(embed=m_ext_commands.eat(message, head_s, db))
     elif message.content.startswith(head_s) and message.content.endswith(' 물어'):
         await message.channel.send(embed=m_ext_commands.bite(message, head_s, db))
+    elif message.content == head_s + '배워':
+        embed=discord.Embed(title="사용 방법", description="루냥아 배워 (명령어) | (반응)", color=0xffffff)
+        embed.add_field(name="응용", value="(반응) && (반응2) & (반응3) .. : 다수 반응 중 랜덤 출현", inline=False)
+        embed.add_field(name="이름 삽입", value="[멘션] : 명령어 사용자를 멘션\n[이름] : 명령어 사용자의 이름을 표시")
+        await message.channel.send(embed=embed)
     elif message.content.startswith(head_s + '배워 '):
         await message.channel.send(embed=m_user.make_custom_commands(db, message))
     elif message.content.startswith(head_s + '잊어 '):
         await message.channel.send(embed=m_user.remove_custom_commands(db, message))
-    elif message.content.startswith(head_s + "배운거"):
+    elif message.content == head_s + "배운거":
         await message.channel.send(embed=m_user.list_custom_commands(db, message, head_s))
+    elif message.content.startswith(head_s + "배운거 "):
+        await message.channel.send(embed=m_user.info_custom_commands(db, message))
     elif message.content == head_s + "서버정보":
         await message.channel.send(embed=m_user.serverinfo(db, message))
     elif message.content == head_s + "서버설정":
@@ -465,7 +483,11 @@ async def on_message(message):
             page = int(page)
         except:
             page = 1
-        await message.channel.send(embed=m_help.servers_list(client, page, db, message.author.id))
+        await message.channel.send(embed=m_user.servers_list(client, page, db, message.author.id))
+    elif message.content == head_s + "서버랭킹":
+        await message.channel.send(embed=m_user.servers_rank_users(client, db))
+    elif message.content == head_s + "호감도랭킹":
+        await message.channel.send(embed=m_user.level_rank(client, db))
     elif message.content.startswith(head_s + "닉변 "):
         nc = message.content.replace(head_s + "닉변 ", "")
         try:
@@ -591,7 +613,10 @@ async def on_message(message):
         embed=discord.Embed(title="Key " + m[1] + " in section " + m[0], color=0xffffff)
         try:
             i = db.get(m[0], m[1])
-            embed.add_field(name="value", value=i, inline=False)
+            if m[1] == "" or m[1] == None:
+                embed=discord.Embed(title="Value of Key " + m[1] + " in section is empty." + m[0], color=0xffffff)
+            else:
+                embed.add_field(name="value", value=i, inline=False)
         except Exception as e:
             embed.add_field(name="error string", value=str(e), inline=False)
         await message.channel.send(embed=embed)
@@ -1125,7 +1150,7 @@ async def on_message_edit(before, after):
         cid = db.get("server_log", str(before.guild.id))
         cid = client.get_channel(int(cid))
         if cid != None:
-            embed=discord.Embed(title="메시지 수정 감지", description=before.author.name, color=0xffff00)
+            embed=discord.Embed(title="메시지 수정 감지", description=before.author.name, color=0xff0000)
             embed.add_field(name="이전", value=before.content, inline=False)
             embed.add_field(name="이후", value=after.content, inline=False)
             embed.set_footer(text="채널 : " + before.channel.name)
@@ -1158,6 +1183,18 @@ async def on_member_join(member):
         m = m.replace("[멘션]", member.mention)
         m = m.replace("[이름]", member.name)
         await ch.send(m)
+    try:
+        cid = db.get("server_log", str(member.guild.id))
+        cid = client.get_channel(int(cid))
+        if cid != None:
+            embed=discord.Embed(title="사용자가 서버를 입장함", color=0x00ff00)
+            embed.add_field(name="이름", value=member.name, inline=False)
+            embed.add_field(name="사용자 ID", value=str(member.id), inline=False)
+            await cid.send(embed=embed)
+        else:
+            db.remove_option("server_log", str(member.guild.id))
+    except:
+        pass
 
 @client.event
 async def on_member_remove(member):
@@ -1170,6 +1207,18 @@ async def on_member_remove(member):
         m = a[1]
         m = m.replace("[이름]", member.name)
         await c.send(m)
+    try:
+        cid = db.get("server_log", str(member.guild.id))
+        cid = client.get_channel(int(cid))
+        if cid != None:
+            embed=discord.Embed(title="사용자가 서버를 퇴장함", color=0x00ff00)
+            embed.add_field(name="이름", value=member.name, inline=False)
+            embed.add_field(name="사용자 ID", value=str(member.id), inline=False)
+            await cid.send(embed=embed)
+        else:
+            db.remove_option("server_log", str(member.guild.id))
+    except:
+        pass
 
 @client.event
 async def on_member_update(before, after):
@@ -1182,7 +1231,7 @@ async def on_member_update(before, after):
             cid = db.get("server_log", str(before.guild.id))
             cid = client.get_channel(int(cid))
             if cid != None:
-                embed=discord.Embed(title=nn + " 님이 서버 닉네임을 변경함", color=0xffff00)
+                embed=discord.Embed(title=nn + " 님이 서버 닉네임을 변경함", color=0x00ff00)
                 embed.add_field(name="이전", value=nb, inline=False)
                 embed.add_field(name="이후", value=na, inline=False)
                 await cid.send(embed=embed)
