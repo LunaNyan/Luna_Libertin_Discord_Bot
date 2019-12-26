@@ -1,5 +1,7 @@
 import math, discord, random, datetime, m_etc, m_lang
 
+test_glyph_2 = ""
+
 def set_bio(conf, user, text):
     conf.set("bio", str(user.id), text)
 
@@ -290,6 +292,14 @@ def serversettings(conf, message):
         embed.add_field(name="불타는 서버 지정 문구", value=bu, inline=False)
     except:
         embed.add_field(name="불타는 서버 지정 문구", value="없음", inline=False)
+    if str(message.guild.id) in conf.get("etc", "pingpong_headless"):
+        embed.add_field(name="일상대화 접두어", value="불필요", inline=False)
+    else:
+        embed.add_field(name="일상대화 접두어", value="필수", inline=False)
+    if str(message.guild.id) in conf.get("etc", "guild_custom_headless"):
+        embed.add_field(name="서버 지정 명령어 접두어", value="불필요", inline=False)
+    else:
+        embed.add_field(name="서버 지정 명령어 접두어", value="필수", inline=False)
     return embed
 
 def attendance(conf, user):
@@ -327,29 +337,32 @@ def guild_custom_commands(db, message):
         return None
 
 def make_custom_commands(db, message):
-    m = message.content.replace(head(db, message) + "배워 ", "")
-    m = m.split(" | ")
+    mr = message.content.replace(head(db, message) + "배워 ", "")
+    m = mr.split(" | ")
     editing_m = m_lang.string(db, message.author.id, "custom_command_added")
-    try:
-        i = db.get("custom_commands", str(message.guild.id) + "_" + m[0])
-        i = i.split(" | ")[1]
-        editing_m = m_lang.string(db, message.author.id, "custom_command_edit")
-        if message.author.guild_permissions.administrator == False and str(message.author.id) != i:
-            embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_edit"), color=0xff000)
-        else:
-            raise
-    except Exception as e:
+    if mr.startswith("| ") or mr.startswith(" | ") or mr.endswith(" |"):
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_no_blank"), color=0xff0000)
+    else:
         try:
-            db.set("custom_commands", str(message.guild.id) + "_" + m[0], m[1] + " | " + str(message.author.id) + " | " + message.author.name)
-            embed=discord.Embed(title=editing_m, color=0xff77ff)
-            if "&&" in m[1]:
-                li = m[1].split("&&")
-                embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
+            i = db.get("custom_commands", str(message.guild.id) + "_" + m[0])
+            i = i.split(" | ")[1]
+            editing_m = m_lang.string(db, message.author.id, "custom_command_edit")
+            if message.author.guild_permissions.administrator == False and str(message.author.id) != i:
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_edit"), color=0xff000)
             else:
-                embed.add_field(name=m[0], value=m[1], inline=False)
-            embed.set_footer(text="주의 : 배운 명령어는 해당 서버에서만 동작합니다")
-        except:
-            embed=discord.Embed(title='사용 방법 : "루냥아 배워 (명령어) | (반응)"', color=0xffffff)
+                raise
+        except Exception as e:
+            try:
+                db.set("custom_commands", str(message.guild.id) + "_" + m[0], m[1] + " | " + str(message.author.id) + " | " + message.author.name)
+                embed=discord.Embed(title=editing_m, color=0xff77ff)
+                if "&&" in m[1]:
+                    li = m[1].split("&&")
+                    embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
+                else:
+                    embed.add_field(name=m[0], value=m[1], inline=False)
+                embed.set_footer(text="주의 : 배운 명령어는 해당 서버에서만 동작합니다")
+            except:
+                embed=discord.Embed(title='사용 방법 : "루냥아 배워 (명령어) | (반응)"', color=0xffffff)
     return embed
 
 def list_custom_commands(db, message, head):
@@ -400,6 +413,25 @@ def remove_custom_commands(db, message):
         embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_found"), color=0xff0000)
     return embed
 
+def info_custom_commands(db, message):
+    m = message.content.replace(head(db, message) + "배운거 ", "")
+    try:
+        d = db.get("custom_commands", str(message.guild.id) + "_" + m).split(" | ")
+        w = m_etc.get_name(d[1])
+        mm = ""
+        if "&&" in d[0]:
+            dd = d[0].split("&&")
+            for di in dd:
+                mm += di + "\n"
+        else:
+            mm = d[0]
+        embed = discord.Embed(title="명령어 " + m + "의 정보")
+        embed.add_field(name="작성자", value=w, inline=False)
+        embed.add_field(name="반응", value=mm, inline=False)
+    except:
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_found"), color=0xff0000)
+    return embed
+
 def sleep(db, message, dt):
     embed=discord.Embed(title=str(message.author.name) + m_lang.string(db, message.author.id, "sleep_start"), description = m_lang.string(db, message.author.id, "sleep_start_desc"), color=0xffff00)
     if head(db, message) + "잠수 " in message.content:
@@ -410,12 +442,17 @@ def sleep(db, message, dt):
     db.set("sleep", str(message.author.id) + "&&" + str(message.guild.id), dt.strftime('%s') + "&&" + reason)
     return embed
 
-def check_sleep(db, message):
+def check_sleep(db, author, guild):
     try:
-        db.get("sleep", str(message.author.id) + "&&" + str(message.guild.id))
-        return True
+        s = db.get("sleep", str(author.id) + "&&" + str(guild.id))
+        t = datetime.datetime.now() - datetime.datetime.fromtimestamp(int(s.split("&&")[0]))
+        r = s.split("&&")[1]
+        if r != "empty":
+            return ["사유 없음", t]
+        else:
+            return [r, t]
     except:
-        return False
+        return None
 
 def unsleep(db, message, dt):
     s = db.get("sleep", str(message.author.id) + "&&" + str(message.guild.id))
@@ -429,7 +466,7 @@ def unsleep(db, message, dt):
     return embed
 
 def head(db, message, test_glyph=""):
-    if test_glyph != "_":
+    if test_glyph_2 != "_":
         try:
             hd = db.get("custom_head", str(message.guild.id))
             if message.content.startswith("루냥아"):
@@ -440,3 +477,87 @@ def head(db, message, test_glyph=""):
             return "루냥아 "
     else:
         return "루우냥아 "
+
+def servers_list(client, page, db, id):
+    n = 0
+    servers = {}
+    sorted_servers = {}
+    lk = []
+    lu = []
+    lo = []
+    nd = []
+    de = 0
+    for s in client.guilds:
+        if str(s.id) in db.get("etc", "ndserver"):
+            servers[str(s)] = [str(len(s.members)), s.owner.name, "1"]
+        else:
+            servers[str(s)] = [str(len(s.members)), s.owner.name, "0"]
+        n += 1
+    sorted_servers = sorted(servers)
+    for k in sorted_servers:
+        lk.append(k)
+        lu.append(servers[k][0])
+        lo.append(servers[k][1])
+        nd.append(servers[k][2])
+    pages = math.ceil(len(lk) / 10)
+    if page > pages or page <= 0:
+        embed=discord.Embed(title=m_lang.string(db, id, "wrong_page_idx"))
+    else:
+        embed=discord.Embed(title="전체 서버 목록 (총 " + str(len(lk)) + "개)", color=0xff00ff)
+        c = (page - 1) * 10
+        ct = c + 9
+        while c <= ct:
+            try:
+                if nd[c] == "1":
+#                    embed.add_field(name="#" + str(c+1) + " : (숨겨짐)", inline=False)
+                    de += 1
+                else:
+                    embed.add_field(name="#" + str(c+1) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
+                c += 1
+            except:
+                break
+        embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 서버목록 (페이지)"')
+    return embed
+
+def servers_rank_users(client, db):
+    servers = {}
+    sorted_servers = {}
+    n = 0
+    for s in client.guilds:
+        if str(s.id) in db.get("etc", "ndserver"):
+            continue
+        else:
+            servers[n] = [s.name, len(s.members), s.owner.name]
+        n += 1
+    sorted_servers = sorted(servers.items(), key=lambda x: x[1][1], reverse=True)
+    embed=discord.Embed(title="서버 멤버 수 랭킹", color=0xff00ff)
+    c = 0
+    while c <= 9:
+        try:
+            embed.add_field(name=str(c+1) + "등 : " + str(sorted_servers[c][1][0]), value="유저 수 : " + str(sorted_servers[c][1][1]) + ", 서버 주인 : " + str(sorted_servers[c][1][2]), inline=False)
+            c += 1
+        except:
+            break
+    return embed
+
+def level_rank(client, db):
+    users = {}
+    converted_users = {}
+    sorted_users = {}
+    n = 0
+    for i in db.items('user_level'):
+        if i[1] == '2147483647' or i[0] == str(client.user.id):
+            continue
+        else:
+            converted_users[n] = [m_etc.get_name(i[0]), int(i[1])]
+        n += 1
+    sorted_users = sorted(converted_users.items(), key=lambda x: x[1][1], reverse=True)
+    embed=discord.Embed(title="호감도 랭킹", color=0xff00ff)
+    c = 0
+    while c <= 9:
+        try:
+            embed.add_field(name=str(c+1) + "등 : " + str(sorted_users[c][1][0]), value="호감도 : " + str(sorted_users[c][1][1]), inline=False)
+            c += 1
+        except:
+            break
+    return embed

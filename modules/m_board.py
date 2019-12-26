@@ -3,9 +3,7 @@ import os, configparser, discord, math, datetime, m_etc, m_lang
 memo_temp_title = "66mU66qoIOyCrOyaqSDrsKnrspU="
 memo_temp_content = "IuujqOuDpeyVhCDrqZTrqqggKOuCtOyaqSkiIDog66mU66qoIOyekeyEse2VmOq4sAoi66Oo64Ol7JWEIOuplOuqqCDrqqnroZ0gKO2OmOydtOyngCkiIDog66mU66qoIOuqqeuhnSDrs7TquLAKIuujqOuDpeyVhCDrqZTrqqgg7IKt7KCcICjrsojtmLgpIiA6IOuqqeuhnSDrsojtmLjsl5Ag7ZW064u57ZWY64qUIOuplOuqqCDsgq3soJw="
 
-db_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'db/board_db.dat'))
-
-#db_path = "db/board_db.dat"
+db_path = "db/board_db.dat"
 
 db = configparser.ConfigParser()
 db.read(db_path)

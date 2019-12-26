@@ -2,9 +2,7 @@ import psutil, base64, os, sys, hashlib
 from PIL import Image, ImageDraw, ImageFont
 import configparser
 
-db_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'db/username_db.dat'))
-
-#db_path = "db/username_db.dat"
+db_path = "db/username_db.dat"
 
 db = configparser.ConfigParser()
 db.read(db_path)

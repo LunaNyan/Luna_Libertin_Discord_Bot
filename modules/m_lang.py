@@ -2,9 +2,11 @@ import configparser
 
 kr_def = configparser.ConfigParser()
 kr_ban = configparser.ConfigParser()
+en_def = configparser.ConfigParser()
 
 kr_def.read("lang/lang_kr_default.dat")
 kr_ban.read("lang/lang_kr_ban.dat")
+en_def.read("lang/lang_en_default.dat")
 
 def string(db, id, call):
     try:
@@ -15,11 +17,19 @@ def string(db, id, call):
     if l == "default":
         try:
             s = kr_def.get("string", call)
+            s = s.replace("&nbsp", "\n")
         except:
             s = "내부 시스템 오류 : 언어 " + l + "에서 스트링 " + call + "을 찾을 수 없습니다"
     elif l == "ban":
         try:
             s = kr_ban.get("string", call)
+            s = s.replace("&nbsp", "\n")
+        except:
+            s = "내부 시스템 오류 : 언어 " + l + "에서 스트링 " + call + "을 찾을 수 없습니다"
+    elif l == "en":
+        try:
+            s = en_def.get("string", call)
+            s = s.replace("&nbsp", "\n")
         except:
             s = "내부 시스템 오류 : 언어 " + l + "에서 스트링 " + call + "을 찾을 수 없습니다"
     return s
@@ -34,4 +44,4 @@ def check_lang(db, id):
     elif l == "ban":
         return "한국어(반말모드)"
     elif l == "en":
-        return "English(United of States)"
+        return "English(Development Only)"
