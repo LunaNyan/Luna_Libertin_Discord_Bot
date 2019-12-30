@@ -49,7 +49,7 @@ def seotda_calc(a, b):
         if randint(1, 100) >= gd_percent:
             result_str = "1 - 3 광땡!"
             return 26
-    elif a == b: #땡
+    if a == b: #땡
         if a == 10:
             result_str = "장땡"
         elif a == 9:
