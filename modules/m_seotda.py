@@ -1,13 +1,17 @@
-#!/usr/bin/python3
+# 두장섯다 알고리즘 모듈
 
 from random import randint, shuffle
 import discord
 
 winning_percentage = 7
-# 승률 조정 (기본값 : 7)
-# 0부터 25까지 있으며, 낮을 수록 승률이 높습니다.
+# 승률 조정 (기본값 : 7, 범위 : 0 ~ 28)
+# "낮을 수록" 승률이 높습니다.
 # 예를 들어, 승률을 0으로 맞출 경우 CPU가 플레이어보다 낮은 패를 선택할 수 없게 되기에, 플레이어는 무조건 이기게 됩니다.
-# 승률을 25로 맞출 경우, CPU는 모든 종류의 패를 선택할 수 있게 됩니다.
+# 승률을 28로 맞출 경우, CPU는 모든 종류의 패를 선택할 수 있게 됩니다.
+
+gd_percent = 50
+# 광땡 출현 확률 조정 (기본값 : 50, 범위 : 1 ~ 100)
+# "낮을 수록" 광땡 출현 확률이 증가합니다.
 
 result_str = ""
 deck = []
@@ -30,9 +34,22 @@ yb = 0
 yaa = 0
 ybb = 0
 
+# 패 판정
 def seotda_calc(a, b):
     global result_str
-    if a == b: #땡
+    if (a == 3 and b == 8) or (a == 8 and b == 3): #광땡
+        if randint(1, 100) >= gd_percent:
+            result_str = "3 - 8 광땡!"
+            return 28
+    elif (a == 1 and b == 8) or (a == 8 and b == 1):
+        if randint(1, 100) >= gd_percent:
+            result_str = "1 - 8 광땡!"
+            return 27
+    elif (a == 1 and b == 3) or (a == 3 and b == 1):
+        if randint(1, 100) >= gd_percent:
+            result_str = "1 - 3 광땡!"
+            return 26
+    elif a == b: #땡
         if a == 10:
             result_str = "장땡"
         elif a == 9:
@@ -54,7 +71,7 @@ def seotda_calc(a, b):
         elif a == 1:
             result_str = "삥땡"
         sd_power = 15 + a
-    elif (a == 1 and b == 2) or (a == 2 and b == 1): #중간
+    elif (a == 1 and b == 2) or (a == 2 and b == 1): #삥
         result_str = "알리"
         sd_power = 15
     elif (a == 1 and b == 4) or (a == 4 and b == 1):
@@ -110,6 +127,7 @@ def seotda_player(aa, bb):
     xbb = deck[bb]
     return seotda_calc(xaa, xbb)
 
+# CPU 패 선택
 def seotda_cpu():
     global deck
     global ya
@@ -127,6 +145,7 @@ def seotda_cpu():
             break
     return seotda_calc(yaa, ybb)
 
+# 무작위 패 생성
 def seotda_ready():
     global deck
     for ix in range(2):

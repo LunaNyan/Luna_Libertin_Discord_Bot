@@ -17,7 +17,7 @@ sys.path.append('../')
 
 startTime = datetime.now()
 
-bot_ver = "21.0.0-test-20191224"
+bot_ver = "21.0.0-test-20191230"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -445,10 +445,22 @@ async def on_message(message):
         elif message.content == head_s + '배워':
             embed=discord.Embed(title="사용 방법", description="루냥아 배워 (명령어) | (반응)", color=0xffffff)
             embed.add_field(name="응용", value="(반응) && (반응2) & (반응3) .. : 다수 반응 중 랜덤 출현", inline=False)
-            embed.add_field(name="이름 삽입", value="[멘션] : 명령어 사용자를 멘션\n[이름] : 명령어 사용자의 이름을 표시")
+            embed.add_field(name="이름 삽입", value="[멘션] : 명령어 사용자를 멘션\n[이름] : 명령어 사용자의 이름을 표시", inline=False)
             await message.channel.send(embed=embed)
         elif message.content.startswith(head_s + '배워 '):
             await message.channel.send(embed=m_user.make_custom_commands(db, message))
+        elif message.content == head_s + '제안':
+            embed=discord.Embed(title="사용 방법", description="루냥아 제안 (명령어) | (반응)", color=0xffffff)
+            embed.add_field(name="응용", value="(반응) && (반응2) & (반응3) .. : 다수 반응 중 랜덤 출현", inline=False)
+            embed.add_field(name="이름 삽입", value="[멘션] : 명령어 사용자를 멘션\n[이름] : 명령어 사용자의 이름을 표시", inline=False)
+            embed.add_field(name="주의사항", value="제안 후 선정된 명령어는 모든 서버에서 사용됩니다\n부적절한 명령어를 제안하는 경우 이용 제재가 따를 수 있습니다", inline=False)
+            await message.channel.send(embed=embed)
+        elif message.content == head_s + '제안 목록':
+            await message.channel.send(embed=m_user.list_suggests(db, message))
+        elif message.content == head_s + '제안 삭제':
+            await message.channel.send(embed=m_user.purge_suggests(db, message))
+        elif message.content.startswith(head_s + '제안 '):
+            await message.channel.send(embed=m_user.suggest_commands(db, message))
         elif message.content.startswith(head_s + '잊어 '):
             await message.channel.send(embed=m_user.remove_custom_commands(db, message))
         elif message.content == head_s + "배운거":
@@ -564,24 +576,6 @@ async def on_message(message):
             elif m_lang.check_lang(db, message.author.id) == "한국어(반말모드)":
                 db.set("lang", str(message.author.id), "default")
                 await message.channel.send("이제 존댓말로 대화할게요!")
-        # command for christmas event
-        # delete when event is over
-        elif message.content == head_s + "메리 크리스마스":
-            tropy = ""
-            try:
-                tropy = db.get("user_tropy", str(message.author.id))
-            except:
-                pass
-            if "메리 크리스마스 2019!" in tropy:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "event_christmas_already"), color=0xf58442)
-            else:
-                if tropy != "":
-                    tropy += ", 메리 크리스마스 2019!"
-                else:
-                    tropy = "메리 크리스마스 2019!"
-                db.set("user_tropy", str(message.author.id), tropy)
-                embed=discord.Embed(title="즐거운 크리스마스!", description=m_lang.string(db, message.author.id, "event_christmas_desc"), color=0xf58442)
-            await message.channel.send(embed=embed)
         # admin only functions
         elif message.content == head_s + 'raise_test' and message.author.id == int(conf.get("config", "bot_owner")):
             raise "sex"
