@@ -136,7 +136,6 @@ async def server_file(message, fn):
     except:
         pass
 
-
 @client.event
 async def news_send(message, title_str, content):
     await message.channel.send("Sending news..")
@@ -150,7 +149,7 @@ async def news_send(message, title_str, content):
         try:
             news_channel = client.get_channel(int(c))
             await news_channel.send(embed=embed)
-            await message.channel.send(str(c) + " : Success")
+            await message.channel.send(c.name + " at " + c.guild.name + " (" + str(c) + ") : Success")
         except Exception as e:
             cs = cs.replace(c + ", ", "")
             await message.channel.send(str(c) + " : Failed (" + str(e) + ")")

@@ -107,6 +107,11 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="땡", value="두 패의 월수가 같은 경우 (장땡 ~ 삥땡)", inline=False)
         embed.add_field(name="삥", value="알리(1+2), 독사(1+4), 구삥(1+9), 장삥(1+10), 장사(4+10), 세륙(4+6)", inline=False)
         embed.add_field(name="끗", value="두 패 합의 일의 자리 숫자 (갑오 > X끗 > 망통)", inline=False)
+        embed.add_field(name="멍텅구리구사(멍구사, 9열+4열)", value="상대 족보가 9땡 이하인 경우 무승부, 이외에는 세끗", inline=False)
+        embed.add_field(name="구사(9+4)", value="상대 족보가 알리 이하인 경우 무승부, 이외에는 세끗", inline=False)
+        embed.add_field(name="7 - 4 암행어사(7열 + 4열)", value="상대 족보가 1 - 8 광땡 또는 1 - 3 광땡인 경우 승리, 이외에는 한끗", inline=False)
+        embed.add_field(name="7 - 3 땡잡이(7열 + 3광)", value="상대 족보가 1 ~ 9땡인 경우 승리, 이외에는 망통(0끗)", inline=False)
+        embed.set_footer(text="")
     elif a == '게임 제비뽑기' or a == '제비뽑기':
         embed=discord.Embed(title="제비뽑기 사용 방법", description="명령어 : 루냥아 제비뽑기 (선택지1) (선택지2) ... , (결과1) (결과2) ...", color=0xffff00)
         embed.add_field(name="사용 방법", value="각 항목은 띄어쓰기로 구분, 선택지와 결과는 쉼표(,)로 구분!", inline=False)
