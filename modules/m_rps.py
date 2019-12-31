@@ -50,5 +50,5 @@ def rps(message, user, db):
         embed.add_field(name="루냥이의 선택", value=cm, inline=True)
         embed.add_field(name="결과", value=r, inline=False)
     else:
-        embed=discord.Embed(title=m_lang.string(db, message.author.id, "rps_help"), description="예시 : 루냥아 가위바위보 " + choice(["가위", "바위", "보"]))
+        embed=discord.Embed(title=m_lang.string(db, user.id, "rps_help"), description="예시 : 루냥아 가위바위보 " + choice(["가위", "바위", "보"]))
     return embed

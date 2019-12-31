@@ -99,11 +99,19 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="제비뽑기", value="CPU가 제비뽑기를 실행합니다", inline=False)
         embed.add_field(name="가위바위보", value="CPU와 가위바위보를 진행합니다", inline=False)
     elif a == '게임 섯다' or a == '섯다':
-        embed=discord.Embed(title="두장섯다 사용 방법", description="명령어 : 루냥아 섯다 (숫자1) (숫자2), 0~9까지의 숫자 두개를 입력해 진행합니다", color=0xffff00)
-        embed.add_field(name="족보 순위", value="땡 > 삥 > 끗", inline=False)
-        embed.add_field(name="땡", value="두 패가 같은 경우 (장땡 ~ 삥땡)", inline=False)
+        embed=discord.Embed(title="두장섯다 사용 방법", description="명령어 : 루냥아 섯다 (숫자1) (숫자2), 0~9까지의 숫자 두개를 입력해 진행합니다\n[확률 정보](http://121.1.120.57:50000/sd_percentage.htm)", color=0xffff00)
+        embed.add_field(name="족보 순위", value="광땡 > 땡 > 삥 > 끗", inline=False)
+        embed.add_field(name="3 - 8 광땡", value="3월 광 + 8월 광", inline=False)
+        embed.add_field(name="1 - 8 광땡", value="1월 광 + 8월 광", inline=False)
+        embed.add_field(name="1 - 3 광땡", value="1월 광 + 3월 광", inline=False)
+        embed.add_field(name="땡", value="두 패의 월수가 같은 경우 (장땡 ~ 삥땡)", inline=False)
         embed.add_field(name="삥", value="알리(1+2), 독사(1+4), 구삥(1+9), 장삥(1+10), 장사(4+10), 세륙(4+6)", inline=False)
-        embed.add_field(name="끗", value="두 패 합의 일의 자리 숫자 (갑오 ~ 망통)", inline=False)
+        embed.add_field(name="끗", value="두 패 합의 일의 자리 숫자 (갑오 > X끗 > 망통)", inline=False)
+        embed.add_field(name="멍텅구리구사(멍구사, 9열+4열)", value="상대 족보가 9땡 이하인 경우 무승부, 이외에는 세끗", inline=False)
+        embed.add_field(name="구사(9+4)", value="상대 족보가 알리 이하인 경우 무승부, 이외에는 세끗", inline=False)
+        embed.add_field(name="7 - 4 암행어사(7열 + 4열)", value="상대 족보가 1 - 8 광땡 또는 1 - 3 광땡인 경우 승리, 이외에는 한끗", inline=False)
+        embed.add_field(name="7 - 3 땡잡이(7열 + 3광)", value="상대 족보가 1 ~ 9땡인 경우 승리, 이외에는 망통(0끗)", inline=False)
+        embed.set_footer(text="")
     elif a == '게임 제비뽑기' or a == '제비뽑기':
         embed=discord.Embed(title="제비뽑기 사용 방법", description="명령어 : 루냥아 제비뽑기 (선택지1) (선택지2) ... , (결과1) (결과2) ...", color=0xffff00)
         embed.add_field(name="사용 방법", value="각 항목은 띄어쓰기로 구분, 선택지와 결과는 쉼표(,)로 구분!", inline=False)
@@ -134,7 +142,7 @@ def help(user, client, text, bot_ver, head, mode):
             embed=discord.Embed(title="관리자 기능 도움말", description="명령어 목록", color=0xff0000)
             embed.add_field(name="공지", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제", inline=False)
             embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
-            embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보", inline=False)
+            embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보, 루냥아 비밀채널 (숫자)", inline=False)
             embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
             embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 접두어 설정 (접두어), 루냥아 불타는 서버 문구, 루냥아 일상대화 접두어, 루냥아 서버 지정 명령어 접두어", inline=False)
         elif a == '관리자 공지':
@@ -157,6 +165,7 @@ def help(user, client, text, bot_ver, head, mode):
             embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 정보", value="연결된 채널의 정보를 봅니다", inline=False)
             embed.add_field(name="루냥아 야짤채널", value="현재 채널의 야짤기능 허용 여부를 결정합니다", inline=False)
+            embed.add_field(name="루냥아 비밀채널 (숫자)", value="현재 채널에 사라지는 메시지 기능을 활성화합니다", inline=False)
         elif a == '관리자 모더레이션':
             embed=discord.Embed(title="관리자 기능 도움말", description="모더레이션", color=0xff0000)
             embed.add_field(name="루냥아 뮤트 (멘션)", value="멘션된 사용자를 뮤트(채팅금지)합니다", inline=False)
@@ -213,7 +222,6 @@ def get_info_public(uptime, servername, bot_ver):
     embed.add_field(name="서버 이름", value=servername, inline=False)
     embed.add_field(name="CPU", value=cpuinfo.get_cpu_info()["brand"], inline=False)
     embed.add_field(name="RAM 용량", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB")
-    embed.add_field(name="운영체제 버전", value="Ubuntu Server 18.04", inline=False)
     embed.add_field(name="Python 버전", value=cpuinfo.get_cpu_info()["python_version"].replace(".final.0", ""), inline=False)
     embed.add_field(name="Discord.py 버전", value=discord.__version__, inline=False)
     embed.add_field(name="동작 시간", value=uptime, inline=False)
@@ -232,7 +240,7 @@ def source_code():
 
 def selfintro(client, bot_ver, message):
     embed=discord.Embed(title="기계식 루냥이", color=0xffffff)
-    embed.add_field(name="디렉터", value="[libertin](https://www.facebook.com/profile.php?id=100016101485889)", inline=True)
+    embed.add_field(name="프로듀서", value="[libertin](https://www.facebook.com/profile.php?id=100016101485889)", inline=True)
     embed.add_field(name="프로그래머", value="[Katinor](https://twitter.com/icoRayner)\n[Seia](https://twitter.com/Seia_Soto)", inline=True)
     embed.add_field(name="시스템 관리", value="[perillamint](https://twitter.com/perillamint)", inline=True)
     embed.add_field(name="대사 작성", value="[Preta](https://twitter.com/Preta_Crowz)", inline=True)

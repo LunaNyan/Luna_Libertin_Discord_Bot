@@ -1,6 +1,11 @@
-import math, discord, random, datetime, m_etc, m_lang
+import math, discord, random, datetime, m_etc, m_lang, configparser
 
 test_glyph_2 = ""
+
+sdb_path = "db/command_suggests.dat"
+
+sdb = configparser.ConfigParser()
+sdb.read(sdb_path)
 
 def set_bio(conf, user, text):
     conf.set("bio", str(user.id), text)
@@ -465,7 +470,7 @@ def unsleep(db, message, dt):
     embed.add_field(name="잠수 시간", value=str(t), inline=False)
     return embed
 
-def head(db, message):
+def head(db, message, test_glyph=""):
     if test_glyph_2 != "_":
         try:
             hd = db.get("custom_head", str(message.guild.id))
@@ -560,4 +565,48 @@ def level_rank(client, db):
             c += 1
         except:
             break
+    return embed
+
+def suggest_commands(db, message):
+    if not sdb.has_section(str(message.author.id)):
+        sdb.add_section(str(message.author.id))
+        sdb.set(str(message.author.id), "meta_name", message.author.name)
+    if len(sdb.items(str(message.author.id))) > 6:
+        embed = discord.Embed(m_lang.string(db, message.author.id, "too_much_suggest"))
+        embed.set_footer(text='제안한 명령어 보기 : "루냥아 제안 목록", 제안한 명령어 전체 삭제 : "루냥아 제안 삭제"')
+    else:
+        mr = message.content.replace(head(db, message) + "제안 ", "")
+        m = mr.split(" | ")
+        sdb.set(str(message.author.id), m[0], m[1])
+        embed = discord.Embed(title=m_lang.string(db, message.author.id, "suggest_command"))
+        if "&&" in m[1]:
+            li = m[1].split("&&")
+            embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
+        else:
+            embed.add_field(name=m[0], value=m[1], inline=False)
+        embed.set_footer(text="해당 명령어는 운영자의 검토 이후 추가됩니다")
+        with open(sdb_path, 'w') as configfile:
+            sdb.write(configfile)
+    return embed
+
+def list_suggests(db, message):
+    if not sdb.has_section(str(message.author.id)):
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_suggest"))
+    else:
+        cc = 1
+        embed=discord.Embed(title=message.author.name + " 님의 명령어 제안 목록")
+        for c in sdb.items(str(message.author.id)):
+            if c[0] != 'meta_name':
+                embed.add_field(name="#" + str(cc) + " : " + c[0], value=c[1], inline=False)
+                cc += 1
+    return embed
+
+def purge_suggests(db, message):
+    if not sdb.has_section(str(message.author.id)):
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_suggest"))
+    else:
+        sdb.remove_section(str(message.author.id))
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "purged_suggest"))
+        with open(sdb_path, 'w') as configfile:
+            sdb.write(configfile)
     return embed
