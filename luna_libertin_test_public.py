@@ -8,16 +8,15 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
 
 import time, random, re, traceback, discord, asyncio, psutil, os, sys, random, configparser
 from datetime import datetime, timedelta
-from modules.m_seotda import *
 import imp
 
 sys.path.append('./modules/')
-import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc, m_lang
+import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc, m_lang, m_seotda
 sys.path.append('../')
 
 startTime = datetime.now()
 
-bot_ver = "21.0.0-test-20191230"
+bot_ver = "21.1.0-test-200113"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -80,6 +79,21 @@ async def attendance_reset():
         dt = datetime.now()
         if dt.hour == 0 and dt.minute == 0 and dt.second == 0:
             db.set("attendance", "today", "0")
+            lotto_numbers = []
+            lotto_numbers_available = []
+            lotto_numbers_repeat = 1
+            while len(lotto_numbers_available) < 45:
+                lotto_numbers_available.append(lotto_numbers_repeat)
+                lotto_numbers_repeat += 1
+            while len(lotto_numbers) < 6:
+                il = random.randint(0, len(lotto_numbers_available))
+                lotto_numbers.append(lotto_numbers_available[il])
+                del lotto_numbers_available[il]
+            lotto_numbers_str = ""
+            for l in lotto_numbers:
+                lotto_numbers_str += l + ","
+            db.set("lotto_meta", "number", lotto_numbers_str)
+            db.set("lotto_meta", "dt", str(dt.year) + "," + str(dt.month) + "," + str(dt.day))
         await asyncio.sleep(1)
 
 @client.event
@@ -149,7 +163,7 @@ async def news_send(message, title_str, content):
         try:
             news_channel = client.get_channel(int(c))
             await news_channel.send(embed=embed)
-            await message.channel.send(c.name + " at " + c.guild.name + " (" + str(c) + ") : Success")
+            await message.channel.send(news_channel.name + " at " + news_channel.guild.name + " (" + str(c) + ") : Success")
         except Exception as e:
             cs = cs.replace(c + ", ", "")
             await message.channel.send(str(c) + " : Failed (" + str(e) + ")")
@@ -179,6 +193,12 @@ async def on_message(message):
         global article_content
         global comm_count
         global news_image
+        # heartbeat request from doctor bot
+        if message.content == "heartbeat_request":
+            pb = time.monotonic()
+            await message.channel.send("ping test")
+            ping = (time.monotonic() - pb) * 1000
+            await message.channel.send("ack" + str(int(ping)))
         # head pointer
         head_s = m_user.head(db, message)
         # admin indicator
@@ -327,7 +347,7 @@ async def on_message(message):
             if message.content == head_s + '섯다':
                 embed=discord.Embed(title="사용 방법 : 루냥아 섯다 (0부터 9까지의 숫자) (0부터 9까지의 숫자)", color=0xff77ff)
             else:
-                embed=seotda(message.content, message.author, head_s)
+                embed=m_seotda.seotda(message.content, message.author, head_s)
             await message.channel.send(embed=embed)
         elif message.content.startswith(head_s + '소개말'):
             if message.content == head_s + "소개말":
@@ -1096,11 +1116,12 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
         elif message.content == head_s + "비밀채널" and ifadmin:
             embed=discord.Embed(title="사용 방법", description="루냥아 비밀채널 (5부터 75까지의 숫자)")
-            embed.add_field(name="효과", value="채널 내 메시지 수가 지정된 수를 넘어서는 경우 제일 오래된 메시지부터 삭제", inlile=False)
+            embed.add_field(name="효과", value="채널 내 메시지 수가 지정된 수를 넘어서는 경우 제일 오래된 메시지부터 삭제", inline=False)
+            await message.channel.send(embed=embed)
         elif message.content.startswith(head_s + "비밀채널 ") and ifadmin:
             m = int(message.content.replace(head_s + "비밀채널 ", ""))
             cnt = 0
-            if cnt > 75 or cnt < 5:
+            if m > 75 or m < 5:
                 embed=discord.Embed(title=m_lang.string(db, message.author.id, "volatile_invalid_count"), color=0xff0000)
             else:
                 async for cf in message.channel.history(limit=100):

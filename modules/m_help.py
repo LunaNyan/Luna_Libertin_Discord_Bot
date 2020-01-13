@@ -99,7 +99,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="제비뽑기", value="CPU가 제비뽑기를 실행합니다", inline=False)
         embed.add_field(name="가위바위보", value="CPU와 가위바위보를 진행합니다", inline=False)
     elif a == '게임 섯다' or a == '섯다':
-        embed=discord.Embed(title="두장섯다 사용 방법", description="명령어 : 루냥아 섯다 (숫자1) (숫자2), 0~9까지의 숫자 두개를 입력해 진행합니다", color=0xffff00)
+        embed=discord.Embed(title="두장섯다 사용 방법", description="명령어 : 루냥아 섯다 (숫자1) (숫자2), 0~9까지의 숫자 두개를 입력해 진행합니다\n[확률 정보](http://121.1.120.57:50000/sd_percentage.htm)", color=0xffff00)
         embed.add_field(name="족보 순위", value="광땡 > 땡 > 삥 > 끗", inline=False)
         embed.add_field(name="3 - 8 광땡", value="3월 광 + 8월 광", inline=False)
         embed.add_field(name="1 - 8 광땡", value="1월 광 + 8월 광", inline=False)
