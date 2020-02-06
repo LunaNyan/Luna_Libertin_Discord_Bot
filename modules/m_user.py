@@ -156,6 +156,7 @@ def check_another(conf, user, message):
         embed.add_field(name="칭호", value=tr, inline=True)
     except:
         tr = ""
+    embed.set_footer(text='계정 생성일시 등의 정보 확인 : "루냥아 계정정보"')
     return embed
 
 def accountinfo(conf, user, message):
@@ -342,32 +343,45 @@ def guild_custom_commands(db, message):
         return None
 
 def make_custom_commands(db, message):
-    mr = message.content.replace(head(db, message) + "배워 ", "")
-    m = mr.split(" | ")
-    editing_m = m_lang.string(db, message.author.id, "custom_command_added")
-    if mr.startswith("| ") or mr.startswith(" | ") or mr.endswith(" |"):
-        embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_no_blank"), color=0xff0000)
+    s = str(message.guild.id)
+    l = dict(db.items("custom_commands"))
+    n = 0
+    for a in l:
+        if s in a:
+            n += 1
+    if n >= 999:
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_limit_exceeded"), color=0xff0000)
     else:
-        try:
-            i = db.get("custom_commands", str(message.guild.id) + "_" + m[0])
-            i = i.split(" | ")[1]
-            editing_m = m_lang.string(db, message.author.id, "custom_command_edit")
-            if message.author.guild_permissions.administrator == False and str(message.author.id) != i:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_edit"), color=0xff000)
-            else:
-                raise
-        except Exception as e:
+        mr = message.content.replace(head(db, message) + "배워 ", "")
+        m = mr.split(" | ")
+        editing_m = m_lang.string(db, message.author.id, "custom_command_added")
+        if mr.startswith("| ") or mr.startswith(" | ") or mr.endswith(" |"):
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_no_blank"), color=0xff0000)
+        else:
             try:
-                db.set("custom_commands", str(message.guild.id) + "_" + m[0], m[1] + " | " + str(message.author.id) + " | " + message.author.name)
-                embed=discord.Embed(title=editing_m, color=0xff77ff)
-                if "&&" in m[1]:
-                    li = m[1].split("&&")
-                    embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
+                i = db.get("custom_commands", str(message.guild.id) + "_" + m[0])
+                i = i.split(" | ")[1]
+                editing_m = m_lang.string(db, message.author.id, "custom_command_edit")
+                if message.author.guild_permissions.administrator == False and str(message.author.id) != i:
+                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_not_edit"), color=0xff000)
                 else:
-                    embed.add_field(name=m[0], value=m[1], inline=False)
-                embed.set_footer(text="주의 : 배운 명령어는 해당 서버에서만 동작합니다")
-            except:
-                embed=discord.Embed(title='사용 방법 : "루냥아 배워 (명령어) | (반응)"', color=0xffffff)
+                    raise
+            except Exception as e:
+                try:
+                    try:
+                        asdfasdf = int(m[0])
+                        embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_no_number_only"), color=0xff000)
+                    except:
+                        db.set("custom_commands", str(message.guild.id) + "_" + m[0], m[1] + " | " + str(message.author.id) + " | " + message.author.name)
+                        embed=discord.Embed(title=editing_m, color=0xff77ff)
+                        if "&&" in m[1]:
+                            li = m[1].split("&&")
+                            embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
+                        else:
+                            embed.add_field(name=m[0], value=m[1], inline=False)
+                        embed.set_footer(text="주의 : 배운 명령어는 해당 서버에서만 동작합니다")
+                except:
+                    embed=discord.Embed(title='사용 방법 : "루냥아 배워 (명령어) | (반응)"', color=0xffffff)
     return embed
 
 def list_custom_commands(db, message, head):
@@ -388,7 +402,7 @@ def list_custom_commands(db, message, head):
             u.append(str(usn))
             n += 1
     pages = math.ceil(n / 10)
-    if page > pages or page <= 0:
+    if page > pages:
         embed=discord.Embed(title=m_lang.string(db, message.author.id, "wrong_page_idx"))
     else:
         c = (page - 1) * 10
@@ -524,7 +538,7 @@ def servers_list(client, page, db, id):
         embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 서버목록 (페이지)"')
     return embed
 
-def servers_rank_users(client, db):
+def servers_rank_users(client, db, page):
     servers = {}
     sorted_servers = {}
     n = 0
@@ -535,14 +549,20 @@ def servers_rank_users(client, db):
             servers[n] = [s.name, len(s.members), s.owner.name]
         n += 1
     sorted_servers = sorted(servers.items(), key=lambda x: x[1][1], reverse=True)
-    embed=discord.Embed(title="서버 멤버 수 랭킹", color=0xff00ff)
-    c = 0
-    while c <= 9:
-        try:
-            embed.add_field(name=str(c+1) + "등 : " + str(sorted_servers[c][1][0]), value="유저 수 : " + str(sorted_servers[c][1][1]) + ", 서버 주인 : " + str(sorted_servers[c][1][2]), inline=False)
-            c += 1
-        except:
-            break
+    pages = math.ceil(len(servers) / 10)
+    if page > pages or page <= 0:
+        embed=discord.Embed(title=m_lang.string(db, id, "wrong_page_idx"))
+    else:
+        embed=discord.Embed(title="서버 멤버 수 랭킹", color=0xff00ff)
+        embed.set_footer(text=str(page) + ' / ' + str(pages) + ' 페이지, 다른 페이지 보기 : "루냥아 서버랭킹 (페이지)"')
+        c = (page - 1) * 10
+        ct = c + 9
+        while c <= ct:
+            try:
+                embed.add_field(name=str(c+1) + "등 : " + str(sorted_servers[c][1][0]), value="유저 수 : " + str(sorted_servers[c][1][1]) + ", 서버 주인 : " + str(sorted_servers[c][1][2]), inline=False)
+                c += 1
+            except:
+                break
     return embed
 
 def level_rank(client, db):
@@ -610,3 +630,93 @@ def purge_suggests(db, message):
         with open(sdb_path, 'w') as configfile:
             sdb.write(configfile)
     return embed
+
+def set_lotto_number(db, message, dt):
+    m = message.content.replace(head(db, message) + "로또 ", "")
+    li = m.split(" ")
+    if len(li) != 6:
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_invalid_count"))
+    else:
+        try:
+            lo = []
+            sl = ""
+            for s in li:
+                if int(s) in lo:
+                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_multiple_copy"))
+                    return embed
+                elif int(s) > 45 or int(s) < 1:
+                    embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_invalid_number"))
+                    return embed
+                else:
+                    lo.append(int(s))
+            for s in lo:
+                sl += str(s) + ","
+            try:
+                tmp = db.get("lotto", str(message.author.id))
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_edit_successful"))
+                embed.set_footer(text='당첨 결과 확인 : "루냥아 로또 결과"')
+            except:
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_successful"))
+                embed.set_footer(text='당첨 결과 확인 : "루냥아 로또 결과"')
+            db.set("lotto", str(message.author.id), sl + str(dt.year) + "," + str(dt.month) + "," + str(dt.day))
+        except Exception as e:
+            print(str(e))
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_not_a_number"))
+    return embed
+
+def autolotto(db, message, dt):
+    lotto_numbers = []
+    lotto_numbers_available = []
+    lotto_numbers_repeat = 1
+    while len(lotto_numbers_available) < 45:
+        lotto_numbers_available.append(lotto_numbers_repeat)
+        lotto_numbers_repeat += 1
+    while len(lotto_numbers) < 6:
+        il = random.randint(0, len(lotto_numbers_available)-1)
+        lotto_numbers.append(lotto_numbers_available[il])
+        del lotto_numbers_available[il]
+    lotto_numbers_str = ""
+    for l in lotto_numbers:
+        lotto_numbers_str += str(l) + ","
+    db.set("lotto", str(message.author.id), lotto_numbers_str + str(dt.year) + "," + str(dt.month) + "," + str(dt.day))
+    embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_successful"))
+    embed.add_field(name="로또 번호", value=lotto_numbers_str[:-1])
+    embed.set_footer(text='당첨 결과 확인 : "루냥아 로또 결과"')
+    return embed
+
+def get_lotto(db, message, dt, lotto_meta, lotto_dt):
+    try:
+        l_raw = db.get("lotto", str(message.author.id))
+        l_li = l_raw.split(",")
+        l_num = l_li[:6]
+        l_dt = l_li[6:]
+        m_num = lotto_meta.split(",")
+        m_dt = lotto_dt.split(",")
+        matches = 0
+        m_txt = ""
+        for i in l_num:
+            m_txt += i + ","
+        m_txt = m_txt[:-1]
+        if l_dt[0] == m_dt[0] and l_dt[1] == m_dt[1] and l_dt[2] == m_dt[2]:
+            for i in l_num:
+                if i in m_num:
+                    matches += 1
+        else:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_not_attended"))
+            return embed
+        if matches >= 4:
+            res = "1등!"
+        elif matches == 3:
+            res = "2등!"
+        elif matches == 2:
+            res = "3등!"
+        elif matches <= 1:
+            res = "꽝!"
+        embed=discord.Embed(title=message.author.name + " 님의 금일 로또 결과")
+        embed.add_field(name="응모한 번호", value=m_txt, inline=False)
+        embed.add_field(name="갱신된 번호", value=lotto_meta, inline=False)
+        embed.add_field(name="결과", value=res, inline=False)
+        return embed
+    except:
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_not_attended"))
+        return embed

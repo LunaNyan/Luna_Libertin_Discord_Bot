@@ -156,30 +156,33 @@ def memo_view(message, head, dbx):
 
 def memo_write(message, head, dbx):
     content = message.content.replace(head + "메모 ", "")
-    try:
-        l_content = str(db.get("memo_"+ str(message.author.id), "content")).split(", ")
-        l_dtstr = str(db.get("memo_"+ str(message.author.id), "datetime")).split(", ")
-    except:
-        db.add_section("memo_"+ str(message.author.id))
-        l_content = [memo_temp_title]
-        l_dtstr = [memo_temp_content]
-    if len(l_content) == 30:
-        embed=discord.Embed(title=m_lang.string(dbx, message.author.id, "memo_amount_exceeded"), description=m_lang.string(dbx, message.author.id, "delete_obsolete_memo"), color=0xff0000)
+    if len(content) >= 300:
+        embed=discord.Embed(title=m_lang.string(dbx, message.author.id, "memo_too_long"), color=0xff0000)
     else:
-        l_content.insert(0, m_etc.base64e(content))
-        l_dtstr.insert(0, m_etc.base64e(str(datetime.datetime.now().isoformat())))
-        n = 0
-        s_content = ""
-        s_dtstr = ""
-        for c in l_content:
-            s_content += c + ", "
-            s_dtstr += l_dtstr[n] + ", "
-            n += 1
-        db.set("memo_"+ str(message.author.id), "content", s_content[:-2])
-        db.set("memo_"+ str(message.author.id), "datetime", s_dtstr[:-2])
-        embed=discord.Embed(title=m_lang.string(dbx, message.author.id, "saved_memo"), description=m_lang.string(dbx, message.author.id, "saved_memo_desc"), color=0xffff00)
-        with open(db_path, 'w') as configfile:
-            db.write(configfile)
+        try:
+            l_content = str(db.get("memo_"+ str(message.author.id), "content")).split(", ")
+            l_dtstr = str(db.get("memo_"+ str(message.author.id), "datetime")).split(", ")
+        except:
+            db.add_section("memo_"+ str(message.author.id))
+            l_content = [memo_temp_title]
+            l_dtstr = [memo_temp_content]
+        if len(l_content) == 30:
+            embed=discord.Embed(title=m_lang.string(dbx, message.author.id, "memo_amount_exceeded"), description=m_lang.string(dbx, message.author.id, "delete_obsolete_memo"), color=0xff0000)
+        else:
+            l_content.insert(0, m_etc.base64e(content))
+            l_dtstr.insert(0, m_etc.base64e(str(datetime.datetime.now().isoformat())))
+            n = 0
+            s_content = ""
+            s_dtstr = ""
+            for c in l_content:
+                s_content += c + ", "
+                s_dtstr += l_dtstr[n] + ", "
+                n += 1
+            db.set("memo_"+ str(message.author.id), "content", s_content[:-2])
+            db.set("memo_"+ str(message.author.id), "datetime", s_dtstr[:-2])
+            embed=discord.Embed(title=m_lang.string(dbx, message.author.id, "saved_memo"), description=m_lang.string(dbx, message.author.id, "saved_memo_desc"), color=0xffff00)
+            with open(db_path, 'w') as configfile:
+                db.write(configfile)
     return embed
 
 def memo_remove(message, head, dbx):
@@ -210,7 +213,7 @@ def memo_remove(message, head, dbx):
         n += 1
     db.set("memo_"+ str(message.author.id), "content", s_content[:-2])
     db.set("memo_"+ str(message.author.id), "datetime", s_dtstr[:-2])
-    embed=discord.Embed(title=_lang.string(dbx, message.author.id, "memo_deleted"), color=0xffff00)
+    embed=discord.Embed(title=m_lang.string(dbx, message.author.id, "memo_deleted"), color=0xffff00)
     with open(db_path, 'w') as configfile:
         db.write(configfile)
     return embed

@@ -16,7 +16,7 @@ sys.path.append('../')
 
 startTime = datetime.now()
 
-bot_ver = "21.1.0-test-200113"
+bot_ver = "22.0.0-test-2020020602"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -71,13 +71,18 @@ article_content = ""
 
 comm_count = 0
 
+trigger_dayjob = False
+
 client = discord.Client()
 
 @client.event
 async def attendance_reset():
     while True:
+        global trigger_dayjob
         dt = datetime.now()
         if dt.hour == 0 and dt.minute == 0 and dt.second == 0:
+            trigger_dayjob = True
+        if trigger_dayjob == True:
             db.set("attendance", "today", "0")
             lotto_numbers = []
             lotto_numbers_available = []
@@ -86,14 +91,15 @@ async def attendance_reset():
                 lotto_numbers_available.append(lotto_numbers_repeat)
                 lotto_numbers_repeat += 1
             while len(lotto_numbers) < 6:
-                il = random.randint(0, len(lotto_numbers_available))
+                il = random.randint(0, len(lotto_numbers_available)-1)
                 lotto_numbers.append(lotto_numbers_available[il])
                 del lotto_numbers_available[il]
             lotto_numbers_str = ""
             for l in lotto_numbers:
-                lotto_numbers_str += l + ","
-            db.set("lotto_meta", "number", lotto_numbers_str)
-            db.set("lotto_meta", "dt", str(dt.year) + "," + str(dt.month) + "," + str(dt.day))
+                lotto_numbers_str += str(l) + ","
+            db.set("lotto_meta", "number", lotto_numbers_str[:-1])
+            db.set("lotto_meta", "dt", str(dt.year) + "," + str(dt.month) + "," + str(dt.day-1))
+            trigger_dayjob == False
         await asyncio.sleep(1)
 
 @client.event
@@ -193,6 +199,7 @@ async def on_message(message):
         global article_content
         global comm_count
         global news_image
+        global trigger_dayjob
         # heartbeat request from doctor bot
         if message.content == "heartbeat_request":
             pb = time.monotonic()
@@ -339,6 +346,8 @@ async def on_message(message):
             await message.channel.send(embed=m_ext_commands.hug())
         elif message.content == head_s + "부비부비":
             await message.channel.send(embed=m_ext_commands.cuddle())
+        elif message.content == head_s + "쪽":
+            await message.channel.send(embed=m_ext_commands.kiss())
         elif message.content.startswith(head_s + '섞어줘'):
             await message.channel.send(m_ext_commands.say_shuffle(message, head_s))
         elif message.content.startswith(head_s + '행운의숫자'):
@@ -360,9 +369,12 @@ async def on_message(message):
                     m_user.set_bio(db, message.author, bio_str)
                     await message.channel.send(m_lang.string(db, message.author.id, "bio_set"))
         elif message.content.startswith(head_s + '방명록 쓰기 '):
-            m_board.gbook_write(message.content.replace(head_s + "방명록 쓰기 ", ""), message.author.id)
-            embed=discord.Embed(title=m_lang.string(db, message.author.id, "board_writed_title"), description=m_lang.string(db, message.author.id, "board_writed_desc"), color=0xffffff)
-            await message.channel.send(embed=embed)
+            if len(message.content.replace(head_s + "방명록 쓰기 ", "")) > 150:
+                await message.channel.send(m_lang.string(db, message.author.id, "board_too_long"))
+            else:
+                m_board.gbook_write(message.content.replace(head_s + "방명록 쓰기 ", ""), message.author.id)
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "board_writed_title"), description=m_lang.string(db, message.author.id, "board_writed_desc"), color=0xffffff)
+                await message.channel.send(embed=embed)
         elif message.content.startswith(head_s + '방명록'):
             page = message.content.replace(head_s + "방명록 ", "")
             try:
@@ -526,8 +538,12 @@ async def on_message(message):
             except:
                 page = 1
             await message.channel.send(embed=m_user.servers_list(client, page, db, message.author.id))
-        elif message.content == head_s + "서버랭킹":
-            await message.channel.send(embed=m_user.servers_rank_users(client, db))
+        elif message.content.startswith(head_s + "서버랭킹"):
+            try:
+                page = int(message.content.replace(head_s + "서버랭킹 ", ""))
+            except:
+                page = 1
+            await message.channel.send(embed=m_user.servers_rank_users(client, db, page))
         elif message.content == head_s + "호감도랭킹":
             await message.channel.send(embed=m_user.level_rank(client, db))
         elif message.content.startswith(head_s + "닉변 "):
@@ -595,6 +611,19 @@ async def on_message(message):
             elif m_lang.check_lang(db, message.author.id) == "한국어(반말모드)":
                 db.set("lang", str(message.author.id), "default")
                 await message.channel.send("이제 존댓말로 대화할게요!")
+        elif message.content == head_s + "로또":
+            embed=discord.Embed(title="로또 이용 방법")
+            embed.add_field(name="명령어", value="루냥아 로또 (1~45 사이의 숫자 6개)", inline=False)
+            embed.add_field(name="규칙", value="매일 0시에 갱신되는 로또 번호와 응모한 로또 번호가 몇 개나 동일한 지에 따라 등수가 정해집니다\n1등 : 4개 이상\n2등 : 3개\n3등 : 2개", inline=False)
+            embed.add_field(name="결과 확인", value='루냥아 로또 결과', inline=False)
+            embed.add_field(name="주의사항", value="같은 번호를 반복 응모할 수 없습니다")
+            await message.channel.send(embed=embed)
+        elif message.content == head_s + "로또 결과":
+            await message.channel.send(embed=m_user.get_lotto(db, message, datetime.now(), db.get("lotto_meta", "number"), db.get("lotto_meta", "dt")))
+        elif message.content == head_s + "로또 자동":
+            await message.channel.send(embed=m_user.autolotto(db, message, datetime.now()))
+        elif message.content.startswith(head_s + "로또"):
+            await message.channel.send(embed=m_user.set_lotto_number(db, message, datetime.now()))
         # admin only functions
         elif message.content == head_s + 'raise_test' and message.author.id == int(conf.get("config", "bot_owner")):
             raise "sex"
@@ -791,6 +820,8 @@ async def on_message(message):
             c = client.get_channel(int(mc))
             await c.send(mm)
             await message.channel.send(c.name + "(" + str(c.id) + ") in " + c.guild.name + "(" + str(c.guild.id) + ")\n" + mm)
+        elif message.content == head_s + 'force_dayjob' and message.author.id == int(conf.get("config", "bot_owner")):
+            trigger_dayjob = True
         # commands for guild admins
         # these commands will be disabled when bot is in test mode
         elif message.content == head_s + "서버공개" and ifadmin:
@@ -1238,7 +1269,7 @@ async def on_member_join(member):
         m = a[1]
         m = m.replace("[멘션]", member.mention)
         m = m.replace("[이름]", member.name)
-        await ch.send(m)
+        await c.send(m)
     try:
         cid = db.get("server_log", str(member.guild.id))
         cid = client.get_channel(int(cid))
