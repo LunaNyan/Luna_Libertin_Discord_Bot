@@ -20,7 +20,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="게임", value="기계식 루냥이와 놀기", inline=False)
         embed.add_field(name="대화", value="기계식 루냥이와 대화하기", inline=False)
         embed.add_field(name="유용한 기능", value="유용한 도구 모음", inline=False)
-        embed.set_footer(text='Copyright (C) 2017 - 2020 기계식 루냥이 팀 | ver ' + bot_ver)
+        embed.set_footer(text='Copyright (C) 2017 - 2020 STUDIO ONE | ver ' + bot_ver)
     elif a == '전체 명령어':
         embed=discord.Embed(title="도움말", description="전체 명령어 목록", color=0x8080ff)
         embed.add_field(name="도움말", value="루냥아 (항목) 도와줘, 루냥아 누구니, 루냥아 소스코드", inline=False)
@@ -30,7 +30,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="서버", value="루냥아 서버정보, 루냥아 서버설정, 루냥아 서버아이콘, 루냥아 가입일시공개, 루냥아 배워, 루냥아 잊어, 루냥아 배운거", inline=False)
         embed.add_field(name="정보", value="루냥아 이용약관, 루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 성능, 루냥아 후원", inline=False)
         embed.add_field(name="대화", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥이 꼬옥, 루냥이 부비부비, 루냥아 (물체) 먹어, 와! 샌즈!, 루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
-        embed.add_field(name="게임", value="루냥아 섯다, 루냥아 제비뽑기, 루냥아 가위바위보", inline=False)
+        embed.add_field(name="게임", value="루냥아 섯다, 루냥아 제비뽑기, 루냥아 가위바위보, 루냥아 로또", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자, 루냥아 핑, 루냥아 색상 (색상코드), 루냥아 받아쓰기 (텍스트), 루냥아 야짤 (태그)", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기, 불타는 서버", inline=False)
         if user.guild_permissions.administrator:
@@ -98,6 +98,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="섯다", value="CPU와 두장섯다를 진행합니다", inline=False)
         embed.add_field(name="제비뽑기", value="CPU가 제비뽑기를 실행합니다", inline=False)
         embed.add_field(name="가위바위보", value="CPU와 가위바위보를 진행합니다", inline=False)
+        embed.add_field(name="로또", value="로또 게임을 진행합니다", inline=False)
     elif a == '게임 섯다' or a == '섯다':
         embed=discord.Embed(title="두장섯다 사용 방법", description="명령어 : 루냥아 섯다 (숫자1) (숫자2), 0~9까지의 숫자 두개를 입력해 진행합니다\n[확률 정보](http://121.1.120.57:50000/sd_percentage.htm)", color=0xffff00)
         embed.add_field(name="족보 순위", value="광땡 > 땡 > 삥 > 끗", inline=False)
@@ -119,6 +120,12 @@ def help(user, client, text, bot_ver, head, mode):
     elif a == '게임 가위바위보' or a == '가위바위보':
         embed=discord.Embed(title="가위바위보 사용 방법", description="명령어 : 루냥아 가위바위보 (선택지)", color=0xffff00)
         embed.add_field(name="선택지", value="가위, 바위, 보", inline=False)
+    elif a == '게임 로또' or a == '로또':
+        embed=discord.Embed(title="로또 이용 방법")
+        embed.add_field(name="명령어", value="루냥아 로또 (1~45 사이의 숫자 6개)", inline=False)
+        embed.add_field(name="규칙", value="매일 0시에 갱신되는 로또 번호와 응모한 로또 번호가 몇 개나 동일한 지에 따라 등수가 정해집니다\n1등 : 4개 이상\n2등 : 3개\n3등 : 2개", inline=False)
+        embed.add_field(name="결과 확인", value='루냥아 로또 결과', inline=False)
+        embed.add_field(name="주의사항", value="같은 번호를 반복 응모할 수 없습니다")
     elif a == '유용한 기능':
         embed=discord.Embed(title="도움말", description="유용한 기능", color=0x00ff00)
         embed.add_field(name="루냥아 계산해줘 (계산식)", value="Wolfram|Alpha 계산 쿼리를 제공합니다", inline=False)
@@ -142,7 +149,7 @@ def help(user, client, text, bot_ver, head, mode):
             embed=discord.Embed(title="관리자 기능 도움말", description="명령어 목록", color=0xff0000)
             embed.add_field(name="공지", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제", inline=False)
             embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
-            embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보, 루냥아 비밀채널 (숫자)", inline=False)
+            embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보, 루냥아 야짤채널, 루냥아 비밀채널 (숫자)", inline=False)
             embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
             embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 접두어 설정 (접두어), 루냥아 불타는 서버 문구, 루냥아 일상대화 접두어, 루냥아 서버 지정 명령어 접두어", inline=False)
         elif a == '관리자 공지':
@@ -230,7 +237,7 @@ def get_info_public(uptime, servername, bot_ver):
 
 def bday():
     embed=discord.Embed(title="저는 2017년 5월 9일에 태어났어요!", color=0xffff00)
-    embed.set_footer(text="Copyright (C) 2017 - 2020 기계식 루냥이 팀")
+    embed.set_footer(text="Copyright (C) 2017 - 2020 STUDIO ONE")
     return embed
 
 def source_code():
@@ -240,16 +247,14 @@ def source_code():
 
 def selfintro(client, bot_ver, message):
     embed=discord.Embed(title="기계식 루냥이", color=0xffffff)
-    embed.add_field(name="프로듀서", value="[libertin](https://www.facebook.com/profile.php?id=100016101485889)", inline=True)
+    embed.add_field(name="총괄 관리자", value="[libertin](https://www.facebook.com/profile.php?id=100016101485889)", inline=True)
     embed.add_field(name="프로그래머", value="[Katinor](https://twitter.com/icoRayner)\n[Seia](https://twitter.com/Seia_Soto)", inline=True)
-    embed.add_field(name="시스템 관리", value="[perillamint](https://twitter.com/perillamint)", inline=True)
-    embed.add_field(name="대사 작성", value="[Preta](https://twitter.com/Preta_Crowz)", inline=True)
-    embed.add_field(name="특별 감사", value="[Scatter Lab](https://scatterlab.co.kr)\n[SQUARE PIXELS & EZ2AC TEAM](https://ez2ac.co.kr)\n" + message.author.name, inline=True)
+    embed.add_field(name="특별 감사", value="[SQUARE PIXELS](https://ez2ac.co.kr)\n[Scatter Lab](https://scatterlab.co.kr)\n" + message.author.name, inline=True)
     embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)", inline=False)
     embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
     embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [十九의 Picrew](https://picrew.me/image_maker/79516)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.set_footer(text="Copyright (C) 2017 - 2020 기계식 루냥이 팀 | ver " + bot_ver)
+    embed.set_footer(text="Copyright (C) 2017 - 2020 STUDIO ONE | ver " + bot_ver)
     return embed
 
 def permcheck(me):
@@ -303,7 +308,7 @@ def bot_welcome_message(client, bot_ver):
     embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description=des)
     embed.add_field(name="봇을 설정하기 전에", value='기능 추가 등의 소식을 받아보려면 공지 받기를 원하는 채널에서 "루냥아 공지채널 추가"를 입력해주세요!')
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.set_footer(text="Copyright (C) 2017 - 2020 기계식 루냥이 팀 | ver " + bot_ver)
+    embed.set_footer(text="Copyright (C) 2017 - 2020 STUDIO ONE | ver " + bot_ver)
     return embed
 
 def tos():

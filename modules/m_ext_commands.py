@@ -87,6 +87,12 @@ def cuddle():
     embed.set_footer(text="powered by nekos.life")
     return embed
 
+def kiss():
+    embed=discord.Embed(title="쪽~ >_<", color=0xff77ff)
+    embed.set_image(url=nekos.img("kiss"))
+    embed.set_footer(text="powered by nekos.life")
+    return embed
+
 def l_lv(conf, user, test_glyph):
     # int 500 or over
     lv_str_1 = ["저두우~:two_hearts:", "헤헤~(방긋"]
