@@ -37,6 +37,7 @@ def ret_check(conf, user, test_glyph):
         return 0
 
 def check(conf, message):
+    user = message.author
     try:
         pt = int(conf.get("user_level", str(message.author.id)))
     except:
@@ -93,6 +94,10 @@ def check(conf, message):
     elif pt < 5000:
         nxtstr = "신의 경지까지 " + str(5000 - pt) + " 남음"
     embed.add_field(name="호감도", value=ptstr + "(" + str(pt) + ")", inline=True)
+    try:
+        embed.add_field(name="누적 출석 횟수", value=str(conf.get("attendance", str(user.id))), inline=True)
+    except:
+        pass
     embed.add_field(name="호감도 목표치", value=nxtstr, inline=True)
     try:
         tr = conf.get("user_tropy", str(message.author.id))
@@ -151,6 +156,10 @@ def check_another(conf, user, message):
     else:
         ptstr = "안녕하세요!"
     embed.add_field(name="호감도", value=ptstr + "(" + str(pt) + ")", inline=True)
+    try:
+        embed.add_field(name="누적 출석 횟수", value=str(conf.get("attendance", str(user.id))), inline=True)
+    except:
+        pass
     try:
         tr = conf.get("user_tropy", str(user.id))
         embed.add_field(name="칭호", value=tr, inline=True)
@@ -349,7 +358,7 @@ def make_custom_commands(db, message):
     for a in l:
         if s in a:
             n += 1
-    if n >= 999:
+    if n >= 4095:
         embed=discord.Embed(title=m_lang.string(db, message.author.id, "custom_command_limit_exceeded"), color=0xff0000)
     else:
         mr = message.content.replace(head(db, message) + "배워 ", "")
@@ -629,6 +638,15 @@ def purge_suggests(db, message):
         embed=discord.Embed(title=m_lang.string(db, message.author.id, "purged_suggest"))
         with open(sdb_path, 'w') as configfile:
             sdb.write(configfile)
+    return embed
+
+def suggest_food(db, message, dt):
+    m = message.content.replace(head(db, message) + "음식제안 ", "")
+    sdb.set("food_suggests", str(message.author.id) + "_" + str(int(dt.timestamp())), m)
+    embed = discord.Embed(title=m_lang.string(db, message.author.id, "suggest_food"), description=m)
+    embed.set_footer(text="운영자의 검토 이후 추가됩니다")
+    with open(sdb_path, 'w') as configfile:
+        sdb.write(configfile)
     return embed
 
 def set_lotto_number(db, message, dt):

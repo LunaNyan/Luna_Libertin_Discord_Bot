@@ -9,14 +9,12 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
 import time, random, re, traceback, discord, asyncio, psutil, os, sys, random, configparser
 from datetime import datetime, timedelta
 import imp
-
-sys.path.append('./modules/')
 import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc, m_lang, m_seotda
 sys.path.append('../')
 
 startTime = datetime.now()
 
-bot_ver = "21.5.0"
+bot_ver = "21.6.2"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -492,6 +490,11 @@ async def on_message(message):
             await message.channel.send(embed=m_user.purge_suggests(db, message))
         elif message.content.startswith(head_s + '제안 '):
             await message.channel.send(embed=m_user.suggest_commands(db, message))
+        elif message.content == head_s + '음식제안':
+            embed=discord.Embed(title="사용 방법", description="루냥아 음식제안 (간단한 설명)", color=0xffffff)
+            await message.channel.send(embed=embed)
+        elif message.content.startswith(head_s + '음식제안 '):
+            await message.channel.send(embed=m_user.suggest_food(db, message, datetime.now()))
         elif message.content.startswith(head_s + '잊어 '):
             await message.channel.send(embed=m_user.remove_custom_commands(db, message))
         elif message.content == head_s + "배운거":
@@ -601,9 +604,9 @@ async def on_message(message):
         elif message.content.startswith(head_s + "야짤") and message.content != head_s + "야짤채널":
             if str(message.channel.id) in db.get("etc", "nsfw_channel"):
                 await message.channel.send(embed=m_ext_commands.nsfw_neko(message, head_s))
-            else:
-                embed=discord.Embed(title=m_lang.string(db, message.author.id, "nsfw_neko_blocked_title"), description=m_lang.string(db, message.author.id, "contact_to_server_admin"), color=0xff0000)
-                await message.channel.send(embed=embed)
+#            else:
+#                embed=discord.Embed(title=m_lang.string(db, message.author.id, "nsfw_neko_blocked_title"), description=m_lang.string(db, message.author.id, "contact_to_server_admin"), color=0xff0000)
+#                await message.channel.send(embed=embed)
         elif message.content == head_s + "반모":
             if m_lang.check_lang(db, message.author.id) == "한국어(기본)":
                 db.set("lang", str(message.author.id), "ban")

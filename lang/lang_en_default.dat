@@ -153,3 +153,4 @@ board_too_long = can't write guestboard content that length is 150 over.
 memo_too_long = can't write memo that length is 300 over.
 custom_command_no_number_only = no numbers only commands is allowed.
 custom_command_limit_exceeded = custom commands limit exceeded.
+suggest_food = suggested food.

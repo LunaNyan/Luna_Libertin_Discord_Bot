@@ -153,3 +153,4 @@ board_too_long = 방명록 글은 150자를 초과할 수 없어요!
 memo_too_long = 메모는 300자를 초과할 수 없어요!
 custom_command_no_number_only = 숫자로만 된 명령어는 배울 수 없어요!
 custom_command_limit_exceeded = 서버 지정 명령어는 999개까지만 저장이 가능해요!
+suggest_food = 음식 추천을 제안했어요!

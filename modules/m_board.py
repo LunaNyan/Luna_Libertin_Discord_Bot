@@ -163,7 +163,10 @@ def memo_write(message, head, dbx):
             l_content = str(db.get("memo_"+ str(message.author.id), "content")).split(", ")
             l_dtstr = str(db.get("memo_"+ str(message.author.id), "datetime")).split(", ")
         except:
-            db.add_section("memo_"+ str(message.author.id))
+            try:
+                db.add_section("memo_"+ str(message.author.id))
+            except:
+                pass
             l_content = [memo_temp_title]
             l_dtstr = [memo_temp_content]
         if len(l_content) == 30:
