@@ -7,3 +7,4 @@ xmltodict
 wolframalpha
 py-cpuinfo
 pillow
+nekos.py

@@ -87,6 +87,9 @@ def get_name(id):
         return None
 
 def set_name(message):
-    db.set("name", str(message.author.id), str(message.author.name))
-    with open(db_path, 'w') as configfile:
-        db.write(configfile)
+    try:
+        db.set("name", str(message.author.id), str(message.author.name))
+        with open(db_path, 'w') as configfile:
+            db.write(configfile)
+    except:
+        pass

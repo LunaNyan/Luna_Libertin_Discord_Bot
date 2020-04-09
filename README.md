@@ -7,7 +7,7 @@
 # 서버 구축에 필요한 자원
 - 리눅스 탑재 시스템
 
- 권장 : Debian, Ubuntu / i386, x86-64, ARMv6 ~ v8a (Raspberry Pi 2 이상 전 모델 및 Pi Zero / Zero W)
+ 권장 : Debian, Ubuntu / x86-64
 
 - 인터넷 연결
 
