@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-bootstrapper_ver = "0.10"
+bootstrapper_ver = "1.00"
 
 print("System Bootstrapper, ver " + bootstrapper_ver)
 
@@ -46,4 +46,10 @@ else:
 
 print("Loading Bot application. Please Wait..")
 sys.path.append('./modules/')
-import main
+try:
+    import main
+except Exception as e:
+    if(str(e)) == "SystemExit: rebootme":
+        import main
+    else:
+        print(str(e))

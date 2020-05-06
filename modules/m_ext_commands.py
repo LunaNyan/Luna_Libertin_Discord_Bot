@@ -1,4 +1,4 @@
-import discord, random, m_etc, m_pingpong, m_lang, nekos
+import discord, random, m_etc, m_pingpong, m_lang, nekos, os
 from m_user import ret_check
 
 comm_d = {'점프':'(쫑긋)폴짝! >_<',
@@ -250,3 +250,32 @@ def neko(message, head):
             embed.set_image(url=nekos.img(s))
             embed.set_footer(text="powered by nekos.life")
     return embed
+
+def turnipcalc(message, head):
+    if message.content == head + "무트코인":
+        embed=discord.Embed(title="사용 방법", description="루냥아 무트코인 (패턴) (씨앗 개수)")
+        embed.add_field(name="패턴 종류", value="파도, 3기, 하락, 낙타혹")
+        return embed
+    else:
+        m = message.content.replace(head + "무트코인 ", "")
+        m = m.split(" ")
+        if m[0] == "파도":
+            pattern = 0
+        elif m[0] == "3기":
+            pattern = 1
+        elif m[0] == "하락":
+            pattern = 2
+        elif m[0] == "낙타혹":
+            pattern = 3
+        else:
+            embed=discord.Embed(title="패턴 종류", description="파도, 3기, 하락, 낙타혹")
+            return embed
+        try:
+            seedamount = m[1]
+        except:
+            embed=discord.Embed(title="사용 방법", description="루냥아 무트코인 (패턴) (씨앗 개수)")
+            return embed
+        result = str(os.popen("./data/TurnipCalc " + str(pattern) + " " + str(seedamount)).read())
+        embed=discord.Embed(title="계산 결과", description="```" + result + "```")
+        embed.set_footer(text="해당 계산 결과는 예상치이므로, 참고만 하시기 바랍니다")
+        return embed

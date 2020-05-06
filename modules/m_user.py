@@ -104,6 +104,11 @@ def check(conf, message):
         embed.add_field(name="칭호", value=tr, inline=True)
     except:
         tr = ""
+    try:
+        hd = conf.get("user_custom_head", str(message.author.id))
+        embed.add_field(name="사용자 지정 접두어", value=hd, inline=True)
+    except:
+        hd = ""
     if pt >= 200:
         try:
             pst = conf.get("etc", "passive_denied")
@@ -318,14 +323,13 @@ def serversettings(conf, message):
     return embed
 
 def attendance(conf, user):
+    # Matt.C : 다시만들게요
+    # 완성 시 def 전체 지울것
     a = []
-    try:
-        a = conf.get("attendance", "today").split(", ")
-        if str(user.id) in a:
-            embed=discord.Embed(title=m_lang.string(conf, user.id, "attendance_already"), description="누적 출석 횟수 : " + str(conf.get("attendance", str(user.id))), color=0xffff00)
-        else:
-            raise
-    except:
+    a = conf.get("attendance", "today").split(", ")
+    if str(user.id) in a:
+        embed=discord.Embed(title=m_lang.string(conf, user.id, "attendance_already"), description="누적 출석 횟수 : " + str(conf.get("attendance", str(user.id))), color=0xffff00)
+    else:
         try:
             c = int(conf.get("attendance", str(user.id)))
             c += 1
@@ -475,7 +479,7 @@ def check_sleep(db, author, guild):
         s = db.get("sleep", str(author.id) + "&&" + str(guild.id))
         t = datetime.datetime.now() - datetime.datetime.fromtimestamp(int(s.split("&&")[0]))
         r = s.split("&&")[1]
-        if r != "empty":
+        if r == "empty":
             return ["사유 없음", t]
         else:
             return [r, t]
@@ -497,8 +501,14 @@ def head(db, message, test_glyph=""):
     if test_glyph_2 != "_":
         try:
             hd = db.get("custom_head", str(message.guild.id))
+            try:
+                hd2 = db.get("user_custom_head", str(message.author.id))
+            except:
+                hd2 = ""
             if message.content.startswith("루냥아"):
                 raise
+            elif hd2 != "" and message.content.startswith(hd2):
+                return hd2 + " "
             else:
                 return hd + " "
         except:

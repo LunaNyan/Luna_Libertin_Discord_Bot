@@ -14,7 +14,7 @@ sys.path.append('../')
 
 startTime = datetime.now()
 
-bot_ver = "21.6.2"
+bot_ver = "22.1.1"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -34,6 +34,23 @@ try:
     db.read(db_path)
     print("INFO    : DB file loaded")
 except Exception as e:
+    if str(e).startswith("While reading from 'db/db.dat' [line "):
+        print("Found duplicate item in DB section. Fixing.")
+        ee = str(e).replace("While reading from 'db/db.dat' [line ", "")
+        ee = ee[:5]
+        ee = ee.replace("]:","")
+        ee = ee.replace(" ","")
+        ee = int(ee)
+        a_file = open("db/db.dat", "r")
+        lines = a_file.readlines()
+        a_file.close()
+        del lines[ee-1]
+        new_file = open("db/db.dat", "w+")
+        for line in lines:
+            new_file.write(line)
+        new_file.close()
+        print("Fixed DB error. rebooting.")
+        raise Exception('rebootme')
     print("FATAL   : Couldn't load DB file" + str(e))
     sys.exit(1)
 
@@ -303,10 +320,16 @@ async def on_message(message):
         m_etc.set_name(message)
         # generic commands starts with head string
         if message.content.startswith(head_s) and message.content.endswith(' 도와줘'):
-            embed = m_help.help(message.author, client, message.content, bot_ver, head_s, True)
+            embed = m_help.help(message.author, client, message.content, bot_ver, head_s, 0)
             await message.channel.send(embed=embed)
         elif message.content.startswith(head_s + '도와줘 '):
-            embed = m_help.help(message.author, client, message.content, bot_ver, head_s, False)
+            embed = m_help.help(message.author, client, message.content, bot_ver, head_s, 1)
+            await message.channel.send(embed=embed)
+        elif message.content.startswith(head_s + '도움말 '):
+            embed = m_help.help(message.author, client, message.content, bot_ver, head_s, 2)
+            await message.channel.send(embed=embed)
+        elif message.content == head_s + '도움말':
+            embed = m_help.help(message.author, client, message.content, bot_ver, head_s, 2, True)
             await message.channel.send(embed=embed)
         elif message.content == head_s + "공지사항 목록":
             await message.channel.send(embed=m_board.list())
@@ -446,7 +469,7 @@ async def on_message(message):
             await message.channel.send(m_ext_commands.l_dog())
         elif message.content == head_s + "사랑해":
             await message.channel.send(m_ext_commands.l_lv(db, message.author, test_glyph))
-        elif message.content == head_s + "출석체크":
+        elif message.content == head_s + "출석체크" or message.content == head_s + "출첵":
             await message.channel.send(embed=m_user.attendance(db, message.author))
         elif message.content.startswith(head_s + '생일'):
             await message.channel.send(embed=m_help.bday())
@@ -604,6 +627,7 @@ async def on_message(message):
         elif message.content.startswith(head_s + "야짤") and message.content != head_s + "야짤채널":
             if str(message.channel.id) in db.get("etc", "nsfw_channel"):
                 await message.channel.send(embed=m_ext_commands.nsfw_neko(message, head_s))
+#            ! 一部のギルドでの要請による措置 !
 #            else:
 #                embed=discord.Embed(title=m_lang.string(db, message.author.id, "nsfw_neko_blocked_title"), description=m_lang.string(db, message.author.id, "contact_to_server_admin"), color=0xff0000)
 #                await message.channel.send(embed=embed)
@@ -627,6 +651,13 @@ async def on_message(message):
             await message.channel.send(embed=m_user.autolotto(db, message, datetime.now()))
         elif message.content.startswith(head_s + "로또"):
             await message.channel.send(embed=m_user.set_lotto_number(db, message, datetime.now()))
+        elif message.content.startswith(head_s + "무트코인"):
+            await message.channel.send(embed=m_ext_commands.turnipcalc(message, head_s))
+        elif message.content.startswith(head_s + "유저 접두어"):
+            hst = message.content.replace(head_s + "유저 접두어 ", "")
+            db.set("user_custom_head", str(message.author.id), hst)
+            embed=discord.Embed(title='유저 지정 접두어가 "' + hst + m_lang.string(db, message.author.id, "custom_head_set_title"), description=m_lang.string(db, message.author.id, "custom_head_set_desc"), color=0xffffff)
+            await message.channel.send(embed=embed)
         # admin only functions
         elif message.content == head_s + 'raise_test' and message.author.id == int(conf.get("config", "bot_owner")):
             raise "sex"
@@ -753,14 +784,9 @@ async def on_message(message):
             for s in client.guilds:
                 users += len(s.members)
             await message.channel.send(embed=m_help.get_info(client, str(upt), client.user.id, hash_str, process.memory_info().rss, comm_count, db.get("etc", "comm_count"), bot_ver, str(len(client.guilds)), users, process))
-        elif message.content == head_s + "reload_m" and message.author.id == int(conf.get("config", "bot_owner")):
-            await message.channel.send("reloading command modules..")
-            a = str(imp.reload(m_food))
-            b = str(imp.reload(m_help))
-            c = str(imp.reload(m_user))
-            d = str(imp.reload(m_ext_commands))
-            e = str(imp.reload(m_ctclink))
-            await message.channel.send(a + "\n" + b + "\n" + c + "\n" + d + "\n" + e + "\nsuccessfully reloaded")
+        elif message.content == head_s + "suicide" and message.author.id == int(conf.get("config", "bot_owner")):
+            await message.channel.send("suiciding..")
+            raise SystemExit
         elif message.content.startswith(head_s + 'article set_title ') and message.author.id == int(conf.get("config", "bot_owner")):
             article_title = message.content.replace(head_s + "article set_title ", "")
         elif message.content.startswith(head_s + 'article set_content ') and message.author.id == int(conf.get("config", "bot_owner")):
@@ -1078,8 +1104,8 @@ async def on_message(message):
                 else:
                     embed = discord.Embed(title=m_lang.string(db, message.author.id, "unallowed_glyph"), description=m_lang.string(db, message.author.id, "unallowed_glyph_desc_1"), color=0xff0000)
             await message.channel.send(embed=embed)
-        elif message.content.startswith(head_s + "접두어 설정 ") and ifadmin:
-            hst = message.content.replace(head_s + "접두어 설정 ", "")
+        elif message.content.startswith(head_s + "서버 접두어") and ifadmin:
+            hst = message.content.replace(head_s + "서버 접두어", "")
             db.set("custom_head", str(message.guild.id), hst)
             embed=discord.Embed(title='서버의 지정 접두어가 "' + hst + m_lang.string(db, message.author.id, "custom_head_set_title"), description=m_lang.string(db, message.author.id, "custom_head_set_desc"), color=0xffffff)
             await message.channel.send(embed=embed)

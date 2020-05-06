@@ -1,16 +1,19 @@
 import discord, cpuinfo, psutil, os, math, m_food, m_lang
 
-def help(user, client, text, bot_ver, head, mode):
+def help(user, client, text, bot_ver, head, mode, generic_help=False):
     # mode interpretation
-    # True    : 루냥아 ㅇㅇ 도와줘
-    # False   : 루냥아 도와줘 ㅇㅇ
+    # 0   : 루냥아 ㅇㅇ 도와줘
+    # 1   : 루냥아 도와줘 ㅇㅇ
+    # 2   : 루냥아 도움말 ㅇㅇ
     a = text
-    if mode == True:
+    if mode == 0:
         a = a.replace(head, '')
         a = a.replace(' 도와줘', '')
-    else:
+    elif mode == 1:
         a = a.replace(head + '도와줘 ', '')
-    if text == head + '도와줘':
+    elif mode == 2:
+        a = a.replace(head + '도움말 ', '')
+    if text == head + '도와줘' or generic_help == True:
         embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description='루냥아 (항목) 도와줘를 입력하세요!\n전체 명령어 목록을 보시려면 "루냥아 전체 명령어 도와줘"를 입력하세요!\n[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)', color=0xff0080)
         embed.add_field(name="도움말", value="기계식 루냥이를 이용하는 방법을 알려줘요!", inline=False)
         embed.add_field(name="커뮤니티", value="다른 서버의 사람들과 소통할 수 있는 광장", inline=False)
@@ -59,6 +62,7 @@ def help(user, client, text, bot_ver, head, mode):
         embed.add_field(name="루냥아 닉변 (닉네임)", value="닉네임을 변경합니다", inline=False)
         embed.add_field(name="루냥아 생성일시공개", value="계정의 생성 일시 공개 여부를 토글합니다", inline=False)
         embed.add_field(name="루냥아 반모", value="반말모드 사용 여부를 토글합니다", inline=False)
+        embed.add_field(name="루냥아 유저 접두어 (접두어)", value="사용자 지정 접두어를 설정합니다", inline=False)
     elif a == '메모':
         embed=discord.Embed(title="도움말", description="메모 항목", color=0xffff00)
         embed.add_field(name="루냥아 메모 (내용)", value="최대 30개까지 메모를 작성합니다\n작성된 메모는 목록 첫번째 위치에 기록됩니다", inline=False)
@@ -151,7 +155,7 @@ def help(user, client, text, bot_ver, head, mode):
             embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
             embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보, 루냥아 야짤채널, 루냥아 비밀채널 (숫자)", inline=False)
             embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
-            embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 접두어 설정 (접두어), 루냥아 불타는 서버 문구, 루냥아 일상대화 접두어, 루냥아 서버 지정 명령어 접두어", inline=False)
+            embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 서버 접두어 (접두어), 루냥아 불타는 서버 문구, 루냥아 일상대화 접두어, 루냥아 서버 지정 명령어 접두어", inline=False)
         elif a == '관리자 공지':
             embed=discord.Embed(title="관리자 기능 도움말", description="공지", color=0xff0000)
             embed.add_field(name="루냥아 공지채널 추가", value="현재 채널을 알림 채널로 추가합니다", inline=False)
@@ -188,7 +192,7 @@ def help(user, client, text, bot_ver, head, mode):
             embed.add_field(name="루냥아 자가진단", value="봇이 사용 가능한 권한을 확인합니다", inline=False)
             embed.add_field(name="루냥아 서버공개", value="서버 공개 여부를 토글합니다\n서버가 비공개로 전환되는 경우 서버 목록에서 (비공개)로 표시되며 서버 정보 명령어를 입력할 수 없게 됩니다", inline=False)
             embed.add_field(name="루냥아 가입일시 전체공개", value="모든 사용자의 서버 가입 일시 공개 여부를 토글합니다", inline=False)
-            embed.add_field(name="루냥아 접두어 설정 (접두어)", value="서버 지정 접두어를 설정합니다", inline=False)
+            embed.add_field(name="루냥아 서버 접두어 (접두어)", value="서버 지정 접두어를 설정합니다", inline=False)
             embed.add_field(name="루냥아 불타는 서버 문구", value="불타는 서버 패시브의 문구를 지정합니다", inline=False)
             embed.add_field(name="루냥아 일상대화 접두어", value="일상대화에 접두어를 필수로 요구할지 결정합니다", inline=False)
             embed.add_field(name="루냥아 서버 지정 명령어 접두어", value="서버 지정 명령어에 접두어를 필수로 요구할지 결정합니다", inline=False)
@@ -247,10 +251,14 @@ def source_code():
 
 def selfintro(client, bot_ver, message):
     embed=discord.Embed(title="기계식 루냥이", color=0xffffff)
-    embed.add_field(name="총괄 관리자", value="[libertin](https://www.facebook.com/profile.php?id=100016101485889)", inline=True)
-    embed.add_field(name="프로그래머", value="[Katinor](https://twitter.com/icoRayner)\n[Seia](https://twitter.com/Seia_Soto)", inline=True)
-    embed.add_field(name="특별 감사", value="[SQUARE PIXELS](https://ez2ac.co.kr)\n[Scatter Lab](https://scatterlab.co.kr)\n" + message.author.name, inline=True)
     embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)", inline=False)
+    embed.add_field(name="총괄 관리자", value="[libertin](https://www.facebook.com/profile.php?id=100016101485889)", inline=True)
+    # 프로그래머 목록
+    text = "[Katinor](https://twitter.com/icoRayner)\n"
+    text+= "[Seia](https://twitter.com/Seia_Soto)\n"
+    embed.add_field(name="프로그래머", value=text, inline=True)
+    embed.add_field(name="시스템 관리자", value="Sawawa", inline=True)
+    embed.add_field(name="특별 감사", value="[SQUARE PIXELS](https://ez2ac.co.kr)\n[Scatter Lab](https://scatterlab.co.kr)\n" + message.author.name, inline=True)
     embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
     embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [十九의 Picrew](https://picrew.me/image_maker/79516)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
     embed.set_thumbnail(url=client.user.avatar_url)
