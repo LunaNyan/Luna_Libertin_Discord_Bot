@@ -279,3 +279,14 @@ def turnipcalc(message, head):
         embed=discord.Embed(title="계산 결과", description="```" + result + "```")
         embed.set_footer(text="해당 계산 결과는 예상치이므로, 참고만 하시기 바랍니다")
         return embed
+
+def search_url(message, head):
+    if message.content == head + "검색":
+        embed=discord.Embed(title="사용 방법", description="루냥아 검색 (검색어)")
+        return embed
+    else:
+        query2 = message.content.replace(head + "검색 ", "")
+        query = query2.replace(" ", "%20")
+        embed=discord.Embed(title="검색 결과 : " + query2, description="[구글](https://google.com/search?q=" + query + ")\n\n[네이버](https://search.naver.com/search.naver?query=" + query + ")\n\n[유튜브](https://www.youtube.com/results?search_query=" + query + ")\n\n[나무위키](https://namu.wiki/Search?q=" + query + ")")
+        return embed
+    

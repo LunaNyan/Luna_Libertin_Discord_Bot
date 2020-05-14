@@ -23,7 +23,7 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed.add_field(name="게임", value="기계식 루냥이와 놀기", inline=False)
         embed.add_field(name="대화", value="기계식 루냥이와 대화하기", inline=False)
         embed.add_field(name="유용한 기능", value="유용한 도구 모음", inline=False)
-        embed.set_footer(text='Copyright (C) 2017 - 2020 STUDIO ONE | ver ' + bot_ver)
+        embed.set_footer(text='Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE | ver ' + bot_ver)
     elif a == '전체 명령어':
         embed=discord.Embed(title="도움말", description="전체 명령어 목록", color=0x8080ff)
         embed.add_field(name="도움말", value="루냥아 (항목) 도와줘, 루냥아 누구니, 루냥아 소스코드", inline=False)
@@ -34,7 +34,7 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed.add_field(name="정보", value="루냥아 이용약관, 루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 성능, 루냥아 후원", inline=False)
         embed.add_field(name="대화", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥이 꼬옥, 루냥이 부비부비, 루냥아 (물체) 먹어, 와! 샌즈!, 루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 제비뽑기, 루냥아 가위바위보, 루냥아 로또", inline=False)
-        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자, 루냥아 핑, 루냥아 색상 (색상코드), 루냥아 받아쓰기 (텍스트), 루냥아 야짤 (태그)", inline=False)
+        embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자, 루냥아 핑, 루냥아 색상 (색상코드), 루냥아 받아쓰기 (텍스트), 루냥아 야짤 (태그), 루냥아 검색 (검색어)", inline=False)
         embed.add_field(name="패시브", value="관심 가져주기, 불타는 서버", inline=False)
         if user.guild_permissions.administrator:
             embed.add_field(name="관리자", value='자세한 사항은 "루냥아 관리자 도와줘"를 입력하세요!', inline=False)
@@ -144,6 +144,7 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed.add_field(name="루냥아 색상 (색상코드)", value="색상코드가 배경 색상으로 설정된 이미지를 반환합니다", inline=False)
         embed.add_field(name="루냥아 받아쓰기 (텍스트)", value="받은 텍스트를 이미지로 변환합니다", inline=False)
         embed.add_field(name="루냥아 야짤 (태그)", value="태그에 해당하는 야짤을 보여줍니다\n서버 관리자가 허용한 채널에 한해서만 동작합니다", inline=False)
+        embed.add_field(name="루냥아 검색 (검색어)", value="검색어를 구글, 네이버, 유튜브, 나무위키 검색 링크로 반환합니다", inline=False)
     elif a == '패시브':
         embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
         embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
@@ -154,7 +155,7 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
             embed.add_field(name="공지", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제", inline=False)
             embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
             embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보, 루냥아 야짤채널, 루냥아 비밀채널 (숫자)", inline=False)
-            embed.add_field(name="모더레이션", value="루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
+            embed.add_field(name="모더레이션", value="루냥아 확성기로그, 루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
             embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 서버 접두어 (접두어), 루냥아 불타는 서버 문구, 루냥아 일상대화 접두어, 루냥아 서버 지정 명령어 접두어", inline=False)
         elif a == '관리자 공지':
             embed=discord.Embed(title="관리자 기능 도움말", description="공지", color=0xff0000)
@@ -179,6 +180,7 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
             embed.add_field(name="루냥아 비밀채널 (숫자)", value="현재 채널에 사라지는 메시지 기능을 활성화합니다", inline=False)
         elif a == '관리자 모더레이션':
             embed=discord.Embed(title="관리자 기능 도움말", description="모더레이션", color=0xff0000)
+            embed.add_field(name="루냥아 확성기로그", value="확성기 사용자의 이름 공개를 강제합니다", inline=False)
             embed.add_field(name="루냥아 뮤트 (멘션)", value="멘션된 사용자를 뮤트(채팅금지)합니다", inline=False)
             embed.add_field(name="루냥아 언뮤트 (멘션)", value="멘션된 사용자의 뮤트(채팅금지)를 해제합니다", inline=False)
             embed.add_field(name="루냥아 킥 (멘션)", value="사용자를 추방(kick)합니다", inline=False)
@@ -241,7 +243,7 @@ def get_info_public(uptime, servername, bot_ver):
 
 def bday():
     embed=discord.Embed(title="저는 2017년 5월 9일에 태어났어요!", color=0xffff00)
-    embed.set_footer(text="Copyright (C) 2017 - 2020 STUDIO ONE")
+    embed.set_footer(text="Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE")
     return embed
 
 def source_code():
@@ -260,9 +262,9 @@ def selfintro(client, bot_ver, message):
     embed.add_field(name="시스템 관리자", value="Sawawa", inline=True)
     embed.add_field(name="특별 감사", value="[SQUARE PIXELS](https://ez2ac.co.kr)\n[Scatter Lab](https://scatterlab.co.kr)\n" + message.author.name, inline=True)
     embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
-    embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [十九의 Picrew](https://picrew.me/image_maker/79516)로 제작되었습니다\n봇의 제작자는 Picrew 제작자로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
+    embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [ろりしょためーかー](https://picrew.me/image_maker/198062)로 제작되었습니다\n봇의 제작자는 利伊로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.set_footer(text="Copyright (C) 2017 - 2020 STUDIO ONE | ver " + bot_ver)
+    embed.set_footer(text="Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE | ver " + bot_ver)
     return embed
 
 def permcheck(me):
@@ -316,7 +318,7 @@ def bot_welcome_message(client, bot_ver):
     embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description=des)
     embed.add_field(name="봇을 설정하기 전에", value='기능 추가 등의 소식을 받아보려면 공지 받기를 원하는 채널에서 "루냥아 공지채널 추가"를 입력해주세요!')
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.set_footer(text="Copyright (C) 2017 - 2020 STUDIO ONE | ver " + bot_ver)
+    embed.set_footer(text="Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE | ver " + bot_ver)
     return embed
 
 def tos():

@@ -6,7 +6,7 @@ if sys.version_info[0] != 3 or sys.version_info[1] < 5:
     print("FATAL   : This script requires Python version 3.5")
     sys.exit(1)
 
-import time, random, re, traceback, discord, asyncio, psutil, os, sys, random, configparser
+import time, random, re, traceback, discord, asyncio, psutil, os, sys, random, configparser, shutil
 from datetime import datetime, timedelta
 import imp
 import m_food, m_help, m_user, m_rps, m_device, m_board, m_ctclink, m_wolframalpha, m_ext_commands, m_etc, m_lang, m_seotda
@@ -14,7 +14,7 @@ sys.path.append('../')
 
 startTime = datetime.now()
 
-bot_ver = "22.1.1"
+bot_ver = "22.2.1"
 
 print("INFO    : Luna Libertin Discord bot, version " + bot_ver)
 print("INFO    : Food DB version " + m_food.DB_VERSION)
@@ -120,6 +120,12 @@ async def attendance_reset():
 @client.event
 async def user_count_reset():
     while True:
+        # DB backup sequence
+        dt = datetime.now()
+        dt = str(int(dt.timestamp()))
+        shutil.copy2("db/db.dat", "db_backups/db_" + dt + ".bak")
+        shutil.copy2("db/board_db.dat", "db_backups/board_db_" + dt + ".bak")
+        # count reset
         db.remove_section("count")
         db.add_section("count")
         await asyncio.sleep(1800)
@@ -156,8 +162,9 @@ async def server_log(message, colorh, texth, desch = None, footh = None):
             await cid.send(embed=embed)
         else:
             db.remove_option("server_log", str(message.guild.id))
+        return True
     except:
-        pass
+        return False
 
 @client.event
 async def server_file(message, fn):
@@ -427,7 +434,13 @@ async def on_message(message):
                 say_str = say_str.replace(head_s + '확성기 ','')
                 await message.delete()
                 await message.channel.send(say_str)
-                await server_log(message, 0x00ffff, "확성기 기능을 사용함", message.author.name + " : " + say_str, "채널 : " + message.channel.name)
+                log_available = await server_log(message, 0x00ffff, "확성기 기능을 사용함", message.author.name + " : " + say_str, "채널 : " + message.channel.name)
+                if str(message.guild.id) in db.get("etc", "mplog"):
+                    mplog = True
+                else:
+                    mplog = False
+                if log_available == False or mplog == True:
+                    await message.channel.send("||작성자 : " + message.author.name + "||")
         elif message.content.startswith(head_s + "계산해줘 이미지 "):
             message_temp = await message.channel.send(m_lang.string(db, message.author.id, "plz_wait"))
             bci_str = message.content
@@ -653,6 +666,8 @@ async def on_message(message):
             await message.channel.send(embed=m_user.set_lotto_number(db, message, datetime.now()))
         elif message.content.startswith(head_s + "무트코인"):
             await message.channel.send(embed=m_ext_commands.turnipcalc(message, head_s))
+        elif message.content.startswith(head_s + "검색"):
+            await message.channel.send(embed=m_ext_commands.search_url(message, head_s))
         elif message.content.startswith(head_s + "유저 접두어"):
             hst = message.content.replace(head_s + "유저 접두어 ", "")
             db.set("user_custom_head", str(message.author.id), hst)
@@ -787,6 +802,9 @@ async def on_message(message):
         elif message.content == head_s + "suicide" and message.author.id == int(conf.get("config", "bot_owner")):
             await message.channel.send("suiciding..")
             raise SystemExit
+        elif message.content == head_s + "reboot" and message.author.id == int(conf.get("config", "bot_owner")):
+            await message.channel.send("rebooting..")
+            raise Exception("rebootme")
         elif message.content.startswith(head_s + 'article set_title ') and message.author.id == int(conf.get("config", "bot_owner")):
             article_title = message.content.replace(head_s + "article set_title ", "")
         elif message.content.startswith(head_s + 'article set_content ') and message.author.id == int(conf.get("config", "bot_owner")):
@@ -862,6 +880,16 @@ async def on_message(message):
                 snd = snd + ", " + str(message.guild.id)
                 embed=discord.Embed(title=m_lang.string(db, message.author.id, "ndserver_deactivated"), color=0xffffff)
             db.set("etc", "ndserver", snd)
+            await message.channel.send(embed=embed)
+        elif message.content == head_s + "확성기로그" and ifadmin:
+            snd = db.get("etc", "mplog")
+            if str(message.guild.id) in snd:
+                snd = snd.replace(", " + str(message.guild.id), "")
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "mplog_deactivated"), color=0xffffff)
+            else:
+                snd = snd + ", " + str(message.guild.id)
+                embed=discord.Embed(title=m_lang.string(db, message.author.id, "mplog_activated"), color=0xffffff)
+            db.set("etc", "mplog", snd)
             await message.channel.send(embed=embed)
         elif message.content == head_s + "가입일시 전체공개" and ifadmin:
             jnd = db.get("etc", "joinedat_ndserver")
@@ -1223,8 +1251,11 @@ async def on_message(message):
         with open(db_path, 'w') as configfile:
             db.write(configfile)
     except Exception as e:
-        embed=discord.Embed(title="오류 발생 : " + str(e), description="[민원창구](https://discordapp.com/invite/yyS9x5V)에 해당 에러 내용을 접수해 주시기 바랍니다")
-        await message.channel.send(embed=embed)
+        if str(e) == "rebootme":
+            sys.exit("rebootme")
+        else:
+            embed=discord.Embed(title="오류 발생 : " + str(e), description="[민원창구](https://discordapp.com/invite/yyS9x5V)에 해당 에러 내용을 접수해 주시기 바랍니다")
+            await message.channel.send(embed=embed)
 
 @client.event
 async def on_message_delete(message):

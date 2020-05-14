@@ -49,7 +49,7 @@ sys.path.append('./modules/')
 try:
     import main
 except Exception as e:
-    if(str(e)) == "SystemExit: rebootme":
+    if(str(e)) == "rebootme":
         import main
     else:
         print(str(e))
