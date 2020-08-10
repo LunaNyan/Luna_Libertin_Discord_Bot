@@ -1,5 +1,7 @@
 import discord, cpuinfo, psutil, os, math, m_food, m_lang
 
+copyright_text = "Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE"
+
 def help(user, client, text, bot_ver, head, mode, generic_help=False):
     # mode interpretation
     # 0   : 루냥아 ㅇㅇ 도와줘
@@ -14,7 +16,7 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
     elif mode == 2:
         a = a.replace(head + '도움말 ', '')
     if text == head + '도와줘' or generic_help == True:
-        embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description='루냥아 (항목) 도와줘를 입력하세요!\n전체 명령어 목록을 보시려면 "루냥아 전체 명령어 도와줘"를 입력하세요!\n[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)', color=0xff0080)
+        embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description='루냥아 (항목) 도와줘를 입력하세요!\n전체 명령어 목록을 보시려면 "루냥아 전체 명령어 도와줘"를 입력하세요!\n[민원창구](https://discordapp.com/invite/6pgYMbC), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)', color=0xff0080)
         embed.add_field(name="도움말", value="기계식 루냥이를 이용하는 방법을 알려줘요!", inline=False)
         embed.add_field(name="커뮤니티", value="다른 서버의 사람들과 소통할 수 있는 광장", inline=False)
         embed.add_field(name="프로필", value="자기소개와 계정 정보를 볼 수 있는 곳", inline=False)
@@ -23,15 +25,15 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed.add_field(name="게임", value="기계식 루냥이와 놀기", inline=False)
         embed.add_field(name="대화", value="기계식 루냥이와 대화하기", inline=False)
         embed.add_field(name="유용한 기능", value="유용한 도구 모음", inline=False)
-        embed.set_footer(text='Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE | ver ' + bot_ver)
-    elif a == '전체 명령어':
+        embed.set_footer(text=copyright_text + ' | ver ' + bot_ver)
+    elif a == '전체 명령어' or a == '전체명령어':
         embed=discord.Embed(title="도움말", description="전체 명령어 목록", color=0x8080ff)
         embed.add_field(name="도움말", value="루냥아 (항목) 도와줘, 루냥아 누구니, 루냥아 소스코드", inline=False)
-        embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말), 루냥아 서버랭킹, 루냥아 호감도랭킹", inline=False)
+        embed.add_field(name="커뮤니티", value="루냥아 공지사항 목록, 루냥아 공지사항 (숫자), 루냥아 방명록, 루냥아 방명록 쓰기 (할 말), 루냥아 서버목록, 루냥아 서버랭킹, 루냥아 호감도랭킹", inline=False)
         embed.add_field(name="프로필", value="루냥아 출석체크, 루냥아 나 어때, 루냥아 (멘션) 어때, 루냥아 소개말 (자기소개), 루냥아 거울 (멘션), 루냥아 닉변 (닉네임), 루냥아 생성일시공개, 루냥아 반모", inline=False)
         embed.add_field(name="메모", value="루냥아 메모 (내용), 루냥아 메모 목록 (페이지), 루냥아 메모 삭제 (번호)", inline=False)
         embed.add_field(name="서버", value="루냥아 서버정보, 루냥아 서버설정, 루냥아 서버아이콘, 루냥아 가입일시공개, 루냥아 배워, 루냥아 잊어, 루냥아 배운거", inline=False)
-        embed.add_field(name="정보", value="루냥아 이용약관, 루냥아 인기도, 루냥아 서버목록, 루냥아 생일, 루냥아 성능, 루냥아 후원", inline=False)
+        embed.add_field(name="정보", value="루냥아 이용약관, 루냥아 인기도, 루냥아 생일, 루냥아 성능, 루냥아 후원", inline=False)
         embed.add_field(name="대화", value="루냥아 배고파, 루냥이 귀여워, 루냥이 쓰담쓰담, 루냥이 꼬옥, 루냥이 부비부비, 루냥아 (물체) 먹어, 와! 샌즈!, 루냥아 짖어, 루냥아 손, 루냥아 점프, 루냥아 굴러", inline=False)
         embed.add_field(name="게임", value="루냥아 섯다, 루냥아 제비뽑기, 루냥아 가위바위보, 루냥아 로또", inline=False)
         embed.add_field(name="유용한 기능", value="루냥아 계산해줘 (계산식), 루냥아 계산해줘 이미지 (계산식), 루냥아 확성기, 루냥아 골라줘, 루냥아 섞어줘 (선택지1) (선택지2) .., 루냥아 주사위, 루냥아 행운의숫자, 루냥아 핑, 루냥아 색상 (색상코드), 루냥아 받아쓰기 (텍스트), 루냥아 야짤 (태그), 루냥아 검색 (검색어)", inline=False)
@@ -50,6 +52,7 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed.add_field(name="루냥아 방명록", value="방명록을 표시합니다", inline=False)
         embed.add_field(name="루냥아 방명록 쓰기 (할 말)", value="방명록에 글을 씁니다", inline=False)
         embed.add_field(name="루냥아 거울 (멘션)", value="자신 또는 멘션된 계정의 프로필 사진을 보여줍니다", inline=False)
+        embed.add_field(name="루냥아 서버목록", value="이 봇이 활동중인 서버들의 목록을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 서버랭킹", value="유저 수가 가장 많은 10개의 서버 랭킹을 보여줍니다", inline=False)
         embed.add_field(name="루냥아 호감도랭킹", value="호감도가 가장 높은 10개의 유저 랭킹을 보여줍니다", inline=False)
     elif a == '프로필':
@@ -82,7 +85,6 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed.add_field(name="루냥아 이용약관", value="기계식 루냥이의 이용 약관을 표시합니다", inline=False)
         embed.add_field(name="루냥아 인기도", value="몇개의 서버에서 몇명의 유저들이 저를 보고 있는지 알려줘요!", inline=False)
         embed.add_field(name="루냥아 자가진단", value="봇이 정상 동작할 수 있는지 점검합니다", inline=False)
-        embed.add_field(name="루냥아 서버목록", value="서버 목록을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 생일", value="봇이 언제 탄생했는지 알려줍니다", inline=False)
         embed.add_field(name="루냥아 성능", value="봇의 버전, 서버 성능을 보여줍니다", inline=False)
         embed.add_field(name="루냥아 후원", value="후원 계좌와 리워드를 표시합니다", inline=False)
@@ -103,6 +105,7 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed.add_field(name="제비뽑기", value="CPU가 제비뽑기를 실행합니다", inline=False)
         embed.add_field(name="가위바위보", value="CPU와 가위바위보를 진행합니다", inline=False)
         embed.add_field(name="로또", value="로또 게임을 진행합니다", inline=False)
+        embed.add_field(name="로하이", value="로하이 게임을 진행합니다", inline=False)
     elif a == '게임 섯다' or a == '섯다':
         embed=discord.Embed(title="두장섯다 사용 방법", description="명령어 : 루냥아 섯다 (숫자1) (숫자2), 0~9까지의 숫자 두개를 입력해 진행합니다\n[확률 정보](http://121.1.120.57:50000/sd_percentage.htm)", color=0xffff00)
         embed.add_field(name="족보 순위", value="광땡 > 땡 > 삥 > 끗", inline=False)
@@ -130,13 +133,15 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed.add_field(name="규칙", value="매일 0시에 갱신되는 로또 번호와 응모한 로또 번호가 몇 개나 동일한 지에 따라 등수가 정해집니다\n1등 : 4개 이상\n2등 : 3개\n3등 : 2개", inline=False)
         embed.add_field(name="결과 확인", value='루냥아 로또 결과', inline=False)
         embed.add_field(name="주의사항", value="같은 번호를 반복 응모할 수 없습니다")
+    elif a == '게임 로하이' or a == '로하이':
+        embed = discord.Embed(title="로하이 이용 방법", description="루냥아 로하이 (1 ~ 13)")
+        embed.add_field(name="규칙", value="CPU가 고른 카드와 플레이어가 고른 카드와 일치하면 승리", inline=False)
     elif a == '유용한 기능':
         embed=discord.Embed(title="도움말", description="유용한 기능", color=0x00ff00)
         embed.add_field(name="루냥아 계산해줘 (계산식)", value="Wolfram|Alpha 계산 쿼리를 제공합니다", inline=False)
         embed.add_field(name="루냥아 계산해줘 이미지 (계산식)", value="Wolfram|Alpha 플롯 계산 쿼리를 제공합니다(실험적인 기능입니다!)", inline=False)
         embed.add_field(name="루냥아 골라줘 (선택지1) (선택지2) ...", value="어느것을 고를까요 알아맞춰 봅시다", inline=False)
         embed.add_field(name="루냥아 확성기 (할 말)", value="루냥이가 대신 말해줍니다 (혐오 단어가 감지되는 경우 거부됩니다)", inline=False)
-        embed.add_field(name="루냥아 서버목록", value="이 봇이 활동중인 서버들의 목록을 불러옵니다", inline=False)
         embed.add_field(name="루냥아 섞어줘 (선택지1) (선택지2) ...", value="선택지들의 순서를 섞어줍니다", inline=False)
         embed.add_field(name="루냥아 주사위", value="1부터 6까지 무작위의 숫자를 출력합니다", inline=False)
         embed.add_field(name="루냥아 행운의숫자", value="1부터 100 중의 숫자를 무작위로 선택합니다", inline=False)
@@ -149,55 +154,65 @@ def help(user, client, text, bot_ver, head, mode, generic_help=False):
         embed=discord.Embed(title="도움말", description="패시브", color=0x0000ff)
         embed.add_field(name="관심 가져주기", value='채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n호감도가 친구 이상일 때 동작합니다\n"루냥아 관심 가져주기"로 토글이 가능합니다', inline=False)
         embed.add_field(name="불타는 서버", value='서버에서 명령어가 아닌 채팅을 많이 치고 있을 때 일정 확률로 관심을 가져줍니다\n관리자인 경우 "루냥아 불타는 서버"로 토글이 가능합니다', inline=False)
+    elif a == '잠수':
+        embed=discord.Embed(title="해당 사유로 잠수를 할 수 없습니다", value="사용할 수 있는 다른 사유로 선회해 주시기 바랍니다")
     elif user.guild_permissions.administrator:
         if a == '관리자':
             embed=discord.Embed(title="관리자 기능 도움말", description="명령어 목록", color=0xff0000)
-            embed.add_field(name="공지", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제", inline=False)
-            embed.add_field(name="기록", value="루냥아 로그채널 생성", inline=False)
-            embed.add_field(name="채널", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보, 루냥아 야짤채널, 루냥아 비밀채널 (숫자)", inline=False)
-            embed.add_field(name="모더레이션", value="루냥아 확성기로그, 루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
-            embed.add_field(name="기타", value="루냥아 지워줘 (5~100), 루냥아 초대링크 생성, 루냥아 자가진단, 루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 서버 접두어 (접두어), 루냥아 불타는 서버 문구, 루냥아 일상대화 접두어, 루냥아 서버 지정 명령어 접두어", inline=False)
-        elif a == '관리자 공지':
-            embed=discord.Embed(title="관리자 기능 도움말", description="공지", color=0xff0000)
+            embed.add_field(name="전용채널", value="루냥아 공지채널 추가, 루냥아 공지채널 삭제, 루냥아 로그채널 생성", inline=False)
+            embed.add_field(name="채널관리", value="루냥아 환영인사 (메시지), 루냥아 작별인사 (메시지), 루냥아 금지채널 추가, 루냥아 금지채널 삭제, 루냥아 야짤채널, 루냥아 비밀채널 (숫자)", inline=False)
+            embed.add_field(name="채널연결", value="루냥아 채널연결 생성, 루냥아 채널연결 접속 (코드), 루냥아 채널연결 삭제, 루냥아 채널연결 정보", inline=False)
+            embed.add_field(name="모더레이션", value="루냥아 확성기로그, 루냥아 지워줘 (5~100), 루냥아 뮤트 (멘션), 루냥아 언뮤트 (멘션), 루냥아 킥 (멘션), 루냥아 밴 (멘션 또는 고유 ID)", inline=False)
+            embed.add_field(name="설정", value="루냥아 서버공개, 루냥아 가입일시 전체공개, 루냥아 서버 접두어 (접두어), 루냥아 불타는 서버 토글, 루냥아 불타는 서버 문구, 루냥아 일상대화 접두어, 루냥아 잠수 쿨타임, 루냥아 서버 지정 명령어 접두어, 루냥아 서버소개", inline=False)
+            embed.add_field(name="기타", value="루냥아 초대링크 생성, 루냥아 자가진단", inline=False)
+        elif a == '관리자 전용채널':
+            embed=discord.Embed(title="관리자 기능 도움말", description="전용 채널", color=0xff0000)
             embed.add_field(name="루냥아 공지채널 추가", value="현재 채널을 알림 채널로 추가합니다", inline=False)
             embed.add_field(name="루냥아 공지채널 삭제", value="현재 채널을 알림 채널에서 삭제합니다", inline=False)
-        elif a == '관리자 기록':
-            embed=discord.Embed(title="관리자 기능 도움말", description="기록", color=0xff0000)
             embed.add_field(name="루냥아 로그채널 생성", value="메시지 수정, 삭제, 확성기 사용을 기록해주는 채널을 생성합니다\n비활성화를 원할 시 기록 채널을 삭제하면 됩니다", inline=False)
-        elif a == '관리자 채널':
-            embed=discord.Embed(title="관리자 기능 도움말", description="채널", color=0xff0000)
+        elif a == '관리자 채널관리':
+            embed=discord.Embed(title="관리자 기능 도움말", description="채널 관리", color=0xff0000)
             embed.add_field(name="루냥아 환영인사 (메시지)", value="서버에 유저가 들어왔을 때 해당 채널에 표시할 메시지를 지정합니다\n'루냥아 환영인사 삭제'로 메시지를 삭제합니다\n[멘션] : 사용자 멘션\n[이름] : 사용자 이름", inline=False)
             embed.add_field(name="루냥아 작별인사 (메시지)", value="서버에서 유저가 나갔을 때 해당 채널에 표시할 메시지를 지정합니다\n'루냥아 작별인사 삭제'로 메시지를 삭제합니다\n[이름] : 사용자 이름", inline=False)
             embed.add_field(name="루냥아 금지채널 추가", value="해당 채널에서 명령어 사용을 금지합니다", inline=False)
             embed.add_field(name="루냥아 금지채널 삭제", value="해당 채널을 명령어 금지 채널에서 삭제합니다", inline=False)
             embed.add_field(name="루냥아 애드블락 추가", value="해당 채널에서 초대 링크 첨부를 금지합니다", inline=False)
             embed.add_field(name="루냥아 애드블락 삭제", value="해당 채널을 코대 링크 첨부 금지 채널에서 삭제합니다", inline=False)
+            embed.add_field(name="루냥아 야짤채널", value="현재 채널의 야짤기능 허용 여부를 결정합니다", inline=False)
+            embed.add_field(name="루냥아 비밀채널 (숫자)", value="현재 채널에 사라지는 메시지 기능을 활성화합니다", inline=False)
+        elif a == '관리자 채널연결':
+            embed=discord.Embed(title="관리자 기능 도움말", description="채널 연결 기능", color=0xff0000)
             embed.add_field(name="루냥아 채널연결 생성", value="채널 간 1:1 텍스트 채팅 연결을 준비합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 접속 (코드)", value="부여받은 접속 코드로 채널을 연결합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 삭제", value="채널 연결을 삭제합니다", inline=False)
             embed.add_field(name="루냥아 채널연결 정보", value="연결된 채널의 정보를 봅니다", inline=False)
-            embed.add_field(name="루냥아 야짤채널", value="현재 채널의 야짤기능 허용 여부를 결정합니다", inline=False)
-            embed.add_field(name="루냥아 비밀채널 (숫자)", value="현재 채널에 사라지는 메시지 기능을 활성화합니다", inline=False)
         elif a == '관리자 모더레이션':
             embed=discord.Embed(title="관리자 기능 도움말", description="모더레이션", color=0xff0000)
             embed.add_field(name="루냥아 확성기로그", value="확성기 사용자의 이름 공개를 강제합니다", inline=False)
+            embed.add_field(name="루냥아 지워줘 (5~100)", value="주어진 개수만큼 메시지를 삭제합니다", inline=False)
             embed.add_field(name="루냥아 뮤트 (멘션)", value="멘션된 사용자를 뮤트(채팅금지)합니다", inline=False)
             embed.add_field(name="루냥아 언뮤트 (멘션)", value="멘션된 사용자의 뮤트(채팅금지)를 해제합니다", inline=False)
             embed.add_field(name="루냥아 킥 (멘션)", value="사용자를 추방(kick)합니다", inline=False)
             embed.add_field(name="루냥아 밴 (멘션 또는 고유 ID)", value="사용자를 차단(ban)합니다", inline=False)
             embed.set_footer(text="주의 : 모든 모더레이션 기능은 사전 확인 없이 바로 진행되므로 신중히 사용하시기 바랍니다")
-        elif a == '관리자 기타':
-            embed=discord.Embed(title="관리자 기능 도움말", description="기타", color=0xff0000)
+        elif a == '관리자 설정':
+            embed=discord.Embed(title="관리자 기능 도움말", description="서버별 봇 설정", color=0xff0000)
             embed.add_field(name="루냥아 유저패시브", value="현재 서버에서 사용자 패시브 허용 여부를 토글합니다", inline=False)
-            embed.add_field(name="루냥아 지워줘 (5~100)", value="주어진 개수만큼 메시지를 삭제합니다", inline=False)
-            embed.add_field(name="루냥아 초대링크 생성", value="즉석 초대 링크를 생성합니다", inline=False)
-            embed.add_field(name="루냥아 자가진단", value="봇이 사용 가능한 권한을 확인합니다", inline=False)
             embed.add_field(name="루냥아 서버공개", value="서버 공개 여부를 토글합니다\n서버가 비공개로 전환되는 경우 서버 목록에서 (비공개)로 표시되며 서버 정보 명령어를 입력할 수 없게 됩니다", inline=False)
             embed.add_field(name="루냥아 가입일시 전체공개", value="모든 사용자의 서버 가입 일시 공개 여부를 토글합니다", inline=False)
             embed.add_field(name="루냥아 서버 접두어 (접두어)", value="서버 지정 접두어를 설정합니다", inline=False)
-            embed.add_field(name="루냥아 불타는 서버 문구", value="불타는 서버 패시브의 문구를 지정합니다", inline=False)
+            embed.add_field(name="루냥아 불타는 서버 토글", value="불타는 서버 패시브를 활성화 또는 비활성화합니다", inline=False)
+            embed.add_field(name="루냥아 불타는 서버 문구", value="불타는 서버 패시브의 문구를 지정합니다 (' && '으로 구분해 무작위 출현 문구를 지정할 수 있습니다)", inline=False)
             embed.add_field(name="루냥아 일상대화 접두어", value="일상대화에 접두어를 필수로 요구할지 결정합니다", inline=False)
+            embed.add_field(name="루냥아 잠수 쿨타임", value="잠수 기능에 5분 쿨타임을 적용할지 결정합니다", inline=False)
             embed.add_field(name="루냥아 서버 지정 명령어 접두어", value="서버 지정 명령어에 접두어를 필수로 요구할지 결정합니다", inline=False)
+            embed.add_field(name="루냥아 서버소개", value="서버 목록에 현재 서버 소개말을 설정합니다", inline=False)
+        elif a == '관리자 기타':
+            embed=discord.Embed(title="관리자 기능 도움말", description="기타", color=0xff0000)
+            embed.add_field(name="루냥아 초대링크 생성", value="즉석 초대 링크를 생성합니다", inline=False)
+            embed.add_field(name="루냥아 자가진단", value="봇이 사용 가능한 권한을 확인합니다", inline=False)
+        else:
+            embed=discord.Embed(title='해당 항목에 대한 도움말을 찾을 수 없어요!', description='전체 도움말을 원하신다면 "루냥아 전체 명령어 도와줘"를 입력해주세요!')
     else:
         embed=discord.Embed(title='해당 항목에 대한 도움말을 찾을 수 없어요!', description='전체 도움말을 원하신다면 "루냥아 전체 명령어 도와줘"를 입력해주세요!')
     return embed
@@ -232,7 +247,7 @@ def get_info(client, uptime, uid, hash_str, memkb, count_d, count_s, bot_ver, se
 
 def get_info_public(uptime, servername, bot_ver):
     embed=discord.Embed(title="기계식 루냥이의 시스템 성능")
-    embed.add_field(name="서버 이름", value=servername, inline=False)
+    #embed.add_field(name="서버 이름", value=servername, inline=False)
     embed.add_field(name="CPU", value=cpuinfo.get_cpu_info()["brand"], inline=False)
     embed.add_field(name="RAM 용량", value=str(int(psutil.virtual_memory().total / 1048576)) + " MB")
     embed.add_field(name="Python 버전", value=cpuinfo.get_cpu_info()["python_version"].replace(".final.0", ""), inline=False)
@@ -243,7 +258,7 @@ def get_info_public(uptime, servername, bot_ver):
 
 def bday():
     embed=discord.Embed(title="저는 2017년 5월 9일에 태어났어요!", color=0xffff00)
-    embed.set_footer(text="Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE")
+    embed.set_footer(text=copyright_text)
     return embed
 
 def source_code():
@@ -253,18 +268,18 @@ def source_code():
 
 def selfintro(client, bot_ver, message):
     embed=discord.Embed(title="기계식 루냥이", color=0xffffff)
-    embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/yyS9x5V), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)", inline=False)
-    embed.add_field(name="총괄 관리자", value="[libertin](https://www.facebook.com/profile.php?id=100016101485889)", inline=True)
+    embed.add_field(name="유용한 링크", value="[민원창구](https://discordapp.com/invite/6pgYMbC), [봇 초대하기](https://discordapp.com/oauth2/authorize?client_id=598080777565241354&scope=bot&permissions=388190)", inline=False)
+    embed.add_field(name="총괄 관리자", value="libertin", inline=True)
     # 프로그래머 목록
     text = "[Katinor](https://twitter.com/icoRayner)\n"
     text+= "[Seia](https://twitter.com/Seia_Soto)\n"
     embed.add_field(name="프로그래머", value=text, inline=True)
-    embed.add_field(name="시스템 관리자", value="Sawawa", inline=True)
+    embed.add_field(name="시스템 관리자", value="さわわ", inline=True)
     embed.add_field(name="특별 감사", value="[SQUARE PIXELS](https://ez2ac.co.kr)\n[Scatter Lab](https://scatterlab.co.kr)\n" + message.author.name, inline=True)
     embed.add_field(name="프로그램 저작권", value="해당 봇의 프로그램 데이터는 MIT 허가서에 의해 제공됩니다\n자세한 사항은 [여기를 참고해주세요](https://www.olis.or.kr/license/Detailselect.do?lId=1006&mapCode=010006)", inline=False)
     embed.add_field(name="프로필 이미지", value="해당 봇의 프로필 이미지는 [ろりしょためーかー](https://picrew.me/image_maker/198062)로 제작되었습니다\n봇의 제작자는 利伊로부터 아이콘 이미지로서의 일러스트 사용을 허가받았습니다", inline=False)
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.set_footer(text="Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE | ver " + bot_ver)
+    embed.set_footer(text=copyright_text + " | ver " + bot_ver)
     return embed
 
 def permcheck(me):
@@ -314,11 +329,11 @@ def suggest_game(db, id):
     return embed
 
 def bot_welcome_message(client, bot_ver):
-    des = '기계식 루냥이는 각종 유저 편의 기능과 서버 관리 기능을 포함하고 있는 종합 봇이예요!\n\n간단한 사용 방법은 **"루냥아 도와줘"**를 입력해 보세요!\n이용 약관은 **"루냥아 이용약관"**을 참조하세요!'
+    des = '기계식 루냥이는 각종 유저 편의 기능과 서버 관리 기능을 포함하고 있는 종합 봇이예요!\n\n**"루냥아 이용수칙"**을 입력하여 나오는 수칙을 꼭 읽어주세요!\n간단한 사용 방법은 **"루냥아 도와줘"**를 입력해 보세요!\n이용 약관은 **"루냥아 이용약관"**을 참조하세요!'
     embed=discord.Embed(title="기계식 루냥이를 초대해주셔서 감사합니다!", description=des)
     embed.add_field(name="봇을 설정하기 전에", value='기능 추가 등의 소식을 받아보려면 공지 받기를 원하는 채널에서 "루냥아 공지채널 추가"를 입력해주세요!')
     embed.set_thumbnail(url=client.user.avatar_url)
-    embed.set_footer(text="Copyright (C) 2017 - 2019 libertin, 2020 STUDIO ONE | ver " + bot_ver)
+    embed.set_footer(text=copyright_text + " | ver " + bot_ver)
     return embed
 
 def tos():
@@ -327,4 +342,16 @@ def tos():
     embed.add_field(name="수집된 정보의 사용", value="기계식 루냥이는 수집되는 정보를 본 용도로만 사용하며, 아래 명시된 용도 외에는 보관 및 사용되지 않습니다.\n- 방명록 등의 서비스를 위한 사용 내역 기록\n- 서비스 제공 (프로필, 게임) 등을 위한 데이터베이스 구축", inline=False)
     embed.add_field(name="이용약관의 동의", value="본 봇을 그룹에 초대하는 행위를 한다면 본 약관에 동의한 것으로 간주합니다.", inline=False)
     embed.add_field(name="이용계약의 해지", value="사용자가 이용약관에 반대할 경우 언제든지 서비스 받기를 중단할 수 있습니다. 이를 위해서는 그저 사용자가 초대한 서버/그룹/채널에서 본 봇을 내보내기만 하면 됩니다. 본 봇을 서버에서 내보낼 경우 관련된 데이터는 지체 없이 파기됩니다. 특별한 사유가 있다면 관리자에게 문의해주시기 바랍니다.")
+    return embed
+
+def rules():
+    text = "기계식 루냥이에는 확성기, 방명록, 커스텀 명령어 등 상대방 간 상호작용을 즐겁게 해주거나 새로운 친구를 찾는 등의 기능이 존재합니다.\n"
+    text+= "단 이를 이용하여 __다음과 같은 행동을 하는 것은 기본적으로 금지__되며, **적발 시 이용 제한 조치, 사례가 심한 경우 법적 조치**에 처하실 수 있음을 알려드립니다.\n\n"
+    text+= "- 타인, 또는 특정 그룹에 대한 비방 또는 찬양, 사기, 타인 사칭, 선동 행위\n"
+    text+= "- 본인 또는 타인의 개인정보가 포함된 어휘\n"
+    text+= "- 미성년자의 접근이 제한되지 않은 곳에서의 유해 또는 음란물 게시\n"
+    text+= "- 정치적 활동에 관련된 발언\n"
+    text+= "- 사전 허가되지 않은 광고 또는 홍보(건전한 것으로 판단되는 서버 홍보는 허용)\n"
+    text+= "- 기타 관련 법령에 위반되는 행위\n"
+    embed=discord.Embed(title="기계식 루냥이 이용 수칙", description=text)
     return embed

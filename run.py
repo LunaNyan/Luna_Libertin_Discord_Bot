@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-bootstrapper_ver = "1.00"
+bootstrapper_ver = "1.10"
 
 print("System Bootstrapper, ver " + bootstrapper_ver)
 
@@ -9,10 +9,16 @@ import sys, os, os.path, configparser
 # 시스템 정보 확인
 print("Checking system.")
 if sys.platform != "linux":
-    print("FATAL : This application is ONLY for Linux. NOT for Windows or other.")
+    print("FATAL   : This application is ONLY for Linux. NOT for Windows or other.")
     sys.exit(1)
 else:
     print("Success.")
+
+if sys.version_info[0] != 3 or sys.version_info[1] < 5:
+    print("FATAL   : This script requires Python version 3.5")
+    sys.exit(1)
+else:
+    print("Python " + str(sys.version_info.major) + "." + str(sys.version_info.minor) + "." + str(sys.version_info.micro))
 
 # 모듈 검사
 print("Checking required modules.")

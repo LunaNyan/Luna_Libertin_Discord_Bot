@@ -278,8 +278,10 @@ def serverinfo(conf, message):
         embed=discord.Embed(title="서버 정보를 볼 수 없습니다", description="서버 설정에 의해 정보를 볼 수 있도록 허용되지 않았습니다", color=0xff0000)
     return embed
 
-def serversettings(conf, message):
+def serversettings(conf, message, ifadmin):
     embed=discord.Embed(title=message.guild.name, color=0xffff00)
+    if ifadmin:
+        embed.add_field(name="서버 코드", value=conf.get("server_code", str(message.guild.id)), inline=False)
     if str(message.guild.id) in conf.get("etc", "ndserver"):
         embed.add_field(name="서버 공개 여부", value="비공개", inline=False)
     else:
@@ -323,8 +325,6 @@ def serversettings(conf, message):
     return embed
 
 def attendance(conf, user):
-    # Matt.C : 다시만들게요
-    # 완성 시 def 전체 지울것
     a = []
     a = conf.get("attendance", "today").split(", ")
     if str(user.id) in a:
@@ -465,13 +465,17 @@ def info_custom_commands(db, message):
     return embed
 
 def sleep(db, message, dt):
-    embed=discord.Embed(title=str(message.author.name) + m_lang.string(db, message.author.id, "sleep_start"), description = m_lang.string(db, message.author.id, "sleep_start_desc"), color=0xffff00)
-    if head(db, message) + "잠수 " in message.content:
-        reason = message.content.replace(head(db, message) + "잠수 ", "")
-        embed.add_field(name="사유", value=reason, inline=False)
-    else:
-        reason = "empty"
-    db.set("sleep", str(message.author.id) + "&&" + str(message.guild.id), dt.strftime('%s') + "&&" + reason)
+    try:
+        a = db.get('j_sleep_cooldown', str(message.guild.id) + "_" + str(message.author.id))
+        embed=discord.Embed(title=m_lang.string(db, message.author.id, "sleep_cooldown"), description = str(datetime.datetime.fromtimestamp(int(a))) + m_lang.string(db, message.author.id, "sleep_cooldown_desc"), color=0xff0000)
+    except:
+        embed=discord.Embed(title=str(message.author.name) + m_lang.string(db, message.author.id, "sleep_start"), description = m_lang.string(db, message.author.id, "sleep_start_desc"), color=0xffff00)
+        if head(db, message) + "잠수 " in message.content:
+            reason = message.content.replace(head(db, message) + "잠수 ", "")
+            embed.add_field(name="사유", value=reason, inline=False)
+        else:
+            reason = "empty"
+        db.set("sleep", str(message.author.id) + "&&" + str(message.guild.id), dt.strftime('%s') + "&&" + reason)
     return embed
 
 def check_sleep(db, author, guild):
@@ -495,6 +499,13 @@ def unsleep(db, message, dt):
     if r != "empty":
         embed.add_field(name="사유", value=r, inline=False)
     embed.add_field(name="잠수 시간", value=str(t), inline=False)
+    te = datetime.datetime.now()
+    te = int(te.timestamp())
+    if str(message.guild.id) in db.get('etc', 'no_sleep_cooldown'):
+        pass
+    else:
+        db.set('j_sleep_cooldown', str(message.guild.id) + "_" + str(message.author.id), str(te + 300))
+        embed.set_footer(text = "다시 잠수를 하시려면 5분 뒤 다시 시도해주세요")
     return embed
 
 def head(db, message, test_glyph=""):
@@ -516,6 +527,13 @@ def head(db, message, test_glyph=""):
     else:
         return "루우냥아 "
 
+def get_guild_intro(db, id):
+    try:
+        i = db.get("guild_intro", id)
+        return i
+    except:
+        return ""
+
 def servers_list(client, page, db, id):
     n = 0
     servers = {}
@@ -523,13 +541,14 @@ def servers_list(client, page, db, id):
     lk = []
     lu = []
     lo = []
+    li = []
     nd = []
     de = 0
     for s in client.guilds:
         if str(s.id) in db.get("etc", "ndserver"):
-            servers[str(s)] = [str(len(s.members)), s.owner.name, "1"]
+            servers[str(s)] = [str(len(s.members)), s.owner.name, "1", get_guild_intro(db, str(s.id))]
         else:
-            servers[str(s)] = [str(len(s.members)), s.owner.name, "0"]
+            servers[str(s)] = [str(len(s.members)), s.owner.name, "0", get_guild_intro(db, str(s.id))]
         n += 1
     sorted_servers = sorted(servers)
     for k in sorted_servers:
@@ -537,6 +556,7 @@ def servers_list(client, page, db, id):
         lu.append(servers[k][0])
         lo.append(servers[k][1])
         nd.append(servers[k][2])
+        li.append(servers[k][3])
     pages = math.ceil(len(lk) / 10)
     if page > pages or page <= 0:
         embed=discord.Embed(title=m_lang.string(db, id, "wrong_page_idx"))
@@ -550,7 +570,10 @@ def servers_list(client, page, db, id):
 #                    embed.add_field(name="#" + str(c+1) + " : (숨겨짐)", inline=False)
                     de += 1
                 else:
-                    embed.add_field(name="#" + str(c+1) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
+                    if li[c] == "":
+                        embed.add_field(name="#" + str(c+1) + " : " + lk[c], value="유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
+                    else:
+                        embed.add_field(name="#" + str(c+1) + " : " + lk[c], value=li[c] + "\n유저 수 : " + lu[c] + ", 서버 주인 : " + lo[c], inline=False)
                 c += 1
             except:
                 break
@@ -606,24 +629,18 @@ def level_rank(client, db):
             break
     return embed
 
-def suggest_commands(db, message):
+def suggest_commands(db, message, dt):
     if not sdb.has_section(str(message.author.id)):
         sdb.add_section(str(message.author.id))
         sdb.set(str(message.author.id), "meta_name", message.author.name)
-    if len(sdb.items(str(message.author.id))) > 6:
+    if len(sdb.items(str(message.author.id))) >= 10:
         embed = discord.Embed(m_lang.string(db, message.author.id, "too_much_suggest"))
-        embed.set_footer(text='제안한 명령어 보기 : "루냥아 제안 목록", 제안한 명령어 전체 삭제 : "루냥아 제안 삭제"')
+        embed.set_footer(text='제안 보기 : "루냥아 제안 목록", 제안 전체 삭제 : "루냥아 제안 삭제"')
     else:
         mr = message.content.replace(head(db, message) + "제안 ", "")
-        m = mr.split(" | ")
-        sdb.set(str(message.author.id), m[0], m[1])
-        embed = discord.Embed(title=m_lang.string(db, message.author.id, "suggest_command"))
-        if "&&" in m[1]:
-            li = m[1].split("&&")
-            embed.add_field(name=m[0], value=str(len(li)) + "개의 항목 중 랜덤 출현", inline=False)
-        else:
-            embed.add_field(name=m[0], value=m[1], inline=False)
-        embed.set_footer(text="해당 명령어는 운영자의 검토 이후 추가됩니다")
+        sdb.set(str(message.author.id), str(dt), mr)
+        embed = discord.Embed(title=m_lang.string(db, message.author.id, "suggest_command"), description=mr)
+        embed.set_footer(text="운영자의 검토 이후 추가됩니다")
         with open(sdb_path, 'w') as configfile:
             sdb.write(configfile)
     return embed
@@ -633,10 +650,10 @@ def list_suggests(db, message):
         embed=discord.Embed(title=m_lang.string(db, message.author.id, "no_suggest"))
     else:
         cc = 1
-        embed=discord.Embed(title=message.author.name + " 님의 명령어 제안 목록")
+        embed=discord.Embed(title=message.author.name + " 님의 제안 목록")
         for c in sdb.items(str(message.author.id)):
             if c[0] != 'meta_name':
-                embed.add_field(name="#" + str(cc) + " : " + c[0], value=c[1], inline=False)
+                embed.add_field(name="#" + str(cc), value=c[1], inline=False)
                 cc += 1
     return embed
 
@@ -745,6 +762,7 @@ def get_lotto(db, message, dt, lotto_meta, lotto_dt):
         embed.add_field(name="갱신된 번호", value=lotto_meta, inline=False)
         embed.add_field(name="결과", value=res, inline=False)
         return embed
-    except:
+    except Exception as e:
+        print(e)
         embed=discord.Embed(title=m_lang.string(db, message.author.id, "lotto_not_attended"))
         return embed

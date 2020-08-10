@@ -253,3 +253,47 @@ def seotda(message_content, user, head):
     except ValueError:
         embed = discord.Embed(title="잘못된 카드 번호입니다")
     return embed
+
+def lowhigh_strip(n):
+    if n == 0:
+        text = "A"
+    elif n == 10:
+        text = "J"
+    elif n == 11:
+        text = "Q"
+    elif n == 12:
+        text = "K"
+    else:
+        text = str(n + 1)
+    return text
+
+def lowhigh(message, head):
+    # 1  : A
+    # 10 : K
+    # 11 : Q
+    # 12 : J
+    invalid_num = False
+    m = message.content.replace(head + "로하이 ", "")
+    try:
+        power = int(m) - 1
+        if power >= 13 or power < 0:
+            invalid_num = True
+        else:
+            power = randint(0, 12)
+    except:
+        invalid_num = True
+    if message.content == head + "로하이" or invalid_num:
+        embed = discord.Embed(title="사용 방법", description="루냥아 로하이 (1 ~ 13)")
+        return embed
+    else:
+        winrate = randint(0, 99)
+        if winrate >= 50:
+            cpu_power = power
+        else:
+            cpu_power = randint(0, 12)
+        if cpu_power == power:
+            result = "승리!"
+        else:
+            result = "패배"
+        embed = discord.Embed(title=result, description="플레이어가 고른 카드 : " + lowhigh_strip(power) + "\n루냥이가 고른 카드 : " + lowhigh_strip(cpu_power))
+        return embed

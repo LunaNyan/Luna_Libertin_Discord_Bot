@@ -1,19 +1,17 @@
 [user_level]
 
-[user_tropy]
-
-[count]
-
-[server_count]
-
-[sudden_hugging]
-
 [hug_count]
 
 [bio]
 
+[lang]
+
+[guild_intro]
+
+[user_tropy]
+
 [attendance]
-today = 0, 
+today = 0
 
 [ctclink]
 
@@ -21,21 +19,52 @@ today = 0,
 
 [server_log]
 
+[user_mute]
+
 [custom_commands]
 
-[user_mute]
+[user_custom_head]
+
+[custom_head]
+
+[server_count]
+
+[volatile_channel]
+
+[welcome_message]
+
+[farewell_message]
 
 [sleep]
 
+[server_burning]
+
 [etc]
 comm_count = 0
-news_channel = 
-ndserver = 0
-createdat_nduser = 0
-createdat_ndserver = 0
 joinedat_nduser = 0
 joinedat_ndserver = 0
-adblock_channel = 
-denied_channel = 0
+createdat_nd = 0
+ndserver = 0
+news_channel = 
+denied_channel = 
+passive_denied = 0
+adblock_channel = 0
 nsfw_channel = 0
+pingpong_headless = 0
+guild_custom_headless = 0
+mplog = 0
 test_features = 
+no_sleep_cooldown = 0
+
+[lotto_meta]
+
+[lotto]
+
+[moderation]
+ban_nsfw = 0
+
+[j_sleep_cooldown]
+
+[server_code]
+
+[count]

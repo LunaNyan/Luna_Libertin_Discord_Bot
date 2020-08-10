@@ -211,10 +211,14 @@ def ext_talk(client, message, head):
 
 def server_burning(db, id):
     try:
-        b = db.get("server_burning", str(id))
+        bb = db.get("server_burning", str(id))
+        if " && " in bb:
+            bl = bb.split(" && ")
+            return random.choice(bl)
+        else:
+            raise
     except:
-        b = "저하고도 놀아줘요!"
-    return b
+        return "저하고도 놀아줘요!"
 
 def nsfw_neko(message, head):
     if message.content == head + "야짤":
@@ -251,34 +255,9 @@ def neko(message, head):
             embed.set_footer(text="powered by nekos.life")
     return embed
 
-def turnipcalc(message, head):
-    if message.content == head + "무트코인":
-        embed=discord.Embed(title="사용 방법", description="루냥아 무트코인 (패턴) (씨앗 개수)")
-        embed.add_field(name="패턴 종류", value="파도, 3기, 하락, 낙타혹")
-        return embed
-    else:
-        m = message.content.replace(head + "무트코인 ", "")
-        m = m.split(" ")
-        if m[0] == "파도":
-            pattern = 0
-        elif m[0] == "3기":
-            pattern = 1
-        elif m[0] == "하락":
-            pattern = 2
-        elif m[0] == "낙타혹":
-            pattern = 3
-        else:
-            embed=discord.Embed(title="패턴 종류", description="파도, 3기, 하락, 낙타혹")
-            return embed
-        try:
-            seedamount = m[1]
-        except:
-            embed=discord.Embed(title="사용 방법", description="루냥아 무트코인 (패턴) (씨앗 개수)")
-            return embed
-        result = str(os.popen("./data/TurnipCalc " + str(pattern) + " " + str(seedamount)).read())
-        embed=discord.Embed(title="계산 결과", description="```" + result + "```")
-        embed.set_footer(text="해당 계산 결과는 예상치이므로, 참고만 하시기 바랍니다")
-        return embed
+def turnipcalc():
+    embed=discord.Embed(title="무트코인 예측 사이트", description="[해당 사이트](https://turnipprophet.io)에서 무트코인 예측을 할 수 있습니다")
+    return embed
 
 def search_url(message, head):
     if message.content == head + "검색":

@@ -55,6 +55,7 @@ def outline_draw(d, text, x, y, rb=0, gb=0, bb=0, rf=255, gf=255, bf=255):
 
 def make_color(text, head):
     m = text.replace(head + "색상 ", "")
+    m = text.replace(head + "색상코드 ", "")
     m = m.upper()
     ms = "color hex #" + m
     h = tuple(int(m[i:i+2], 16) for i in (0, 2, 4))
