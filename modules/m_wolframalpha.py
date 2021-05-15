@@ -1,6 +1,8 @@
-import requests
-import wolframalpha
-import xmltodict
+import sys, requests, wolframalpha, xmltodict
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
 
 client = ""
 
@@ -14,6 +16,25 @@ def wa_calc(query):
     return answer
 
 def wa_img(conf, query):
+    url = 'http://api.wolframalpha.com/v1/query?input=%s&appid=%s' %(query, conf.get("wolframalpha", "appid"))
+    res = requests.get(url)
+    xml_content = res.content
+    dict_content = xmltodict.parse(xml_content)
+    results = []
+    pods = dict_content["queryresult"]["pod"]
+    try:
+        plot_url = pods["subpod"]["img"]["@src"]
+    except:
+        try:
+            plot_url = pods[3]["subpod"][0]["img"]["@src"]
+        except:
+            plot_url = pods[2]["subpod"]["img"]["@src"]
+    img_data = requests.get(plot_url).content
+    with open('wa_temp_img.gif', 'wb') as handler:
+        handler.write(img_data)
+    return 'wa_temp_img.gif'
+
+def captcha(conf, query):
     url = 'http://api.wolframalpha.com/v1/query?input=%s&appid=%s' %(query, conf.get("wolframalpha", "appid"))
     res = requests.get(url)
     xml_content = res.content

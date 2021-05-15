@@ -1,5 +1,9 @@
-import discord, m_lang
+import sys, discord, m_lang, m_user
 from random import randint, choice
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
 
 def rps_arg(text):
     if text == " 가위":
@@ -23,12 +27,12 @@ def rps_judge(player, cpu):
     else:
         return "패배!"
 
-def rps(message, user, db):
+def rps(message, head, user, db):
     if user.display_name == user.name:
         usrname = user.name
     else:
         usrname = user.display_name + "(" + user.name + ")"
-    m = message.replace("루냥아 가위바위보", "")
+    m = message.content.replace(head + "가위바위보", "")
     m = m.replace("_", "")
     p = rps_arg(m)
     if p != False:
@@ -49,6 +53,10 @@ def rps(message, user, db):
         embed.add_field(name=usrname + "의 선택", value=m, inline=True)
         embed.add_field(name="루냥이의 선택", value=cm, inline=True)
         embed.add_field(name="결과", value=r, inline=False)
+        if r == "승리!":
+            m_user.gamemoney(db, message, 60)
+        elif r == "무승부!":
+            m_user.gamemoney(db, message, 10)
     else:
         embed=discord.Embed(title=m_lang.string(db, user.id, "rps_help"), description="예시 : 루냥아 가위바위보 " + choice(["가위", "바위", "보"]))
     return embed

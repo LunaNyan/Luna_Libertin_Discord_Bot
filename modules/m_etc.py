@@ -1,6 +1,21 @@
-import psutil, base64, os, sys, hashlib
+import psutil, base64, os, sys, hashlib, datetime, discord, random
 from PIL import Image, ImageDraw, ImageFont
 import configparser
+import matplotlib.pyplot as plt
+import numpy as np
+from datetime import datetime, timedelta
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
+
+e_txt = ["오류 발생!",
+         "개발진들이 마실 카페인이 늘어났어요!",
+         "기계식 루냥이.EXE는 '우에엥 도와줘'를 사용했다!",
+         "개발진들이 C++의 놀라움을 경험했습니다",
+         "개발진들이 파이썬의 놀라움을 경험했습니다",
+         "동작 중이던 코드가 이세계행 트럭과 부딪혔습니다",
+         "개발진들이 현실을 부정하기 시작했습니다"]
 
 db_path = "db/username_db.dat"
 
@@ -53,12 +68,18 @@ def outline_draw(d, text, x, y, rb=0, gb=0, bb=0, rf=255, gf=255, bf=255):
     d.text((x+1, y+1), text, fill=(rb, gb, bb))
     d.text((x, y), text, fill=(rf, gf, bf))
 
-def make_color(text, head):
-    m = text.replace(head + "색상 ", "")
-    m = text.replace(head + "색상코드 ", "")
+def make_color(text, head, mode):
+    if mode:
+        m = text.replace(head + "색상 ", "")
+    else:
+        m = text.replace(head + "색상코드 ", "")
+    m = m[-6:]
     m = m.upper()
     ms = "color hex #" + m
-    h = tuple(int(m[i:i+2], 16) for i in (0, 2, 4))
+    try:
+        h = tuple(int(m[i:i+2], 16) for i in (0, 2, 4))
+    except:
+        raise ValueError
     img = Image.new('RGB', (200, 120), color = h)
     d = ImageDraw.Draw(img)
     outline_draw(d, ms, 10, 10)
@@ -94,3 +115,6 @@ def set_name(message):
             db.write(configfile)
     except:
         pass
+
+def err_txt():
+    return random.choice(e_txt)

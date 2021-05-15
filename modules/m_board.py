@@ -1,4 +1,8 @@
-import os, configparser, discord, math, datetime, m_etc, m_lang
+import sys, os, configparser, discord, math, datetime, m_etc, m_lang
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
 
 memo_temp_title = "66mU66qoIOyCrOyaqSDrsKnrspU="
 memo_temp_content = "IuujqOuDpeyVhCDrqZTrqqggKOuCtOyaqSkiIDog66mU66qoIOyekeyEse2VmOq4sAoi66Oo64Ol7JWEIOuplOuqqCDrqqnroZ0gKO2OmOydtOyngCkiIDog66mU66qoIOuqqeuhnSDrs7TquLAKIuujqOuDpeyVhCDrqZTrqqgg7IKt7KCcICjrsojtmLgpIiA6IOuqqeuhnSDrsojtmLjsl5Ag7ZW064u57ZWY64qUIOuplOuqqCDsgq3soJw="

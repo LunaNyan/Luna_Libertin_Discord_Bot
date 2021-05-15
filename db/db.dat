@@ -1,5 +1,7 @@
 [user_level]
 
+[sudden_hugging]
+
 [hug_count]
 
 [bio]
@@ -7,8 +9,6 @@
 [lang]
 
 [guild_intro]
-
-[user_tropy]
 
 [attendance]
 today = 0
@@ -45,18 +45,26 @@ joinedat_nduser = 0
 joinedat_ndserver = 0
 createdat_nd = 0
 ndserver = 0
-news_channel = 
-denied_channel = 
+news_channel = 0
+denied_channel = 0
 passive_denied = 0
 adblock_channel = 0
 nsfw_channel = 0
 pingpong_headless = 0
 guild_custom_headless = 0
 mplog = 0
-test_features = 
+test_features = 0
 no_sleep_cooldown = 0
+reset_guild_pending = 0
+ksat_date = 2021-11-18
+
+[permissions]
+deny_sleep = 0
+deny_megaphone = 0
 
 [lotto_meta]
+number = 9,32,45,12,42,37
+dt = 2021,5,14
 
 [lotto]
 
@@ -66,5 +74,33 @@ ban_nsfw = 0
 [j_sleep_cooldown]
 
 [server_code]
+
+[link_custom_commands_pending]
+
+[link_custom_commands]
+
+[user_passive_custom]
+
+[custom_embed]
+
+[custom_embed_nvram]
+
+[posts]
+
+[sleep_channel]
+
+[mabinogi_sujeong]
+
+[dday]
+
+[dm_custom_commands]
+
+[guild_unlock]
+
+[move_guild_pending]
+
+[gamemoney]
+
+[birthday_notification]
 
 [count]

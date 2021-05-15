@@ -1,7 +1,11 @@
 # 두장섯다 알고리즘 모듈
 
 from random import randint, shuffle
-import discord
+import sys, discord, m_user
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
 
 winning_percentage = 28
 # 승률 조정 (기본값 : 7, 범위 : 0 ~ 28)
@@ -173,10 +177,12 @@ def seotda_ready():
     shuffle(deck)
     deck = deck[:10]
 
-def seotda(message_content, user, head):
+def seotda(db, message, head):
     global result_str_player
     global result_str_cpu
     global winning_percentage
+    message_content = message.content
+    user = message.author
     if user.display_name == user.name:
         usrname = user.name
     else:
@@ -203,24 +209,30 @@ def seotda(message_content, user, head):
                         continue
                 if power_player == -1 and power_cpu <= 24: #특수족보 처리
                     result = "비겼습니다!"
+                    m_user.gamemoney(db, message, 10)
                     break
                 elif power_player <= 24 and power_cpu == -1:
                     result = "비겼습니다!"
+                    m_user.gamemoney(db, message, 10)
                     break
                 elif power_player == -2 and power_cpu <= 15:
                     result = "비겼습니다!"
+                    m_user.gamemoney(db, message, 10)
                     break
                 elif power_player <= 15 and power_cpu == -2:
                     result = "비겼습니다!"
+                    m_user.gamemoney(db, message, 10)
                     break
                 elif power_player == -3 and power_cpu >= 26 and power_cpu <= 27:
                     result = "승리!"
+                    m_user.gamemoney(db, message, 60)
                     break
                 elif power_cpu == -3 and power_player >= 26 and power_player <=27:
                     result = "패배!"
                     break
                 elif power_player == -4 and power_cpu >= 16 and power_cpu <= 24:
                     result = "승리!"
+                    m_user.gamemoney(db, message, 60)
                     break
                 elif power_cpu == -4 and power_player >= 16 and power_player <= 24:
                     result = "패배!"
@@ -231,8 +243,10 @@ def seotda(message_content, user, head):
                 elif power_player > power_cpu:
                     if power_player - power_cpu == 1:
                         result = "한 끗 차이로 승리!"
+                        m_user.gamemoney(db, message, 110)
                     else:
                         result = "승리!"
+                        m_user.gamemoney(db, message, 60)
                     break
                 elif power_player < power_cpu:
                     if power_cpu - power_player == 1:
@@ -267,7 +281,7 @@ def lowhigh_strip(n):
         text = str(n + 1)
     return text
 
-def lowhigh(message, head):
+def lowhigh(db, message, head):
     # 1  : A
     # 10 : K
     # 11 : Q
@@ -286,14 +300,19 @@ def lowhigh(message, head):
         embed = discord.Embed(title="사용 방법", description="루냥아 로하이 (1 ~ 13)")
         return embed
     else:
-        winrate = randint(0, 99)
-        if winrate >= 50:
-            cpu_power = power
+        if m_user.gamemoney(db, message) < 10:
+            embed=discord.Embed(title=m_lang.string(db, message.author.id, "not_enough_gamemoney"), desctiption=m_lang.string(db, message.author.id, "not_enough_gamemoney_desc"))
         else:
-            cpu_power = randint(0, 12)
-        if cpu_power == power:
-            result = "승리!"
-        else:
-            result = "패배"
-        embed = discord.Embed(title=result, description="플레이어가 고른 카드 : " + lowhigh_strip(power) + "\n루냥이가 고른 카드 : " + lowhigh_strip(cpu_power))
+            m_user.gamemoney(db, message, -10)
+            winrate = randint(0, 99)
+            if winrate >= 50:
+                cpu_power = power
+            else:
+                cpu_power = randint(0, 12)
+            if cpu_power == power:
+                result = "승리!"
+                m_user.gamemoney(db, message, 40)
+            else:
+                result = "패배"
+            embed = discord.Embed(title=result, description="플레이어가 고른 카드 : " + lowhigh_strip(power) + "\n루냥이가 고른 카드 : " + lowhigh_strip(cpu_power))
         return embed

@@ -1,4 +1,8 @@
-import csv
+import sys, csv
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
 
 f = open('data/reply_reaction.csv', 'r', encoding='utf-8')
 rdr = csv.reader(f)

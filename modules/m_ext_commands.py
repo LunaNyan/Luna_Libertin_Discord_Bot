@@ -1,5 +1,9 @@
-import discord, random, m_etc, m_pingpong, m_lang, nekos, os
+import sys, discord, random, m_etc, m_pingpong, m_lang, nekos, os
 from m_user import ret_check
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
 
 comm_d = {'점프':'(쫑긋)폴짝! >_<',
           '굴러':'(쫑긋)데굴데굴~ >_<',
@@ -151,9 +155,18 @@ def l_ticket(message, head, db):
     except:
         return m_lang.string(db, message.author.id, "ticket_wrong_indent")
 
-def say_lv():
-    say_lv_str = ["(꼬옥", "(껴안", "(쓰다듬"]
-    return random.choice(say_lv_str)
+def say_lv(message, db):
+    try:
+        lv_cus = db.get("user_passive_custom", str(message.author.id))
+        if " && " in lv_cus:
+            say_lv_str = lv_cus.split(" && ")
+            say_lv_str = random.choice(say_lv_str)
+        else:
+            say_lv_str = lv_cus
+    except:
+        say_lv_str = ["(꼬옥", "(껴안", "(쓰다듬"]
+        say_lv_str = random.choice(say_lv_str)
+    return say_lv_str
 
 def say_shuffle(message, head):
     q = message.content.replace(head + "섞어줘 ", "")
@@ -268,4 +281,7 @@ def search_url(message, head):
         query = query2.replace(" ", "%20")
         embed=discord.Embed(title="검색 결과 : " + query2, description="[구글](https://google.com/search?q=" + query + ")\n\n[네이버](https://search.naver.com/search.naver?query=" + query + ")\n\n[유튜브](https://www.youtube.com/results?search_query=" + query + ")\n\n[나무위키](https://namu.wiki/Search?q=" + query + ")")
         return embed
-    
+
+def genshingacha():
+    embed=discord.Embed(title="STUDIO ONE의 신규 프로젝트!", description="[여기를 눌러](https://discord.com/oauth2/authorize?client_id=597782781673865216&scope=bot&permissions=0) 봇을 초대할 수 있습니다")
+    return embed

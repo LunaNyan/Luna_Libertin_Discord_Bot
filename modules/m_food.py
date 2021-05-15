@@ -1,6 +1,10 @@
-import random
+import sys, random
 
-DB_VERSION = "19121401"
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
+
+DB_VERSION = "19121401_fix"
 
 lf_list = ["메가맥 세트에서 야채 다 빼고 ㄱ",
            "이마트24 가서 속풀라면 ㄱ",

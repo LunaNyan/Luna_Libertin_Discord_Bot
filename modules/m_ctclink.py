@@ -1,4 +1,8 @@
-import random
+import sys, random
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
 
 prev_code = ""
 

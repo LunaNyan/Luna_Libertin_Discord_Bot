@@ -1,12 +1,16 @@
-import configparser
+import sys, configparser
+
+if __name__=="__main__":
+    print("FATAL   : Run this bot from right way.")
+    sys.exit(1)
 
 kr_def = configparser.ConfigParser()
 kr_ban = configparser.ConfigParser()
 en_def = configparser.ConfigParser()
 
-kr_def.read("lang/lang_kr_default.dat")
-kr_ban.read("lang/lang_kr_ban.dat")
-en_def.read("lang/lang_en_default.dat")
+kr_def.read("lang/kr_default.lld")
+kr_ban.read("lang/kr_lower.lld")
+en_def.read("lang/en_default.lld")
 
 def string(db, id, call):
     try:
